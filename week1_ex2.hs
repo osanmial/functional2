@@ -28,13 +28,16 @@ class Semigroup a => Monoid a where
 --{ By bool.a  in reverse}
 -- (a <> b ) <> c 
 -- = RHS
-
 instance Semigroup Bool where
   a <> b = a && b      --- boool.1
 
 -- True is mempty in terms of AND operation
 instance Monoid Bool where
   mempty = True
+
+
+
+
 -- Just xs <> (Just ys <> Just zs) =? (Just xs <> Just ys) <> Just zs 
 --LHS=	Just xs <> (Just ys <> Just zs)
 --{By applying Just.1}
@@ -45,13 +48,9 @@ instance Monoid Bool where
 --{By applying Just.1}
 -- = Just (xs <> ys) <> Just zs
 --{By applying Just.1}
--- = Just (xs <> ys <> zs) --- .1
+-- = Just (xs <> ys <> zs)  .....1
 -- {from .1 and .2 }
---RHS == LHs
-
-
-
-
+--RHS == LHS
 instance Semigroup a => Semigroup (Maybe a) where
   (Just xs) <> (Just ys) = Just (xs <> ys)   --Just.1
   Nothing  <> ys         = ys
@@ -72,8 +71,24 @@ instance (Monoid a, Monoid b) => Monoid (Either a b) where
   mempty = Right mempty
 
 
+
+--Proving associativity for id function
+-- a <> (b <> c)= (a <> b) <> c 
+-- LHS=a <> (b <> c)
+--{By applying fun.1 } 
+-- = a <> (id)
+--{By applying fun.1 } 
+-- = id                      ...fun.2 
+
+-- RHS=(a <> b) <> c
+--{By applying fun.1 } 
+-- = (id) <> c 
+--{By applying fun.1 } 
+-- = id                     ...fun.3
+--{from fun.2 and fun.3}
+-- RHS == LHS
 instance Semigroup (a -> a) where
-  _ <> _ = id 
+  _ <> _ = id       --- fun.1
 
 instance Monoid (a -> a) where
   mempty = id
