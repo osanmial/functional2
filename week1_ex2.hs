@@ -13,11 +13,15 @@ class Semigroup a => Monoid a where
   mempty :: a
 
 
+-- AND operator is accociative
+-- a && (b && c) = (a && b) && c 
 instance Semigroup Bool where
   a <> b = a && b
 
+-- True is mempty in terms of AND operation
 instance Monoid Bool where
   mempty = True
+
 
 
 instance Semigroup a => Semigroup (Maybe a) where
@@ -45,6 +49,7 @@ instance Semigroup (a -> a) where
 
 instance Monoid (a -> a) where
   mempty = id
+  
 
 instance (Semigroup a, Semigroup b) => Semigroup (a, b) where
  (x1, y1) <> (x2, y2) = ((x1 <> x2), (y1 <> y2))
