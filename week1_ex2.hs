@@ -5,7 +5,7 @@ import Prelude hiding (Semigroup, Monoid, (<>), mempty)
 class Semigroup a where
   (<>) :: a -> a -> a
 
-class Monoid a where
+class Semigroup a => Monoid a where
   mempty :: a
 
 
