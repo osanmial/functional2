@@ -94,15 +94,44 @@ instance Monoid (a -> a) where
   mempty = id
   
 
-instance (Semigroup a, Semigroup b) => Semigroup (a, b) where
- (x1, y1) <> (x2, y2) = ((x1 <> x2), (y1 <> y2))
 
+
+--Proving associativity for Pair. 
+-- (x1, y1) <> ((x2, y2) <> (x3,y3)) =? ((x1, y1) <> (x2, y2)) <> (x3,y3) 
+--LHS= (x1, y1) <> ((x2, y2) <> (x3,y3))
+-- {BY applying pa.1}
+-- =(x1,y1) <> ((x2 <> x3), (y2 <> y3))
+-- {BY applying pa.1}
+-- =((x1 <> (x2 <> x3)), (y1 <> (y2 <> y3))
+-- {BY depend on that x and y are simigroup so associativity is satisfied}
+-- = (((x1<> x2 )<> x3),(y1 <> y2 ) <> y3 )    
+-- {By applying -- pa.1 in reverse}
+-- ((x1 <> x2),( y1 <> y2)) <> (x3, y3)
+-- {By applying -- pa.1 in reverse}
+-- ((x1,y1) <> (x2 ,y2)) <> (x3 , y3 )
+-- == RHS 
+instance (Semigroup a, Semigroup b) => Semigroup (a, b) where
+ (x1, y1) <> (x2, y2) = ((x1 <> x2), (y1 <> y2))   -- pa.1
 instance (Monoid a, Monoid b) => Monoid (a, b) where
   mempty = (mempty, mempty)
 
 
+
+--Proving associativity for (). 
+-- () <> (() <> ()) =? (() <> ()) <> () 
+--LHS= () <> (() <> ())
+-- {BY applying paran.1}
+-- () <> (())
+-- {BY applying paran.1}
+-- = ()
+
+--RHS = (() <> ()) <> ()
+-- {BY applying paran.1}
+-- = (()) <> ()
+-- {BY applying paran.1}
+-- = () == LHS  
 instance Semigroup () where
-  _ <> _ = ()
+  _ <> _ = ()             -- paran.1 
 
 instance Monoid () where
   mempty = ()
