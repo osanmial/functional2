@@ -21,11 +21,25 @@ instance Semigroup Bool where
 -- True is mempty in terms of AND operation
 instance Monoid Bool where
   mempty = True
+-- Just xs <> (Just ys <> Just zs) =? (Just xs <> Just ys) <> Just zs 
+--LHS=	Just xs <> (Just ys <> Just zs)
+--{By applying Just.1}
+-- =Just xs <> Just (xs <> ys )
+--{By applying Just.1}
+-- = Just (xs <> ys <> zs)  ... .2
+--RHS=  (Just xs <> Just ys) <> Just zs 
+--{By applying Just.1}
+-- = Just (xs <> ys) <> Just zs
+--{By applying Just.1}
+-- = Just (xs <> ys <> zs) --- .1
+-- {from .1 and .2 }
+--RHS == LHs
+
 
 
 
 instance Semigroup a => Semigroup (Maybe a) where
-  (Just xs) <> (Just ys) = Just (xs <> ys)
+  (Just xs) <> (Just ys) = Just (xs <> ys)   --Just.1
   Nothing  <> ys         = ys
   xs       <> Nothing    = xs
 
