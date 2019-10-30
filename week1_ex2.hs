@@ -14,9 +14,23 @@ class Semigroup a => Monoid a where
 
 
 -- AND operator is accociative
+-- a <> (b <> c)= (a <> b) <> c 
+-- LHS = a <> (b <> c)
 -- a && (b && c) = (a && b) && c 
+-- { By bool.a }
+-- a <> (b && c) 
+-- { By bool.a }
+-- a && (b && c)
+-- {And is assoctive}
+-- (a && b) && C
+--{ By bool.a  in reverse}
+-- (a <> b ) && c 
+--{ By bool.a  in reverse}
+-- (a <> b ) <> c 
+-- = RHS
+
 instance Semigroup Bool where
-  a <> b = a && b
+  a <> b = a && b      --- boool.1
 
 -- True is mempty in terms of AND operation
 instance Monoid Bool where
