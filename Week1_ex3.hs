@@ -4,6 +4,17 @@ module Week1_ex3 where
 import Control.Monad.State
 import Data.List
 
+{-
+TODO:
+Fractional (/)
+Eq (==)
+Applicative pure ->  Oskari ei tunne ei oo familiar
+Enum pred
+Ord compare
+
+
+-}
+
 -- class Transaction k m a where
 --    recall :: k -> m a
 --    store :: k -> a -> m ()
