@@ -1,4 +1,4 @@
-module Week1_ex1 where
+module Week1_ex3 where
 
 import Control.Monad.State
 import Data.List
