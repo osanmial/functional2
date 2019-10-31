@@ -1,11 +1,14 @@
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeSynonymInstances #-}
 module Week1_ex3 where
 
 import Control.Monad.State
 import Data.List
 
-class Transaction k m a where
-  recall :: k -> m a
-  store :: k -> a -> m ()
+-- class Transaction k m a where
+--   recall :: k -> m a
+--   store :: k -> a -> m ()
+
+data Transaction k m a = Trans {recall :: k -> m a, store :: k -> a -> m ()}
 
 data Cursor a = WayBefore | Before [a] | At [a] a [a] | After [a] | WayAfter
 
