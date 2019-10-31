@@ -103,3 +103,8 @@ instance (Ord k, Eq a) => Eq (Map k a) where
   (==) xs ys = isSubmapOfBy (==) xs ys && isSubmapOfBy (==) ys xs  
 
 --tests = (id::Eq (a->a) => (a->a)) == (id::Eq (a->a) => (a->a))
+
+
+
+
+
