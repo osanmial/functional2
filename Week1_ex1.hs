@@ -1,4 +1,4 @@
-module Week1_1 where
+module Week1_ex1 where
 
 import Prelude hiding (Eq, (==))
 import Data.List.NonEmpty 
