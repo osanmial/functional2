@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Week1_1 where
 
 import Prelude hiding (Eq, (==))
@@ -97,7 +98,7 @@ t: Neither of the inputs are related to the output so the rule holds
 -- Empty list cannot be handled for some reason
 
 instance Eq a => Eq [a] where
-  --(==) []  []       = True
+  (==) []  []       = True
   (==) (x:xs) (y:ys) = (x == y) && (xs == ys)
   (==) _      _      = False
 
