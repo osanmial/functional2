@@ -156,8 +156,6 @@ instance Monoid () where
 --{From str.2 and str.3}
 -- RHS ==LHS 
 
-
-
 instance Semigroup [a] where
   xs <> ys = xs ++ ys   -- str.1 
 
@@ -165,8 +163,21 @@ instance Monoid [a] where
   mempty = []
 
 
+-- ((x :| xs) <> (y :| ys)) (z:zs) =? (x :| xs) <> ((y :| ys) (z:zs))
+-- LHS = ((x :| xs) <> (y :| ys)) (z :|zs) 
+-- {By using str*}
+-- x:| (xs ++y:ys ) <> ( z:|zs)
+-- {By using str*}
+-- x:| (xs ++ y:ys ++ z:zs) ... str*1 
+-- RHS=(x :| xs) <> ((y :| ys) (z:zs))
+-- {By using str*}
+-- (x:|xs) <> (y:|(ys++z:zs))
+-- {By using str*}
+-- x:|(xs ++ y:ys++z:zs)
+
+
 instance Semigroup (NonEmpty a) where
-  (x :| xs) <> (y :| ys) = x :| (xs ++ y:ys)
+  (x :| xs) <> (y :| ys) = x :| (xs ++ y:ys) -- str* 
 
 
 instance (Ord k, Semigroup a) => Semigroup (Map k a) where
