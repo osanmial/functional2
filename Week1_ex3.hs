@@ -1,16 +1,12 @@
 module Week1_ex3 where
 
-import Prelude hiding ((==), Eq, Ord, compare)
+import Prelude hiding ((==), Eq, Ord, compare, Enum, pred)
 import Control.Monad.State
 import Data.List
 
 {-
 TODO:
-Fractional (/)
-Applicative pure ->  Oskari ei tunne ei oo familiar
 Enum pred
-
-
 -}
 
 -- class Transaction k m a where
@@ -18,6 +14,14 @@ Enum pred
 --    store :: k -> a -> m ()
 
 data Transaction k m a = Trans {recall :: k -> m a, store :: k -> a -> m ()}
+
+data Enum a = Enum {predSomething :: a -> a}
+
+enumInt :: Enum Int
+enumInt = Enum { predSomething = \x -> x - 1}
+
+pred :: Int -> Int
+pred = (predSomething enumInt)
 
 data Eq a = Eq { equal :: a -> a -> Bool }
 
@@ -41,7 +45,7 @@ ordInt = Ord {compareSomething = f}
     f :: Int -> Int -> Ordering
     f x y
       | x ==y                  = EQ
-      | (x -y) == (abs (x -y)) = GT
+      | (x - y) == (abs (x - y)) = GT
       | otherwise              = LT
 
 compare :: Int -> Int -> Ordering
