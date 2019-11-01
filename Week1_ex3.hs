@@ -4,18 +4,28 @@ import Prelude hiding ((==), Eq, Ord, compare, Enum, pred)
 import Control.Monad.State
 import Data.List
 
+{-
+These redefenitions of '(==) :: Int -> Int -> Bool' and 'pred :: Int -> Int'
+and so on are there just so we could get away with not modifying
+the rest of the source code.
+
+In a real solution that would obviously a bad idea.
+
+Note that the 'real' versions of these classes and functions are hidden. 
+-}
+
 -- class Transaction k m a where
 --    recall :: k -> m a
 --    store :: k -> a -> m ()
 
 data Transaction k m a = Trans {recall :: k -> m a ,store :: k -> a -> m ()}
-data Eq a = { (==):: a -> a-> Bool} 
 
 data Enum a = Enum {predSomething :: a -> a}
 
 enumInt :: Enum Int
 enumInt = Enum { predSomething = \x -> x - 1}
 
+-- See. top blurb
 pred :: Int -> Int
 pred = (predSomething enumInt)
 
@@ -30,6 +40,7 @@ eqInt = Eq { equal = f }
     f 0 _ = False
     f x y = f (x - y) 0 
 
+-- See. top blurb
 (==) :: Int -> Int -> Bool
 x == y = (equal eqInt) x y
 
@@ -44,6 +55,7 @@ ordInt = Ord {compareSomething = f}
       | (x - y) == (abs (x - y)) = GT
       | otherwise              = LT
 
+-- See. top blurb
 compare :: Int -> Int -> Ordering
 compare = (compareSomething ordInt)
 
