@@ -1,5 +1,6 @@
 module Week1_ex3 where
 
+import Prelude hiding ((==), Eq)
 import Control.Monad.State
 import Data.List
 
@@ -19,6 +20,28 @@ Ord compare
 --    store :: k -> a -> m ()
 
 data Transaction k m a = Trans {recall :: k -> m a, store :: k -> a -> m ()}
+
+data Eq a = Eq { equal :: a -> a -> Bool }
+
+eqInt :: Eq Int
+eqInt = Eq { equal = f }
+  where
+    f :: Int -> Int -> Bool
+    f 0 0 = True
+    f _ 0 = False
+    f 0 _ = False
+    f x y = f (x - y) 0 
+
+(==) :: Int -> Int -> Bool
+x == y = (equal eqInt) x y
+
+--data Ord a = Ord { compare :: a -> a -> Ordering }
+
+--ordInt :: Ord Int
+--ordInt = Ord {compare = f}
+--  where
+--    f :: Int -> Int -> Ordering
+--    f = undefined
 
 data Cursor a = WayBefore | Before [a] | At [a] a [a] | After [a] | WayAfter
 
