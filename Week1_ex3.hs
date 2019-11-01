@@ -4,11 +4,6 @@ import Prelude hiding ((==), Eq, Ord, compare, Enum, pred)
 import Control.Monad.State
 import Data.List
 
-{-
-TODO:
-Enum pred
--}
-
 -- class Transaction k m a where
 --    recall :: k -> m a
 --    store :: k -> a -> m ()
