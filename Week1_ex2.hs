@@ -139,13 +139,27 @@ instance (Monoid a, Monoid b) => Monoid (a, b) where
 -- = () == LHS  
 instance Semigroup () where
   _ <> _ = ()             -- paran.1 
-
 instance Monoid () where
   mempty = ()
 
+-- (xs <> ys )<> zs =? xs <> (ys <> zs )
+-- LHS=(xs <> ys )<> zs 
+--{By usig str.1} 
+--(xs++ys) <> zs
+--{By usig str.1} 
+--(xs++ys++zs).. str.2
+-- RHS= xs <> (ys <> zs )
+--{By usig str.1} 
+--xs <> (ys++zs)
+--{By usig str.1} 
+-- (xs++ys++zs)  .. str.3
+--{From str.2 and str.3}
+-- RHS ==LHS 
+
+
 
 instance Semigroup [a] where
-  xs <> ys = xs ++ ys
+  xs <> ys = xs ++ ys   -- str.1 
 
 instance Monoid [a] where
   mempty = []
