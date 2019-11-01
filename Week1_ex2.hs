@@ -184,6 +184,10 @@ instance Semigroup (NonEmpty a) where
   (x :| xs) <> (y :| ys) = x :| (xs ++ y:ys) -- str* 
 
 
+-- Void doesn't have any instances
+-- intance Semigroup Void where
+
+
 -- Since IO doesn't have decidable equivelence, so it can't be a semigroup
 -- instance Semigroup a => Semigroup (IO a) where
 
