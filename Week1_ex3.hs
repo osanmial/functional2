@@ -1,16 +1,14 @@
 module Week1_ex3 where
 
-import Prelude hiding ((==), Eq)
+import Prelude hiding ((==), Eq, Ord, compare)
 import Control.Monad.State
 import Data.List
 
 {-
 TODO:
 Fractional (/)
-Eq (==)
 Applicative pure ->  Oskari ei tunne ei oo familiar
 Enum pred
-Ord compare
 
 
 -}
@@ -35,13 +33,19 @@ eqInt = Eq { equal = f }
 (==) :: Int -> Int -> Bool
 x == y = (equal eqInt) x y
 
---data Ord a = Ord { compare :: a -> a -> Ordering }
+data Ord a = Ord { compareSomething :: a -> a -> Ordering }
 
---ordInt :: Ord Int
---ordInt = Ord {compare = f}
---  where
---    f :: Int -> Int -> Ordering
---    f = undefined
+ordInt :: Ord Int
+ordInt = Ord {compareSomething = f}
+  where
+    f :: Int -> Int -> Ordering
+    f x y
+      | x ==y                  = EQ
+      | (x -y) == (abs (x -y)) = GT
+      | otherwise              = LT
+
+compare :: Int -> Int -> Ordering
+compare = (compareSomething ordInt)
 
 data Cursor a = WayBefore | Before [a] | At [a] a [a] | After [a] | WayAfter
 
