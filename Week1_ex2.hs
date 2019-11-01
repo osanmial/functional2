@@ -37,7 +37,6 @@ instance Monoid Bool where
 
 
 
-
 -- Just xs <> (Just ys <> Just zs) =? (Just xs <> Just ys) <> Just zs 
 --LHS=	Just xs <> (Just ys <> Just zs)
 --{By applying Just.1}
@@ -59,10 +58,21 @@ instance Semigroup a => Semigroup (Maybe a) where
 instance Monoid a => Monoid (Maybe a) where
   mempty = Nothing
 
-
--- Show doesn't work on this for some reason
+--(Left x) <> ((Left y) <> (Left z))=?((Left x) <> (Left y))<> (Left z)
+--LHS =(Left x) <> ((Left y) <> (Left z))
+--{By using Either.1}
+-- (Left x ) <> (Left (y <> z ))
+--{By using Either.1}
+--Left (x <> (y <> z))
+--{x,y,z belong to Semigroup} 
+-- = Left ((x <> y ) <> z )
+-- {By using Either.1 in reverse }
+-- = (Left (x <> y)) <> (Left z)
+-- {BY using Either.1 in reverse}
+-- = ((Left x) <> (Left y)) <> (Left z)
+-- == RHS 
 instance (Semigroup a, Semigroup b) => Semigroup (Either a b) where
-  (Left x)  <> (Left y)  = Left  (x <> y)
+  (Left x)  <> (Left y)  = Left  (x <> y)       --- Either.1
   (Right x) <> (Right y) = Right (x <> y)
   (Left x)  <> _         = Left x
   _         <> Left y    = Left y
@@ -92,9 +102,6 @@ instance Semigroup (a -> a) where
 
 instance Monoid (a -> a) where
   mempty = id
-  
-
-
 
 --Proving associativity for Pair. 
 -- (x1, y1) <> ((x2, y2) <> (x3,y3)) =? ((x1, y1) <> (x2, y2)) <> (x3,y3) 

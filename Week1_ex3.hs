@@ -18,7 +18,8 @@ Ord compare
 --    recall :: k -> m a
 --    store :: k -> a -> m ()
 
-data Transaction k m a = Trans {recall :: k -> m a, store :: k -> a -> m ()}
+data Transaction k m a = Trans {recall :: k -> m a ,store :: k -> a -> m ()}
+data Eq a = { (==):: a -> a-> Bool} 
 
 data Cursor a = WayBefore | Before [a] | At [a] a [a] | After [a] | WayAfter
 
