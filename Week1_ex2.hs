@@ -81,6 +81,25 @@ instance (Monoid a, Monoid b) => Monoid (Either a b) where
   mempty = Right mempty
 
 
+--Proving associativity for Pair. 
+-- (x1, y1) <> ((x2, y2) <> (x3,y3)) =? ((x1, y1) <> (x2, y2)) <> (x3,y3) 
+--LHS= (x1, y1) <> ((x2, y2) <> (x3,y3))
+-- {BY applying pa.1}
+-- =(x1,y1) <> ((x2 <> x3), (y2 <> y3))
+-- {BY applying pa.1}
+-- =((x1 <> (x2 <> x3)), (y1 <> (y2 <> y3))
+-- {BY depend on that x and y are simigroup so associativity is satisfied}
+-- = (((x1<> x2 )<> x3),(y1 <> y2 ) <> y3 )    
+-- {By applying -- pa.1 in reverse}
+-- ((x1 <> x2),( y1 <> y2)) <> (x3, y3)
+-- {By applying -- pa.1 in reverse}
+-- ((x1,y1) <> (x2 ,y2)) <> (x3 , y3 )
+-- == RHS 
+instance (Semigroup a, Semigroup b) => Semigroup (a, b) where
+ (x1, y1) <> (x2, y2) = ((x1 <> x2), (y1 <> y2))   -- pa.1
+instance (Monoid a, Monoid b) => Monoid (a, b) where
+  mempty = (mempty, mempty)
+
 
 --Proving associativity for id function
 -- a <> (b <> c)= (a <> b) <> c 
@@ -103,25 +122,9 @@ instance Semigroup (a -> a) where
 instance Monoid (a -> a) where
   mempty = id
 
---Proving associativity for Pair. 
--- (x1, y1) <> ((x2, y2) <> (x3,y3)) =? ((x1, y1) <> (x2, y2)) <> (x3,y3) 
---LHS= (x1, y1) <> ((x2, y2) <> (x3,y3))
--- {BY applying pa.1}
--- =(x1,y1) <> ((x2 <> x3), (y2 <> y3))
--- {BY applying pa.1}
--- =((x1 <> (x2 <> x3)), (y1 <> (y2 <> y3))
--- {BY depend on that x and y are simigroup so associativity is satisfied}
--- = (((x1<> x2 )<> x3),(y1 <> y2 ) <> y3 )    
--- {By applying -- pa.1 in reverse}
--- ((x1 <> x2),( y1 <> y2)) <> (x3, y3)
--- {By applying -- pa.1 in reverse}
--- ((x1,y1) <> (x2 ,y2)) <> (x3 , y3 )
--- == RHS 
-instance (Semigroup a, Semigroup b) => Semigroup (a, b) where
- (x1, y1) <> (x2, y2) = ((x1 <> x2), (y1 <> y2))   -- pa.1
-instance (Monoid a, Monoid b) => Monoid (a, b) where
-  mempty = (mempty, mempty)
 
+-- (a -> b) is an impossible function by itself
+--instance Semigroup (a -> b) where
 
 
 --Proving associativity for (). 
@@ -142,6 +145,7 @@ instance Semigroup () where
 instance Monoid () where
   mempty = ()
 
+
 -- (xs <> ys )<> zs =? xs <> (ys <> zs )
 -- LHS=(xs <> ys )<> zs 
 --{By usig str.1} 
@@ -155,9 +159,6 @@ instance Monoid () where
 -- (xs++ys++zs)  .. str.3
 --{From str.2 and str.3}
 -- RHS ==LHS 
-
-
-
 instance Semigroup [a] where
   xs <> ys = xs ++ ys   -- str.1 
 
@@ -168,6 +169,9 @@ instance Monoid [a] where
 instance Semigroup (NonEmpty a) where
   (x :| xs) <> (y :| ys) = x :| (xs ++ y:ys)
 
+
+-- Since IO doesn't have decidable equivelence, so it can't be a semigroup
+-- instance Semigroup a => Semigroup (IO a) where
 
 instance (Ord k, Semigroup a) => Semigroup (Map k a) where
   xs <> ys = unionWith (<>) xs ys
