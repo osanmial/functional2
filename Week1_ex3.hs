@@ -1,6 +1,9 @@
+{-# LANGUAGE MagicHash #-}
+
 module Week1_ex3 where
 
-import Prelude hiding ((==), Eq, Ord, compare, Enum, pred)
+import Prelude hiding ((==), Eq, Ord, compare, Enum, pred, Num, (-))
+import GHC.Exts
 import Control.Monad.State
 import Data.List
 
@@ -20,10 +23,24 @@ Note that the 'real' versions of these classes and functions are hidden.
 
 data Transaction k m a = Trans {recall :: k -> m a ,store :: k -> a -> m ()}
 
+data Num a = Num {minus :: a -> a -> a}
+
+numInt :: Num Int
+numInt = Num {minus = f}
+  where
+    f (I# x#) (I# y#) = I# (x# -# y#)
+
+-- See. top blurb
+(-) :: Int -> Int -> Int
+(-) = (minus numInt)
+
 data Enum a = Enum {predSomething :: a -> a}
 
 enumInt :: Enum Int
-enumInt = Enum { predSomething = \x -> x - 1}
+enumInt = Enum { predSomething = f}
+  where
+    f :: Int -> Int
+    f x = x - 1
 
 -- See. top blurb
 pred :: Int -> Int
@@ -35,10 +52,7 @@ eqInt :: Eq Int
 eqInt = Eq { equal = f }
   where
     f :: Int -> Int -> Bool
-    f 0 0 = True
-    f _ 0 = False
-    f 0 _ = False
-    f x y = f (x - y) 0 
+    f (I# x) (I# y) = isTrue# (x ==# y)
 
 -- See. top blurb
 (==) :: Int -> Int -> Bool
@@ -51,9 +65,9 @@ ordInt = Ord {compareSomething = f}
   where
     f :: Int -> Int -> Ordering
     f x y
-      | x ==y                  = EQ
+      | x ==y                    = EQ
       | (x - y) == (abs (x - y)) = GT
-      | otherwise              = LT
+      | otherwise                = LT
 
 -- See. top blurb
 compare :: Int -> Int -> Ordering
