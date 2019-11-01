@@ -8,7 +8,8 @@ import Data.List
 --    recall :: k -> m a
 --    store :: k -> a -> m ()
 
-data Transaction k m a = Trans {recall :: k -> m a, store :: k -> a -> m ()}
+data Transaction k m a = Trans {recall :: k -> m a ,store :: k -> a -> m ()}
+data Eq a = { (==):: a -> a-> Bool} 
 
 data Enum a = Enum {predSomething :: a -> a}
 
