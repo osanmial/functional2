@@ -189,10 +189,9 @@ instance Semigroup (NonEmpty a) where
 
 
 -- Since IO doesn't have decidable equivelence, so it can't be a semigroup
--- instance Semigroup a => Semigroup (IO a) where
+--instance Semigroup a => Semigroup (IO a) where
 
-<<<<<<< HEAD
-=======
+
 -- xs <> (ys <> zs) =? (xs <> ys ) <> zs
 --LHS = xs <> (ys <> zs)
 --{By using map.1}
@@ -207,7 +206,6 @@ instance Semigroup (NonEmpty a) where
 -- =(unionWith (<>) (unionWith (<>) xs ys) zs)
 
 -- Since the unionWith is associative so the order does not play any rule. Safely we can claim that RHS==LHS  
->>>>>>> 91092684799f9d68d13b97f13d9096dd2a362e3e
 
 instance (Ord k, Semigroup a) => Semigroup (Map k a) where
   xs <> ys = unionWith (<>) xs ys   -- map.1
