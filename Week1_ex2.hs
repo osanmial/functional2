@@ -191,6 +191,7 @@ instance Semigroup (NonEmpty a) where
 -- Since IO doesn't have decidable equivelence, so it can't be a semigroup
 -- instance Semigroup a => Semigroup (IO a) where
 
+
 instance (Ord k, Semigroup a) => Semigroup (Map k a) where
   xs <> ys = unionWith (<>) xs ys
 
