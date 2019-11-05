@@ -65,7 +65,9 @@ instance Functor (Costar m a) where
   fmap f (Costar g) = Costar (f . g)
 
 instance Functor m => Functor (Yoneda m) where
-  fmap f (Yoneda xs) = undefined
+  fmap f (Yoneda xs) = Yoneda (xs . e)
+    where
+      e ca = ca . f
 
 instance Functor (Coyoneda m) where
-  fmap f (Coyoneda _ _) = undefined
+  fmap f (Coyoneda xs ys) = Coyoneda (f . xs) ys
