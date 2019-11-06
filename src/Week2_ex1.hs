@@ -51,14 +51,13 @@ instance Functor Maybe where
 
 -- By the nature of fmap we can change the last type, in this example the Right
 -- fmap (f.g) (Righ x) =? (fmap f . fmap g ) (Right x)
---RHS=fmap (f.g) (Righ x)
+--LHS=fmap (f.g) (Righ x)
 --{By applying E.1}
 -- Right((f.g) x)
 --{By definition of (.)}
 -- Right (f (g x))                    --E.2
 
-
--- LHS = (fmap f . fmap g ) (Right x)
+--RHS = (fmap f . fmap g ) (Right x)
 --By definition of (.)}
 -- == fmap f (fmap g (Righ x))
 --{By applying E.1}
@@ -73,10 +72,41 @@ instance Functor (Either a) where
 
 
 
+
+
+
+-- bimpa (f . g) (h . i) (Left x) =?   (bimap f h . bimap g i) (Left  x))
+-- LHS=  bimap (f . g) (h . i) (Left x)
+--{By applying BE.1}
+-- Left ((f.g) x)
+--{By definition of (.)}
+-- Left (f (g x))                             --BE.2
+
+-- RHS = (bimap f h . bimap g i) (Left  x)) 
+--{By definition of (.)}
+-- bimap f h  (bimap g i (Left x))
+--{By applying BE.1}
+--bimap f h (Left (g x))
+--{By applying BE.1}
+--Left (f (g x))                              --BE.3
+-- {From BE.1 and BE.2}
+-- RHS == LHS 
+
+--In similar way we can prover: 
+-- bimpa (f . g) (h . i) (Right x) ==   (bimap f h . bimap g i) (Right  x))
 -- This has a value of two types so we can use bifunctor
 instance Bifunctor Either where
-  bimap f g (Left x)  = Left (f x)
+  bimap f g (Left x)  = Left (f x)                  --BE.1
   bimap f g (Right y) = Right (g y)
+
+
+
+
+
+
+
+
+
 
 -- By the nature of fmap we can change the last type,
 -- in this example the latter type of the tuple
