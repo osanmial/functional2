@@ -21,10 +21,16 @@ class Profunctor m where
 
 -- Bool doesn't admit a functor, because it's not a wrapper of any kind
 
--- This has value of one type so it can me fmapped over
+-- With Nothing the function doesn't matter, the result will always be Nothing
+-- 'id x == x so' 'fmap id (Just x)' will always be 'Just x'
+
+--fmap (f.g) (Just x) =? (fmap f . fmap g ) (Just x)
+--LHS= fmap (f.g) (Just x)
+--{By using M1}
+--Just ()
 instance Functor Maybe where
-  fmap f (Just x) = Just (f x)
-  fmap f Nothing  = Nothing
+  fmap f (Just x) = Just (f x) --M.1
+  fmap _ Nothing  = Nothing
 
 -- By the nature of fmap we can change the last type, in this example the Right
 instance Functor (Either a) where

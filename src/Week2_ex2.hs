@@ -20,11 +20,11 @@ class Functor m where
 
 
 instance (Functor f, Functor g) => Functor (Sum f g) where
-  fmap ff (InL x) = InL (fmap ff x)
-  fmap ff (InR x) = InR (fmap ff x)
+  fmap f (InL x) = InL (fmap f x)
+  fmap f (InR x) = InR (fmap f x)
 
 instance (Functor m, Functor n) => Functor (Product m n) where
-  fmap ff (Pair xs ys) = (Pair (fmap ff xs) (fmap ff ys))
+  fmap f (Pair x y) = (Pair (fmap f x) (fmap f y))
 
 instance Functor Identity where
   fmap f (Identity x) = Identity (f x)
