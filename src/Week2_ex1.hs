@@ -27,9 +27,21 @@ class Profunctor m where
 --fmap (f.g) (Just x) =? (fmap f . fmap g ) (Just x)
 --LHS= fmap (f.g) (Just x)
 --{By using M1}
---Just ()
+--Just (f.g) (x)
+--{By definition of (.)}
+-- Just (f(g x))                    --M.2
+
+--RHS= (fmap f . fmap g ) (Just x)
+--{By definition of (.)}
+--fmap f (fmap g (Just x)) 
+--{By definition of M.1}
+-- fmap f (Just (g x))
+-- {By using M.1}
+-- Just (f (g x))                    -- M.3
+-- {M.2 and M.3}
+-- LHS==RHS
 instance Functor Maybe where
-  fmap f (Just x) = Just (f x) --M.1
+  fmap f (Just x) = Just (f x)       --M.1
   fmap _ Nothing  = Nothing
 
 -- By the nature of fmap we can change the last type, in this example the Right
