@@ -44,10 +44,34 @@ instance Functor Maybe where
   fmap f (Just x) = Just (f x)       --M.1
   fmap _ Nothing  = Nothing
 
+
+
+
+
+
 -- By the nature of fmap we can change the last type, in this example the Right
+-- fmap (f.g) (Righ x) =? (fmap f . fmap g ) (Right x)
+--RHS=fmap (f.g) (Righ x)
+--{By applying E.1}
+-- Right((f.g) x)
+--{By definition of (.)}
+-- Right (f (g x))                    --E.2
+
+
+-- LHS = (fmap f . fmap g ) (Right x)
+--By definition of (.)}
+-- == fmap f (fmap g (Righ x))
+--{By applying E.1}
+-- == fmap f (Right (g x))
+--{By applying E.1}
+-- Right (f (g x))                     -- E.3
+-- {From E.2 and E.3} 
+-- RHS== LHS    
 instance Functor (Either a) where
-  fmap f (Right y) = Right (f y)
+  fmap f (Right y) = Right (f y)      --E.1
   fmap _ (Left x)  = Left x
+
+
 
 -- This has a value of two types so we can use bifunctor
 instance Bifunctor Either where
