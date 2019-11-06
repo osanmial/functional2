@@ -21,21 +21,27 @@ class Profunctor m where
 
 -- Bool doesn't admit a functor, because it's not a wrapper of any kind
 
+-- This has value of one type so it can me fmapped over
 instance Functor Maybe where
   fmap f (Just x) = Just (f x)
   fmap f Nothing  = Nothing
 
+-- By the nature of fmap we can change the last type, in this example the Right
 instance Functor (Either a) where
   fmap f (Right y) = Right (f y)
   fmap _ (Left x)  = Left x
 
+-- This has a value of two types so we can use bifunctor
 instance Bifunctor Either where
   bimap f g (Left x)  = Left (f x)
   bimap f g (Right y) = Right (g y)
-  
+
+-- By the nature of fmap we can change the last type,
+-- in this example the latter type of the tuple
 instance Functor ((,) a) where
   fmap f (x, y) = (x, f y)
 
+-- This has a value of two types so we can use bifunctor
 instance Bifunctor (,) where
   bimap f g (x, y) = (f x, g y)
 
@@ -83,21 +89,26 @@ instance Contravariant (Op x) where
 
 --() is of kind :: * so it can't be mapped over
 
+-- lists are containers for values of one type, so they can be fmapped over
 instance Functor [] where
   fmap _ []     = []
   fmap f (x:xs) = f x : fmap f xs
 
+-- nonempties are like lists, so they also can be fmapped over
 instance Functor NonEmpty where
   fmap f (x :| xs) = f x :| fmap f xs
 
 -- Void is of wrong kind
 
+-- You can handle the value inside IO so you can apply functions to it,
+-- so it can be mapped over
 instance Functor IO where
   fmap f i = do
     x <- i
     let b = f x
     pure b
 
+-- maps are mappable, obviously
 instance Functor (Map k) where
   fmap f xs = map f xs
 
