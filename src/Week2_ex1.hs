@@ -128,6 +128,7 @@ instance Functor ((,) a) where
   fmap f (x, y) = (x, f y)                            --BC.1
 
 
+<<<<<<< HEAD
 
 
 --bimpa (f . g) (h . i)  (x,y) =?   (bimap f h . bimap g i)  (x,y)
@@ -146,6 +147,7 @@ instance Functor ((,) a) where
 -- (f (g x), h (i y))                                   -- BI.3
 -- {From BI.2 and BI.3}
 -- RHS==LHS
+
 --This has a value of two types so we can use bifunctor
 instance Bifunctor (,) where
   bimap f g (x, y) = (f x, g y)                      -- BI.1 
