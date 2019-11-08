@@ -123,11 +123,9 @@ instance Bifunctor Either where
 --{By applying BC.1}
 --- (x , f (g y))                                         --BC.3
 -- {From BC.2 and BC.3}
---RHS =LHS
+--RHS = LHS
 instance Functor ((,) a) where
   fmap f (x, y) = (x, f y)                            --BC.1
-
-
 
 
 --This has a value of two types so we can use bifunctor
