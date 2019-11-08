@@ -185,9 +185,27 @@ instance Functor ((->) x) where
 
 -- wont work as we have no function to handle the input value
 --instance Bifuncteor (->) where
---  bimap f g
+--  dimap (f . g) (h . i)  x =? (dimap g h . dimap f i) x
+-- LHS =   dimap (f . g) (h . i)  x 
+-- {By applying DM.1}
+-- =  (h.i ) .x. (f.g)
+--{By definition of (.)}
+-- (\y->  h $  i  $  x $  f  $  g y )       --DM.2
+
+--RHS=(dimap g h . dimap f i) x
+--{By definition of (.)}
+-- =dimap g h (dimap f i x)
+-- {By applying DM.1}
+-- =dimap g h (i . x . f)
+-- {By applying DM.1}
+-- =h. (i . x . f ) .g
+--{By definition of (.)}
+-- (\y->  h $  i  $  x $  f  $  g y )         --DM.3
+-- {From DM.2 and DM.3}
+-- RHS==LHS
+
 instance Profunctor (->) where
-  dimap f g h = g . h . f
+  dimap f g h = g . h . f                    --DM.1
   
 instance Contravariant (Op x) where
   contramap f (Op g) = Op (g . f)
