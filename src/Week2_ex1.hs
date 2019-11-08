@@ -89,7 +89,7 @@ instance Functor (Either a) where
 --bimap f h (Left (g x))
 --{By applying BE.1}
 --Left (f (g x))                              --BE.3
--- {From BE.1 and BE.2}
+-- {From BE.3 and BE.2}
 -- RHS == LHS 
 
 --In similar way we can prover: 
@@ -106,14 +106,31 @@ instance Bifunctor Either where
 
 
 
-
-
 -- By the nature of fmap we can change the last type,
 -- in this example the latter type of the tuple
-instance Functor ((,) a) where
-  fmap f (x, y) = (x, f y)
+-- fmap (f.g) (x,y )=? (fmap f . fmap g ) (x,y)
+-- LHS = fmap (f.g) (x,y )
+--{By applying BC.1}
+--(x, (f.g)  y)
+--{By definition of (.)}
+--(x, f (g y))                                              --BC.2
 
--- This has a value of two types so we can use bifunctor
+--RHS= (fmap f . fmap g ) (x,y)
+--{By definition of (.)}
+--fmap  f (fmap g (x,y))
+--{By applying BC.1}
+--fmap f (x , g  y )
+--{By applying BC.1}
+--- (x , f (g y))                                         --BC.3
+-- {From BC.2 and BC.3}
+--RHS =LHS
+instance Functor ((,) a) where
+  fmap f (x, y) = (x, f y)                            --BC.1
+
+
+
+
+--This has a value of two types so we can use bifunctor
 instance Bifunctor (,) where
   bimap f g (x, y) = (f x, g y)
 
@@ -134,8 +151,7 @@ instance Functor ((->) x) where
 
 -- wont work as we have no function to handle the input value
 --instance Bifunctor (->) where
---  bimap f g h = 
-
+--  bimap f g
 instance Profunctor (->) where
   dimap f g h = g . h . f
   
