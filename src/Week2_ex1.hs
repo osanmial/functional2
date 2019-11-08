@@ -282,6 +282,7 @@ instance Functor NonEmpty where
   fmap f (x :| xs) = f x :| fmap f xs
 -- Void is of wrong kind
 
+-- ?  I am not sure for proving if there is a way to compare
 -- You can handle the value inside IO so you can apply functions to it,
 -- so it can be mapped over
 instance Functor IO where
@@ -290,7 +291,35 @@ instance Functor IO where
     let b = f x
     pure b
 
+
+
+
+-- fmap (f.g)  xs ==( fmap f . fmap g ) (xs)             -- Assumption *
+-- fmap (f.g)  (x:xs )=?(fmap f . fmap g ) (x:xs)       --- Claim
+-- LHS= fmap (f.g)  (x:xs)
+--{By Applying Map.1}
+-- map (f.g) (x:xs)                                        -- Map.2
+
+-- RHS = (fmap f . fmap g ) (x:xs)
+-- {By definition of (.)}
+-- = fmap f (fmap g (x:xs))
+--{By Applying Map.1}
+-- = fmap f (map g (x:xs))   
+--{By Applying Map.1}
+-- = map f (map g (x:xs))
+-- {By definition of map}
+-- =map f (g x: (map  g xs) )
+-- {By definition of map}
+-- f (g x)  : map f (map g xs)
 -- maps are mappable, obviously
-instance Functor (Map k) where
-  fmap f xs = map f xs
+-- {By definition of (.)}
+-- (f.g) x : (map f . map g)  xs 
+-- {From the map low proved in FP1}
+-- (f.g) x :  map (f.g) xs
+-- {By definition of (.)}
+-- map  (f.g) (x:xs)                         -- Map.3
+--{From Map.2 and Map.3}
+-- LHS == RHS 
+instance Functor (Map k)  where
+  fmap f xs = map f xs                   ---- Map.1
 
