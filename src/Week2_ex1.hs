@@ -203,12 +203,30 @@ instance Functor ((->) x) where
 -- (\y->  h $  i  $  x $  f  $  g y )         --DM.3
 -- {From DM.2 and DM.3}
 -- RHS==LHS
-
 instance Profunctor (->) where
   dimap f g h = g . h . f                    --DM.1
   
+
+--(contramap f . contramap g) (Op x) =? contramap (g . f) (Op x)
+-- LHS= (contramap f . contramap g ) (Op x)
+-- {By definition of (.)}
+-- =contramap f (contramap g  (Op x))
+-- {By applying Co.1}
+-- =contramap f ( Op  (x.g))
+-- {By applying Co.1}
+-- =Op ((x.g).f)
+--{(.) Associative}
+-- = Op (x.g.f)                                      --Co.2
+
+--RHS=contramap (g . f) (Op x)
+-- {By applying Co.1}
+-- Op (x. (g.f))
+--{(.) Associative}
+-- =Op (x.g.f)                                          --Co.3                        
+--{From Co.2  and Co.3}
+-- RHS==LHS
 instance Contravariant (Op x) where
-  contramap f (Op g) = Op (g . f)
+  contramap f (Op g) = Op (g . f)                -- Co.1
 -- f :: (a -> b)
 -- g :: (b -> x)
 -- ~>  (a -> x)
