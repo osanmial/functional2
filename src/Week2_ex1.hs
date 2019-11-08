@@ -128,7 +128,6 @@ instance Functor ((,) a) where
   fmap f (x, y) = (x, f y)                            --BC.1
 
 
-<<<<<<< HEAD
 
 
 --bimpa (f . g) (h . i)  (x,y) =?   (bimap f h . bimap g i)  (x,y)
@@ -158,17 +157,34 @@ instance Bifunctor (,) where
 --for contravariant the same applies, but backwards.
 --For multi kind functors the problem is that endo has only one kind. 
 
+-- fmap (f.g)  x= ?(fmap f . fmap g ) x
+--LHS = fmap (f.g) x 
+-- {By applying A.1}
+-- = (f.g) . x
+--{By definition of (.)}
+-- (\y -> f (g (x y)))                             -- A.4
+
+--RHS= -- (fmap f . fmap g )  x
+--{By definition of (.)}
+-- = fmap f (fmap  g  x)
+-- {By applying A.1}
+-- fmap f (g . x)
+-- {By applying A.1}
+-- f . (g . x )
+--{By definition of (.)}
+-- (\y-> f (g (x y)))                              -- A.3
+
 
 
 instance Functor ((->) x) where
-   fmap f g = f . g
+   fmap f g = f . g                               -- A.1
 
 --Contravarian wont work as we have no access to the input value of the function.
 --instance Contravariant ((->) x) where
 --   contramap f g = f . g
 
 -- wont work as we have no function to handle the input value
---instance Bifunctor (->) where
+--instance Bifuncteor (->) where
 --  bimap f g
 instance Profunctor (->) where
   dimap f g h = g . h . f
