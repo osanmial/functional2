@@ -276,12 +276,10 @@ instance Functor [] where
 
 
 
-
-
--- nonempties are like lists, so they also can be fmapped over
+-- The prove for non-Empty list can be done as list by induction  but the base case will be here different
+-- Nonempties are like lists, so they also can be fmapped over
 instance Functor NonEmpty where
   fmap f (x :| xs) = f x :| fmap f xs
-
 -- Void is of wrong kind
 
 -- You can handle the value inside IO so you can apply functions to it,
