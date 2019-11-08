@@ -248,9 +248,35 @@ instance Contravariant (Op x) where
 --() is of kind :: * so it can't be mapped over
 
 -- lists are containers for values of one type, so they can be fmapped over
+
+--Prove by induction
+-- fmap (f.g)  (xs )==fmap f . fmap g ) (xs)             -- Assumption 
+-- fmap (f.g)  (x:xs )=?(fmap f . fmap g ) (x:xs)       --- Claim
+-- LHS = fmap (f.g)  (x:xs)
+-- {By applying L.1}
+-- (f.g) x : fmap (f.g) xs                                         -- L.2 
+
+-- RHS= (famp f . fmap g) (x:xs)
+-- {By definition of (.)}
+-- famp f (fmap g (x:xs))
+--{By applying L.1}
+-- = fmap f (g x : fmap g xs)
+--{By applying L.1}
+-- = f (g x): famp f (fmap g xs )
+-- {By definition of (.)}
+-- = (f.g) x : (fmap f . fmap g ) xs
+-- {From the assumption }
+-- = (f.g) x : famp (f.g) xs                                       ---L.3
+-- {from L.2 and L.3}
+-- RHS== LHS
 instance Functor [] where
-  fmap _ []     = []
-  fmap f (x:xs) = f x : fmap f xs
+  fmap _ []     = []                                             
+  fmap f (x:xs) = f x : fmap f xs                               --L.1
+
+
+
+
+
 
 -- nonempties are like lists, so they also can be fmapped over
 instance Functor NonEmpty where
