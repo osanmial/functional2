@@ -123,16 +123,32 @@ instance Bifunctor Either where
 --{By applying BC.1}
 --- (x , f (g y))                                         --BC.3
 -- {From BC.2 and BC.3}
---RHS =LHS
+--RHS = LHS
 instance Functor ((,) a) where
   fmap f (x, y) = (x, f y)                            --BC.1
 
 
 
 
+--bimpa (f . g) (h . i)  (x,y) =?   (bimap f h . bimap g i)  (x,y)
+--LHS= bimpa (f . g) (h . i)  (x,y)
+--{By applying BI.1}
+-- ((f.g) x ,  (h.i) y) 
+--{By definition of (.)}
+-- (f (g x), h (i y))                                     --BI.2
+
+-- RHS = (bimap f h . bimap g i) (x,y)
+--{By definition of (.)}
+-- bimap f h (bimap g i (x,y))
+--{By applying BI.1}
+-- bimap f h  ( g x, i y)
+--{By applying BI.1}
+-- (f (g x), h (i y))                                   -- BI.3
+-- {From BI.2 and BI.3}
+-- RHS==LHS
 --This has a value of two types so we can use bifunctor
 instance Bifunctor (,) where
-  bimap f g (x, y) = (f x, g y)
+  bimap f g (x, y) = (f x, g y)                      -- BI.1 
 
 -- Endo a contains function of type a -> a and in fmap we have no function to convert the input value of the function into the end type endo b where the function would be of type b -> b as we only have a function of type (a -> b) in fmap.
 -- instance Functor Endo where
