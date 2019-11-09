@@ -18,27 +18,15 @@ import Data.Functor.Coyoneda
 class Functor m where
   fmap :: (a -> b) -> m a -> m b
 
---fmap (f.g) (InL x) =? (fmap f . fmap g )  (InL x)
---LHS = fmap (f.g) (InL x) 
--- {By applying InL.1}
--- = InL (fmap (f.g) x)                            --InL.2
 
+--fmap (f.g) (InL x) =? (fmap f . fmap g )  (InL x)
 --RHS =(fmap f . fmap g )  (InL x)
---{By definition of (.)}
--- fmap f (fmap g (InL x))
--- {By applying InL.1}
--- fmap f (InL (famp g x))
--- {By applying InL.1}
--- InL (fmap f (fmap g x) )
---{By definition of (.)}
--- InL (( famp f . famp g)  x)
--- {f and g are Functurs}
--- InL (fmap (f.g) x)                                --Inl.3
--- {From InL.2 and InL.3 }
--- RHS == LHS
+-- {From the consitrain  f and g are Functor} and by applying  Functor's law}
+-- fmap (f.g) (InL x) 
 instance (Functor f, Functor g) => Functor (Sum f g) where
   fmap f (InL x) = InL (fmap f x)                                             -- InL.1
   fmap f (InR x) = InR (fmap f x)
+
 
 --fmap (f.g) (Pair x y) =? (fmap f . fmap g )  (Pair x y)
 -- RHS = (fmap f . fmap g )  (Pair x y)
