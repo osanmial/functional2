@@ -84,8 +84,25 @@ instance (Functor m, Functor n) => Functor (Compose m n) where
 instance Functor (Const a) where
   fmap f (Const x) = Const x                                          --Const.1
 
+
+
+
+--fmap (f.g)  xs =? (fmap f.  fmap g)  xs
+-- LHS=fmap (f.g) xs
+-- {By applying Proxy.1}
+-- = Proxy                                                                    --Proxy.2
+
+-- RHS= (fmap f . fmap g ) xs 
+-- {From the defintion  of (.)}
+-- = fmap  f (fmap g  xs)
+-- {By applying Proxy.1}
+-- = famp f  Proxy
+-- {By applying Proxy.1}
+-- =Proxy                                                                     --Proxy.3
+-- {From Proxy.2 and Proxy.3}
+-- RHS==LHS
 instance Functor Proxy where
-  fmap f xs = Proxy
+  fmap f xs = Proxy                                                       -- Proxy.1
 
 instance Functor (State s) where
   fmap f (State xs) = State (g . xs)
