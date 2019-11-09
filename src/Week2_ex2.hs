@@ -54,6 +54,12 @@ instance (Functor m, Functor n) => Functor (Product m n) where
 instance Functor Identity where
   fmap f (Identity x) = Identity (f x)                                      --Id.1 
 
+
+
+--fmap (f.g)  (Compose xs)=? (fmap f . fmap g )  (Compose xs)
+--RHS =(fmap f . fmap g )  (Compose xs)
+-- {From the consitrain  f and g are Functor and by applying  Functor's law}
+-- fmap (f.g)  (Compose xs)
 instance (Functor m, Functor n) => Functor (Compose m n) where
   fmap f (Compose xs) = (Compose (fmap f' xs)) where
     f' x = fmap f x  
