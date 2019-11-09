@@ -21,22 +21,38 @@ class Functor m where
 
 --fmap (f.g) (InL x) =? (fmap f . fmap g )  (InL x)
 --RHS =(fmap f . fmap g )  (InL x)
--- {From the consitrain  f and g are Functor} and by applying  Functor's law}
+-- {From the consitrain  f and g are Functor and by applying  Functor's law}
 -- fmap (f.g) (InL x) 
 instance (Functor f, Functor g) => Functor (Sum f g) where
   fmap f (InL x) = InL (fmap f x)                                             -- InL.1
   fmap f (InR x) = InR (fmap f x)
 
-
 --fmap (f.g) (Pair x y) =? (fmap f . fmap g )  (Pair x y)
 -- RHS = (fmap f . fmap g )  (Pair x y)
--- {From the consitrain  f and g are Functor} and by applying  Functor's law}
+-- {From the consitrain  f and g are Functor and by applying  Functor's law}
 -- = fmap (f.g) (Pair x y)
 instance (Functor m, Functor n) => Functor (Product m n) where
   fmap f (Pair x y) = (Pair (fmap f x) (fmap f y))                                        --Pair.1
 
+
+--fmap (f.g) (InL x) =? (fmap f.  fmap g) (identity x)
+-- LHS=fmap (f.g) (InL x) 
+--{By applying Id.1}
+-- Identity ((f.g)  x)                                                     --Id.3
+
+-- RHS = (fmap f.  fmap g) (identity x)
+-- {From the defintion  of (.)}
+-- fmap f  (fmap g  (Identity x))
+-- {By applying Id.1 }
+-- fmap f  (Identity (g x))
+-- {By applying Id.1 }
+-- Identity (f  (g  x))
+-- {From the defintion  of (.)}
+-- Identity ((f.g)  x)                                                           -- Id.2
+--{From Id.2 and Id.3 }
+-- RHS==LHS
 instance Functor Identity where
-  fmap f (Identity x) = Identity (f x)
+  fmap f (Identity x) = Identity (f x)                                      --Id.1 
 
 instance (Functor m, Functor n) => Functor (Compose m n) where
   fmap f (Compose xs) = (Compose (fmap f' xs)) where
