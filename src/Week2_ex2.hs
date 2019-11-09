@@ -35,12 +35,12 @@ instance (Functor m, Functor n) => Functor (Product m n) where
   fmap f (Pair x y) = (Pair (fmap f x) (fmap f y))                                        --Pair.1
 
 
---fmap (f.g) (InL x) =? (fmap f.  fmap g) (identity x)
+--fmap (f.g) (Identity x) =? (fmap f.  fmap g) (Identity x)
 -- LHS=fmap (f.g) (InL x) 
 --{By applying Id.1}
 -- Identity ((f.g)  x)                                                     --Id.3
 
--- RHS = (fmap f.  fmap g) (identity x)
+-- RHS = (fmap f.  fmap g) (Identity x)
 -- {From the defintion  of (.)}
 -- fmap f  (fmap g  (Identity x))
 -- {By applying Id.1 }
@@ -64,8 +64,25 @@ instance (Functor m, Functor n) => Functor (Compose m n) where
   fmap f (Compose xs) = (Compose (fmap f' xs)) where
     f' x = fmap f x  
 
+
+
+
+--fmap (f.g) (Const x) =? (fmap f.  fmap g) (Const x)
+-- LHS=fmap (f.g) (Const x) 
+--{By applying Const.1}
+-- Const x                                                      --Const.3
+
+-- RHS = (fmap f.  fmap g) (Const x)
+-- {From the defintion  of (.)}
+-- fmap f  (fmap g  (Const x))
+-- {By applying Const.1 }
+-- fmap f  (Const x)
+-- {By applying Const.1 }
+-- Const  x
+--{From Const.2 and Const.3 }
+-- RHS==LHS
 instance Functor (Const a) where
-  fmap f (Const x) = Const x
+  fmap f (Const x) = Const x                                          --Const.1
 
 instance Functor Proxy where
   fmap f xs = Proxy
