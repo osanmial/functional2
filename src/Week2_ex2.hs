@@ -22,7 +22,7 @@ class Functor m where
 --fmap (f.g) (InL x) =? (fmap f . fmap g )  (InL x)
 --RHS =(fmap f . fmap g )  (InL x)
 -- {From the consitrain  f and g are Functor and by applying  Functor's law}
--- fmap (f.g) (InL x) 
+-- =fmap (f.g) (InL x) 
 instance (Functor f, Functor g) => Functor (Sum f g) where
   fmap f (InL x) = InL (fmap f x)                                             -- InL.1
   fmap f (InR x) = InR (fmap f x)
@@ -38,17 +38,17 @@ instance (Functor m, Functor n) => Functor (Product m n) where
 --fmap (f.g) (Identity x) =? (fmap f.  fmap g) (Identity x)
 -- LHS=fmap (f.g) (InL x) 
 --{By applying Id.1}
--- Identity ((f.g)  x)                                                     --Id.3
+-- =Identity ((f.g)  x)                                                     --Id.3
 
 -- RHS = (fmap f.  fmap g) (Identity x)
 -- {From the defintion  of (.)}
--- fmap f  (fmap g  (Identity x))
+-- =fmap f  (fmap g  (Identity x))
 -- {By applying Id.1 }
--- fmap f  (Identity (g x))
+-- =fmap f  (Identity (g x))
 -- {By applying Id.1 }
--- Identity (f  (g  x))
+-- =Identity (f  (g  x))
 -- {From the defintion  of (.)}
--- Identity ((f.g)  x)                                                           -- Id.2
+-- =Identity ((f.g)  x)                                                           -- Id.2
 --{From Id.2 and Id.3 }
 -- RHS==LHS
 instance Functor Identity where
@@ -70,15 +70,15 @@ instance (Functor m, Functor n) => Functor (Compose m n) where
 --fmap (f.g) (Const x) =? (fmap f.  fmap g) (Const x)
 -- LHS=fmap (f.g) (Const x) 
 --{By applying Const.1}
--- Const x                                                      --Const.3
+-- =Const x                                                      --Const.3
 
 -- RHS = (fmap f.  fmap g) (Const x)
 -- {From the defintion  of (.)}
--- fmap f  (fmap g  (Const x))
+-- =fmap f  (fmap g  (Const x))
 -- {By applying Const.1 }
--- fmap f  (Const x)
+-- =fmap f  (Const x)
 -- {By applying Const.1 }
--- Const  x
+-- =Const  x
 --{From Const.2 and Const.3 }
 -- RHS==LHS
 instance Functor (Const a) where
@@ -104,8 +104,9 @@ instance Functor (Const a) where
 instance Functor Proxy where
   fmap f xs = Proxy                                                       -- Proxy.1
 
+
 instance Functor (State s) where
-  fmap f (State xs) = State (g . xs)
+  fmap f (State xs) = State (g . xs)                                 --State.1
     where
       g (a, b) = (a, f b)
 
@@ -126,8 +127,24 @@ instance Functor m => Functor (Star m a) where
     where
       g = fmap f
 
+
+
+--fmap (f.g)  (Costar x)=? (fmap f.  fmap g)  (Costar x)
+-- LHS=fmap (f.g)  (Costar x)
+--{By applying} Costar.1}
+-- =Costar  (f.g.x)                                                               -- Costar.2
+
+--RHS=(fmap f.  fmap g)  (Costar x)
+-- {From the defintion  of (.)}
+-- =fmap f  (fmap g (Costar x))
+--{By applying} Costar.1}
+-- =fmap f (Costar g.x)
+--{By applying} Costar.1}
+-- Costar (f.g.x)                                                                -- Costar.3
+--{From Costar.2  and Costar.3}
+--RHS==LHS
 instance Functor (Costar m a) where
-  fmap f (Costar g) = Costar (f . g)
+  fmap f (Costar g) = Costar (f . g)                                      --Costar.1
 
 instance Functor m => Functor (Yoneda m) where
   fmap f (Yoneda xs) = Yoneda (xs . e)
