@@ -40,8 +40,12 @@ instance (Functor f, Functor g) => Functor (Sum f g) where
   fmap f (InL x) = InL (fmap f x)                                             -- InL.1
   fmap f (InR x) = InR (fmap f x)
 
+--fmap (f.g) (Pair x y) =? (fmap f . fmap g )  (Pair x y)
+-- RHS = (fmap f . fmap g )  (Pair x y)
+-- {From the consitrain  f and g are Functor} and by applying  Functor's law}
+-- = fmap (f.g) (Pair x y)
 instance (Functor m, Functor n) => Functor (Product m n) where
-  fmap f (Pair x y) = (Pair (fmap f x) (fmap f y))
+  fmap f (Pair x y) = (Pair (fmap f x) (fmap f y))                                        --Pair.1
 
 instance Functor Identity where
   fmap f (Identity x) = Identity (f x)
