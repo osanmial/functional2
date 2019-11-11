@@ -104,11 +104,17 @@ instance Functor (Const a) where
 instance Functor Proxy where
   fmap f xs = Proxy                                                       -- Proxy.1
 
--- ???????????????
+-- 
+--fmap (f.g) (State k )=? (fmap f . fmap g) (State k ) 
+--LHS=(fmap f . fmap g ) (State k)
+-- fmap f (fmap g (State k ))
+-- Let f1 (a1,b1)=(a1 , f1 b1) in State (f1.k)
+-- =fmap f (fmap g (State xs))
+-- = fmap f (State (h.xs))
 instance Functor (State s) where
   fmap f (State xs) = State (g . xs)                                 --State.1
     where
-      g (a, b) = (a, f b)
+      g (a, b) = (a, fb)
 
 -- f :: b -> c
 -- e :: (c -> a) -> (b -> a)
