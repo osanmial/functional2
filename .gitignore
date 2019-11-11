@@ -2,4 +2,6 @@
 \#*
 .#*
 .directory
-.stack-work
+.stack_work
+src/Esko.hs
+
