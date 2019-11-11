@@ -1,12 +1,18 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Week3_ex1 where
 
 import Prelude hiding (Applicative, pure, (<*>))
 import Data.List.NonEmpty
 import Data.Map as Map
 
+
+
 class Functor f => Applicative f where
   pure :: a -> f a
   (<*>) :: f (a -> b) -> f a -> f b
+  infixl 4 <*>
+
 
 --------------------------------------------------------------------------------
 
@@ -73,7 +79,26 @@ instance Applicative IO where
 
 --------------------------------------------------------------------------------
 
+
+
 instance (Monoid k,Ord k) => Applicative (Map k) where
   pure x = singleton mempty x
-  mapf <*> map2 = Map.fromList $ (\(a,g) (c,d) -> (a <> c, g d)) <$> (Map.toList mapf) <*> (Map.toList map2)
+  mapf <*> map2 = Map.fromList (f <$> (Map.toList mapf) <*> (Map.toList map2)) where
+    f :: Monoid a => (a, t -> b) -> (a, t) -> (a, b)
+    f (a,g) (c,d) =(a <> c, g d)
+
+data Sum = Sum {inttiUlos :: Int} deriving (Eq, Ord, Show)
+instance Semigroup Sum where
+  (Sum a) <> (Sum b) = Sum $ a + b
+instance Monoid Sum where
+  mempty = (Sum 0)
+both f (a,b) = (f a,f b)
+
+test =
+  (both inttiUlos) <$>
+  (Map.toList $
+    (Map.fromList $ (\(a,b) -> (Sum a,(Sum b <>))) <$> [(1,1),(1,10)]) <*>
+    (Map.fromList $ (both Sum) <$> [(1,1),(2,2),(3,3),(4,4)]))
+
+
 
