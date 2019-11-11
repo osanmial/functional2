@@ -25,6 +25,8 @@ instance Bifunctor m => Functor (WrappedBifunctor m a) where
   fmap f (WrapBifunctor x) = WrapBifunctor (bimap id f x)
 
 
+-- out = unwrapProfunctor $ fmap (+1000) (WrapProfunctor (length))
+-- out "kissa"
 instance Profunctor m => Functor (WrappedProfunctor m a) where
   fmap f (WrapProfunctor x) = WrapProfunctor (dimap id f x)
 
@@ -36,6 +38,8 @@ instance Profunctor m => Functor (WrappedProfunctor m a) where
 instance Bifunctor m => Functor (Flip m a) where
   fmap f (Flip x) = Flip (bimap f id x)
 
+-- out = runFlip $ (contramap (show :: (Int->String)) (Flip head))
+-- out 100
 instance Profunctor m => Contravariant (Flip m a) where
   contramap f (Flip x) = Flip (dimap f id x)
 
