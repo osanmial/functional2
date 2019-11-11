@@ -79,8 +79,6 @@ instance Applicative IO where
 
 --------------------------------------------------------------------------------
 
-
-
 instance (Monoid k,Ord k) => Applicative (Map k) where
   pure x = singleton mempty x
   mapf <*> map2 = Map.fromList (f <$> (Map.toList mapf) <*> (Map.toList map2)) where
