@@ -47,7 +47,10 @@ instance Monoid a => Applicative ((,) a) where
 instance Applicative ((->) a) where
   pure x = const x
   f <*> functor = \c -> (f c) (functor c)
-
+-- I have found this applicative in the refrence book 
+--instance Applicative ((->) r) where  
+--    pure x = (\_ -> x)  
+--    f <*> g = \x -> f x (g x)  
 --------------------------------------------------------------------------------
 
 -- () is not a functor
@@ -76,7 +79,13 @@ instance Applicative IO where
   mf <*> functor = do
     f <- mf
     fmap f functor
-
+-- I have found this applicative in the refrence book 
+--instance Applicative IO where  
+ --   pure = return  
+ --   a <*> b = do  
+ --       f <- a  
+ --       x <- b  
+ --       return (f x)  
 --------------------------------------------------------------------------------
 
 instance (Monoid k,Ord k) => Applicative (Map k) where

@@ -104,11 +104,17 @@ instance Functor (Const a) where
 instance Functor Proxy where
   fmap f xs = Proxy                                                       -- Proxy.1
 
-
+-- 
+--fmap (f.g) (State k )=? (fmap f . fmap g) (State k ) 
+--LHS=(fmap f . fmap g ) (State k)
+-- fmap f (fmap g (State k ))
+-- Let f1 (a1,b1)=(a1 , f1 b1) in State (f1.k)
+-- =fmap f (fmap g (State xs))
+-- = fmap f (State (h.xs))
 instance Functor (State s) where
   fmap f (State xs) = State (g . xs)                                 --State.1
     where
-      g (a, b) = (a, f b)
+      g (a, b) = (a, fb)
 
 -- f :: b -> c
 -- e :: (c -> a) -> (b -> a)
@@ -117,11 +123,13 @@ instance Functor (State s) where
 -- r . e = g
 -- r :: (b -> a) -> a
 -- g :: (c -> a) -> a
+-- ????????????
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
     where
       e ca = ca . f
 
+-- ??????????
 instance Functor m => Functor (Star m a) where
   fmap f (Star xs) = Star(g . xs)
     where
@@ -146,10 +154,23 @@ instance Functor m => Functor (Star m a) where
 instance Functor (Costar m a) where
   fmap f (Costar g) = Costar (f . g)                                      --Costar.1
 
-instance Functor m => Functor (Yoneda m) where
-  fmap f (Yoneda xs) = Yoneda (xs . e)
-    where
-      e ca = ca . f
 
+
+
+-- ? ? Is that right Yoneda
+--fmap (f.g)  (Yoneda x a) =? (fmap f.  fmap g)  (Yoneda x a)
+--LHS=fmap (f.g)  (Yoneda x a)
+--{By applying Yoneda 1-2}
+-- Yoneda (x . a . f . g)
+
+--RHS=(fmap f.  fmap g)  (Yoneda x a)
+-- {From the defintion  of (.)}
+--famp f (fmap g (Yoneda x a))
+-- ??????????????
+instance Functor m => Functor (Yoneda m) where
+  fmap f (Yoneda xs) = Yoneda (xs . e)                                    --Yoneda.1
+    where
+      e ca = ca . f                                                                   -- Yoneda.2
+-- ??????
 instance Functor (Coyoneda m) where
   fmap f (Coyoneda xs ys) = Coyoneda (f . xs) ys
