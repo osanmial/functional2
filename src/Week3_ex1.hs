@@ -73,6 +73,7 @@ instance Applicative IO where
 
 --------------------------------------------------------------------------------
 
-instance Monoid k => Applicative (Map k) where
+instance (Monoid k,Ord k) => Applicative (Map k) where
   pure x = singleton mempty x
-  mapf <*> map2 = fmap (toList mapf)
+  mapf <*> map2 = Map.fromList $ (\(a,g) (c,d) -> (a <> c, g d)) <$> (Map.toList mapf) <*> (Map.toList map2)
+
