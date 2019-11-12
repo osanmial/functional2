@@ -34,3 +34,15 @@ instance (Applicative f, Applicative g) => Applicative (Product f g) where
 instance Applicative Identity where
   pure x = Identity x
   (Identity f) <*> functor = fmap f functor
+--------------------------------------------------------------------------------
+
+instance Monoid m=> Applicative (Const m) where
+    pure _ = Const mempty
+    Const f <*> Const v = Const (f <> v)
+
+
+--------------------------------------------------------------------------------
+  
+
+
+
