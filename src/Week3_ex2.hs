@@ -9,12 +9,9 @@ import Data.Functor.Product
 import Data.Functor.Identity
 import Data.Functor.Compose
 import Data.Functor.Const
-<<<<<<< HEAD
 import Control.Dsl.Cont as C
-=======
 import Data.Proxy
 import Data.Sequence.Internal
->>>>>>> b7bf86ccb4accef03e5195623f5ffc6216af4776
 
 
 class Functor f => Applicative f where
@@ -51,13 +48,11 @@ instance Monoid m=> Applicative (Const m) where
 instance Applicative (Cont a ) where
     pure x = undefined--Cont (\(y -> x) ->  r)
     (<*>) = undefined
---------------------------------------------------------------------------------
+    
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
     where
       e ca = ca . f
-
-
 
 --------------------------------------------------------------------------------
 
