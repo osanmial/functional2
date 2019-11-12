@@ -1,6 +1,6 @@
 {-# LANGUAGE MagicHash #-}
 
-module Week1_ex3 where
+module Week1.Exercise3 where
 
 import Prelude hiding ((==), Eq, Ord, compare, Enum, pred, Num, (-))
 import GHC.Exts

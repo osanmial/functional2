@@ -1,5 +1,5 @@
 {-# Language FlexibleInstances#-}
-module Week1_ex2 where
+module Week1.Exercise2 where
 
 import Prelude hiding (Semigroup, Monoid, (<>), mempty)
 import Data.Either

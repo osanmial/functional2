@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week2_ex2 where
+module Week2.Exercise2 where
 
 import Prelude hiding (Functor, fmap)
 import Data.Functor.Sum

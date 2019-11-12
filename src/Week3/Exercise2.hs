@@ -1,7 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week3_ex2 where
-
--- TODO change the project model
+module Week3.Excercise2 where
 
 import Prelude hiding (Applicative, pure, (<*>))
 import Data.Functor.Sum
