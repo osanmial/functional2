@@ -25,7 +25,7 @@ class Functor m where
 -- =fmap (f.g) (InL x) 
 instance (Functor f, Functor g) => Functor (Sum f g) where
   fmap f (InL x) = InL (fmap f x)                                             -- InL.1
-  fmap f (InR x) = InR (fmap f x)
+  fmap g (InR x) = InR (fmap g x)
 
 --fmap (f.g) (Pair x y) =? (fmap f . fmap g )  (Pair x y)
 -- RHS = (fmap f . fmap g )  (Pair x y)
