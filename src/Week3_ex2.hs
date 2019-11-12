@@ -9,6 +9,7 @@ import Data.Functor.Product
 import Data.Functor.Identity
 import Data.Functor.Compose
 import Data.Functor.Const
+import Control.Dsl.Cont as C
 
 
 class Functor f => Applicative f where
@@ -40,9 +41,16 @@ instance Monoid m=> Applicative (Const m) where
     pure _ = Const mempty
     Const f <*> Const v = Const (f <> v)
 
-
 --------------------------------------------------------------------------------
-  
+instance Applicative (Cont a ) where
+    pure x = undefined--Cont (\(y -> x) ->  r)
+    (<*>) = undefined
+--------------------------------------------------------------------------------
+instance Functor (Cont a) where
+  fmap f (Cont xs) = Cont (xs . e)
+    where
+      e ca = ca . f
+
 
 
 
