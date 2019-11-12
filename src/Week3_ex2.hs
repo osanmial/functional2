@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week3_ex3 where
+module Week3_ex2 where
 
 -- TODO change the project model
 
@@ -9,6 +9,8 @@ import Data.Functor.Product
 import Data.Functor.Identity
 import Data.Functor.Compose
 import Data.Functor.Const
+import Data.Proxy
+import Data.Sequence.Internal
 
 
 class Functor f => Applicative f where
@@ -34,3 +36,27 @@ instance (Applicative f, Applicative g) => Applicative (Product f g) where
 instance Applicative Identity where
   pure x = Identity x
   (Identity f) <*> functor = fmap f functor
+
+--------------------------------------------------------------------------------
+
+instance (Applicative f, Applicative g) => Applicative (Compose f g) where
+  pure x = undefined
+  (Compose f) <*> functor = undefined-- fmap f functor
+                  -- Expected type (a -> b), ^ Actual type f (g (a -> b)) 
+
+--------------------------------------------------------------------------------
+
+instance Applicative Proxy where
+  pure x = Proxy
+  x <*> y = Proxy
+
+--------------------------------------------------------------------------------
+
+instance Applicative (State s) where
+  pure x = State (\s -> (s, x))
+  (State f) <*> functor = undefined--State (g . functor)
+    where
+      g (a, b) = (a, f b)
+
+--------------------------------------------------------------------------------
+
