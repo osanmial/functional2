@@ -61,8 +61,7 @@ instance Functor Identity where
 -- {From the consitrain  f and g are Functor and by applying  Functor's law}
 -- fmap (f.g)  (Compose xs)
 instance (Functor m, Functor n) => Functor (Compose m n) where
-  fmap f (Compose xs) = (Compose (fmap f' xs)) where
-    f' x = fmap f x  
+  fmap f (Compose xs) = (Compose (fmap (fmap f) xs)) where
 
 
 
@@ -114,7 +113,7 @@ instance Functor Proxy where
 instance Functor (State s) where
   fmap f (State xs) = State (g . xs)                                 --State.1
     where
-      g (a, b) = (a, fb)
+      g (a, b) = (a, f b)
 
 -- f :: b -> c
 -- e :: (c -> a) -> (b -> a)
