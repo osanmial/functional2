@@ -1,7 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week3_ex2 where
-
--- TODO change the project model
+module Week3.Excercise2 where
 
 import Prelude hiding (Applicative, pure, (<*>))
 import Data.Functor.Sum
@@ -14,13 +12,14 @@ import Data.Proxy
 import Data.Sequence.Internal
 
 
-
 class Functor f => Applicative f where
   pure :: a -> f a
   (<*>) :: f (a -> b) -> f a -> f b
   infixl 4 <*>
 
 --------------------------------------------------------------------------------
+
+-- Pure for Sum f g a is probably impossible
 
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
   pure x = undefined :: Sum f g a -| x :: a
@@ -47,15 +46,13 @@ instance Monoid m=> Applicative (Const m) where
 
 --------------------------------------------------------------------------------
 instance Applicative (Cont a ) where
-    pure x = undefined--Cont (\(y -> x) ->  r)
-    (<*>) = undefined
---------------------------------------------------------------------------------
+    pure x = Cont (\f-> f x) 
+    (Cont f)<*>(Cont g) = Cont (\h-> h.f.g)
+    
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
     where
       e ca = ca . f
-
-
 
 --------------------------------------------------------------------------------
 

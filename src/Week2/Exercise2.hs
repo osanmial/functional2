@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week2_ex2 where
+module Week2.Exercise2 where
 
 import Prelude hiding (Functor, fmap)
 import Data.Functor.Sum
@@ -104,12 +104,24 @@ instance Functor Proxy where
   fmap f xs = Proxy                                                       -- Proxy.1
 
 -- 
---fmap (f.g) (State k )=? (fmap f . fmap g) (State k ) 
---LHS=(fmap f . fmap g ) (State k)
--- fmap f (fmap g (State k ))
--- Let f1 (a1,b1)=(a1 , f1 b1) in State (f1.k)
--- =fmap f (fmap g (State xs))
--- = fmap f (State (h.xs))
+--fmap (g.f) (State k )=? (fmap g . fmap f) (State k ) 
+--LHS=(fmap g. fmap f ) (State k)
+-- fmap f (fmap f (State k ))
+--            Let f1 (a1,b1)=(a1 , f b1)                 --1
+--             in State (f1.k)           
+-- =fmap g (State (k1))
+-- {From 1 }
+-- =fmap g (State (f1.k))
+--            Let g2 (a1,f b1)= (a1, (g.f) b1)                      **
+-- = State (g2 . k1)
+
+
+--RHS=famp (g.f) (State k)
+--        Let  g1 (a1,b1) = (a1 , (g.f) b1)                              --2
+--        in State (g1. k)
+-- {From the 1 and 2  informaly } one can say}
+-- RHS==LHS
+
 instance Functor (State s) where
   fmap f (State xs) = State (g . xs)                                 --State.1
     where
@@ -122,13 +134,13 @@ instance Functor (State s) where
 -- r . e = g
 -- r :: (b -> a) -> a
 -- g :: (c -> a) -> a
--- ????????????
+-- ??
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
     where
       e ca = ca . f
 
--- ??????????
+-- ??
 instance Functor m => Functor (Star m a) where
   fmap f (Star xs) = Star(g . xs)
     where
@@ -165,11 +177,11 @@ instance Functor (Costar m a) where
 --RHS=(fmap f.  fmap g)  (Yoneda x a)
 -- {From the defintion  of (.)}
 --famp f (fmap g (Yoneda x a))
--- ??????????????
+-- ??
 instance Functor m => Functor (Yoneda m) where
   fmap f (Yoneda xs) = Yoneda (xs . e)                                    --Yoneda.1
     where
       e ca = ca . f                                                                   -- Yoneda.2
--- ??????
+-- ??
 instance Functor (Coyoneda m) where
   fmap f (Coyoneda xs ys) = Coyoneda (f . xs) ys
