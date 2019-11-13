@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week3_ex3 where
+module Week3.Exercise3 where
 import Control.Applicative
 
 newtype Parser a = Parser {parse :: String -> Either ParseError (String, a)}
