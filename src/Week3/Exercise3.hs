@@ -13,14 +13,19 @@ instance Functor Parser where
       g (Left _)  = Left SomethingWentWrong
       g (Right (x, y)) = Right (x, f y) 
 
-instance Applicative Parser where
-  pure x = Parser (\s -> Right (s, x))
-  Parser pf <*> functor = e
-    where
-      e = h . pf
-      h (pf) = case pf of
-                 Right (s,f) -> f <$> functor
-                 x -> pure x
+-- instance Applicative Parser where
+--   pure x = Parser (\s -> Right (s, x))
+--   Parser pf <*> functor = e
+--     where
+--       e = h . pf
+--       h km = case km of
+--             Right (s,f) -> f <$> functor
+--             Left _      -> Parser (\t -> Left SomethingWentWrong)
+
+eof :: Parser ()
+eof = Parser {parse = g} where
+  g [] = Right ("", ())
+  g _  = Left SomethingWentWrong
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f = Parser {parse = g} where
@@ -48,10 +53,7 @@ chunk xs = Parser {parse = f} where
 
   g :: String -> String -> Either ParseError String
   g []     []     = Right ""
-  g []     js     = Left SomethingWentWrong
-  g hs     []     = Left SomethingWentWrong
-  g (h:hs) (j:js) = if h == j
-                  then
-                    g hs js
-                  else
-                    Left SomethingWentWrong
+  g (h:hs) (j:js)
+    | h == j      = g hs js
+    | otherwise   = Left SomethingWentWrong                    
+  g _      _      = Left SomethingWentWrong
