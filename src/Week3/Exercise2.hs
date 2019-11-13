@@ -22,7 +22,7 @@ class Functor f => Applicative f where
 -- Pure for Sum f g a is probably impossible
 
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
-  pure x = undefined
+  pure x = undefined :: Sum f g a -| x :: a
   (InL f) <*> (InL y) = InL (f <*> y)
   (InR f) <*> (InR y) = InR (f <*> y)
 
