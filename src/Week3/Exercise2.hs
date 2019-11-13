@@ -47,7 +47,7 @@ instance Monoid m=> Applicative (Const m) where
 --------------------------------------------------------------------------------
 instance Applicative (Cont a ) where
     pure x = Cont (\f-> f x) 
-    (Cont f)<*>(Cont g) = Cont (\h-> h.f.g)
+    Cont  f <*> Cont g= Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
     
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
