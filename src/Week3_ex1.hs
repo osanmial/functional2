@@ -89,6 +89,7 @@ instance Applicative IO where
 --------------------------------------------------------------------------------
 
 --Proofs quite required. Might not fufill all required rules
+--freemonoid
 instance (Monoid k,Ord k) => Applicative (Map k) where
   pure x = singleton mempty x
   mapf <*> map2 = Map.fromList (f <$> (Map.toList mapf) <*> (Map.toList map2)) where
@@ -99,7 +100,7 @@ data Sum = Sum {inttiUlos :: Int} deriving (Eq, Ord, Show)
 instance Semigroup Sum where
   (Sum a) <> (Sum b) = Sum $ a + b
 instance Monoid Sum where
-  mempty = (Sum 0)FP
+  mempty = (Sum 0)
 both f (a,b) = (f a,f b)
 
 test =
