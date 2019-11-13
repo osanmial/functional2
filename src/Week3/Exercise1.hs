@@ -90,7 +90,7 @@ data Sum = Sum {inttiUlos :: Int} deriving (Eq, Ord, Show)
 instance Semigroup Sum where
   (Sum a) <> (Sum b) = Sum $ a + b
 instance Monoid Sum where
-  mempty = (Sum 0)FP
+  mempty = (Sum 0)
 both f (a,b) = (f a,f b)
 
 test =

@@ -19,6 +19,8 @@ class Functor f => Applicative f where
 
 --------------------------------------------------------------------------------
 
+-- Pure for Sum f g a is probably impossible
+
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
   pure x = undefined
   (InL f) <*> (InL y) = InL (f <*> y)
