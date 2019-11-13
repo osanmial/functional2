@@ -7,6 +7,27 @@ newtype Parser a = Parser {parse :: String -> Either ParseError (String, a)}
 data ParseError = SomethingWentWrong
   deriving Show
 
+instance Functor Parser where
+  fmap f (Parser x) = Parser (g . x)
+    where
+      g (Left _)  = Left SomethingWentWrong
+      g (Right (x, y)) = Right (x, f y) 
+
+instance Applicative Parser where
+  pure x = Parser (\s -> Right (s, x))
+  Parser pf <*> Parser pa = Parser out
+    where
+      out s = case pf s of
+        Right (fStr, f) -> case pa fStr of
+          Right (aStr, a) -> Right (aStr, f a)
+          Left left -> Left left
+        Left left -> Left left
+
+eof :: Parser ()
+eof = Parser {parse = g} where
+  g [] = Right ("", ())
+  g _  = Left SomethingWentWrong
+
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f = Parser {parse = g} where
   g (c:cs)
@@ -14,43 +35,26 @@ satisfy f = Parser {parse = g} where
     | otherwise = Left SomethingWentWrong
 
 single :: Char -> Parser Char
-single x = Parser {parse = f} where
-  f (c:cs)
-    | c == x    = Right (cs, c)
-    | otherwise = Left SomethingWentWrong
-
+single x = satisfy (==x)
+  
 anySingleBut :: Char -> Parser Char
-anySingleBut x = Parser {parse = f} where
-  f (c:cs)
-    | c /= x    = Right (cs, c)
-    | otherwise = Left SomethingWentWrong
+anySingleBut x = satisfy (/=x)
 
 oneOf :: [Char] -> Parser Char
-oneOf xs = Parser {parse = f} where
-  f (c:cs)
-    | elem c xs = Right (cs, c)
-    | otherwise = Left SomethingWentWrong
+oneOf xs = satisfy (\x -> elem x xs) 
     
 noneOf :: [Char] -> Parser Char
-noneOf xs = Parser {parse = f} where
-  f (c:cs)
-    | notElem c xs = Right (cs, c)
-    | otherwise = Left SomethingWentWrong
+noneOf xs = satisfy (\x -> notElem x xs)
 
-chunck :: String -> Parser String
-chunck (xs) = Parser {parse = f} where
+chunk :: String -> Parser String
+chunk xs = Parser {parse = f} where
   f (cs) = case g xs cs of
              Right ks -> Right (ks, xs)
              Left _   -> Left SomethingWentWrong
 
   g :: String -> String -> Either ParseError String
-  g []     js     = Right js
-  g hs     []     = Left SomethingWentWrong
-  g (h:hs) (j:js) = if h == j
-                  then
-                    case g hs js of
-                      Right s -> Right s
-                      Left _  -> Left SomethingWentWrong
-                  else
-                    Left SomethingWentWrong
-           
+  g []     []     = Right ""
+  g (h:hs) (j:js)
+    | h == j      = g hs js
+    | otherwise   = Left SomethingWentWrong                    
+  g _      _      = Left SomethingWentWrong

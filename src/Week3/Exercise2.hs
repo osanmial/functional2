@@ -40,14 +40,15 @@ instance Applicative Identity where
 
 --------------------------------------------------------------------------------
 
-instance Monoid m=> Applicative (Const m) where
+instance Monoid m => Applicative (Const m) where
     pure _ = Const mempty
     Const f <*> Const v = Const (f <> v)
 
 --------------------------------------------------------------------------------
-instance Applicative (Cont a ) where
+
+instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
-    Cont  f <*> Cont g= Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
+    Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
     
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
@@ -74,5 +75,3 @@ instance Applicative (State s) where
   State f <*> State g=  State $ \ h ->(h, ((snd  (f h)) (snd  (g h))))
    
 --------------------------------------------------------------------------------
-
-
