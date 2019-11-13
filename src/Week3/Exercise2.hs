@@ -22,7 +22,7 @@ class Functor f => Applicative f where
 -- Pure for Sum f g a is probably impossible
 
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
-  pure x = undefined :: Sum f g a -| x :: a
+  pure x = undefined --- :: Sum f g a -| x :: a
   (InL f) <*> (InL y) = InL (f <*> y)
   (InR f) <*> (InR y) = InR (f <*> y)
 
@@ -71,10 +71,8 @@ instance Applicative Proxy where
 
 instance Applicative (State s) where
   pure x = State (\s -> (s, x))
-  (State f) <*> functor = undefined--State (g . functor)
-    where
-      g (a, b) = (a, f b)
-
+  State f <*> State g=  State $ \ h ->(h, ((snd  (f h)) (snd  (g h))))
+   
 --------------------------------------------------------------------------------
 
 
