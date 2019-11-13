@@ -22,7 +22,7 @@ class Functor f => Applicative f where
 -- Pure for Sum f g a is probably impossible
 
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
-  pure x = undefined
+  pure x = undefined :: Sum f g a -| x :: a
   (InL f) <*> (InL y) = InL (f <*> y)
   (InR f) <*> (InR y) = InR (f <*> y)
 
@@ -48,10 +48,8 @@ instance Monoid m => Applicative (Const m) where
 
 instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
-    Cont f <*> functor = undefined
-
---Cont a (c -> b) -> Cont a c -> Cont a b
-
+    Cont  f <*> Cont g= Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
+    
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)
     where

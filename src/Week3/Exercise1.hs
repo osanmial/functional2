@@ -80,6 +80,7 @@ instance Applicative IO where
 --------------------------------------------------------------------------------
 
 --Proofs quite required. Might not fufill all required rules
+--freemonoid
 instance (Monoid k,Ord k) => Applicative (Map k) where
   pure x = singleton mempty x
   mapf <*> map2 = Map.fromList (f <$> (Map.toList mapf) <*> (Map.toList map2)) where
