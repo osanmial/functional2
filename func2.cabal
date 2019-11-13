@@ -13,8 +13,17 @@ build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  README.md
 
-executable func2
+library
   hs-source-dirs:      src
-  main-is:             Main.hs
   default-language:    Haskell2010
-  build-depends:       base >= 4.7 && < 5, mtl, containers, endo, control-dsl, profunctors, kan-extensions, bifunctors
+  exposed-modules:
+                  Week1.Exercise1
+                  Week1.Exercise2
+                  Week1.Exercise3
+                  Week2.Exercise1
+                  Week2.Exercise2
+                  Week2.Exercise3
+                  Week3.Exercise1
+                  Week4.Exercise2
+                  
+  build-depends: base >= 4.7 && < 5, mtl, containers, endo, control-dsl, profunctors, kan-extensions, bifunctors

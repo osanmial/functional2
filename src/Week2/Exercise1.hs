@@ -1,4 +1,4 @@
-module Week2_ex1 where
+module Week2.Exercise1 where
 
 import Prelude hiding (Functor, fmap, map)
 import Data.Monoid.Endo -- endo

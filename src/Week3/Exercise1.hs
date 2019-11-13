@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Week3_ex1 where
+module Week3.Exercise1 where
 
 import Prelude hiding (Applicative, pure, (<*>))
 import Data.List.NonEmpty

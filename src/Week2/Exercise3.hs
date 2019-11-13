@@ -1,4 +1,4 @@
-module Week2_ex3 where
+module Week2.Exercise3 where
 
 import Control.Monad (join)
 import Data.Bifunctor
