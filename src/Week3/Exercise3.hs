@@ -15,12 +15,14 @@ instance Functor Parser where
 
 instance Applicative Parser where
   pure x = Parser (\s -> Right (s, x))
-  Parser pf <*> functor = e
+  Parser pf <*> Parser pa = Parser out
     where
-      e = h . pf
-      h (pf) = case pf of
-                 Right (s,f) -> f <$> functor
-                 x -> pure x
+      out s = case pf s of
+        Right (fStr, f) -> case pa fStr of
+          Right (aStr, a) -> Right (aStr, f a)
+          Left left -> Left left
+        Left left -> Left left
+
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f = Parser {parse = g} where
