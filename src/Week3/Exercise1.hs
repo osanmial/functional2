@@ -115,22 +115,22 @@ class (Ord a) => OrdIterable a where
   --toKeys' :: Foldable t => t a -> t k
 
 instance OrdIterable Sum where
-  first = 0
+  first = Sum 0
   next a = a <> Sum 1
   toKeys list = toKeys' (mempty) list where
     toKeys' n (x:xs) = (n,x):toKeys' (n <> Sum 1) xs
 
-data (Monoid k) => MapM k a = Map k a
+--data (Monoid k) => MapM k a = Map k a
 
 --This essentially converts the problem into a list and as such works
-instance (OrdIterable k) => Applicative (Map k) where
-  pure x = singleton first x
-  mapf <*> map2 = Map.fromList (toKeys $ (F.toList mapf) <*> (F.toList map2))
+--instance (OrdIterable k) => Applicative (Map k) where
+--  pure x = singleton first x
+--  mapf <*> map2 = Map.fromList (toKeys $ (F.toList mapf) <*> (F.toList map2))
 
     
-instance (Monoid k) => Applicative (Map k) where
+instance (Monoid k, Ord k) => Applicative (Map k) where
   pure x = singleton mempty x
-  mapf <*> map2 = Map.fromList (f <$> (F.toList mapf) <*> (F.toList map2)) where
+  mapf <*> map2 = Map.fromList (f <$> (Map.toList mapf) <*> (Map.toList map2)) where
     f :: Monoid a => (a, t -> b) -> (a, t) -> (a, b)
     f (a,g) (c,d) =(a <> c, g d)
 
