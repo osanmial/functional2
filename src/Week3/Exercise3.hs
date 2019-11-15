@@ -20,8 +20,8 @@ instance Applicative Parser where
       out s = case pf s of
         Right (fStr, f) -> case pa fStr of
           Right (aStr, a) -> Right (aStr, f a)
-          left -> left
-        left -> left
+          Left left -> Left left
+        Left left -> Left left
 
 eof :: Parser ()
 eof = Parser {parse = g} where
