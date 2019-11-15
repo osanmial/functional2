@@ -11,8 +11,8 @@ import Data.Functor.Const
 import Control.Dsl.Cont as C
 import Data.Proxy
 import Data.Sequence.Internal
+import Data.Functor.Yoneda
 
---------------------------------------------------------------------------------
 
 class Functor f => Applicative f where
   pure :: a -> f a
@@ -34,17 +34,17 @@ homomorphism
 interchange
     u <*> pure y = pure ($ y) <*> u
 -}
-    
+
 -- here are multiple different ways to define this. 
-instance (Applicative f, Applicative g) => Applicative (Sum f g) where
-  pure x = InR pure x --- :: Sum f g a -| x :: a
-  (InR f) <*> fu = f <$> fu
-  (InL f) <*> fu  = inL f
+--instance (Applicative f, Applicative g) => Applicative (Sum f g) where
+--  pure x = InR pure x --- :: Sum f g a -| x :: a
+--  (InR f) <*> fu = f <$> fu
+--  (InL f) <*> fu  = inL f
 
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Product f g) where
-  pure x = undefined
+  pure x = Pair (pure x) (pure x)
   (Pair x1 x2) <*> (Pair y1 y2) = Pair (x1 <*> y1) (x2 <*> y2)
 
 --------------------------------------------------------------------------------
@@ -56,10 +56,10 @@ instance Applicative Identity where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
-  pure x = undefined
-  (Compose f) <*> functor = undefined-- fmap f functor
-                  -- Expected type (a -> b), ^ Actual type f (g (a -> b)) 
 
+  pure x = Compose $ pure $pure x
+  Compose f  <*> Compose x=  Compose $ (fmap (<*>)  f ) <*> x
+ 
 --------------------------------------------------------------------------------
 
 instance Monoid m => Applicative (Const m) where
@@ -91,8 +91,15 @@ instance Functor (Cont a) where
 
 --------------------------------------------------------------------------------
 
-instance Applicative (Star f d) where
-  pure x = Star (\t -> pure x)
+--instance Applicative (Star f d) where
+--  pure x = Star (\t -> pure x)
   
-  
+--------------------------------------------------------------------------------  
+-- idk check hoogle source
+instance Applicative m => Applicative (Yoneda m) where
+  pure x = Yoneda $ \y -> pure (y x)
+  Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
+
+
+
   
