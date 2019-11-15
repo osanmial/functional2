@@ -30,6 +30,7 @@ eof = Parser {parse = g} where
 
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy f = Parser {parse = g} where
+  g []          = Left SomethingWentWrong
   g (c:cs)
     | f c       = Right (cs, c)
     | otherwise = Left SomethingWentWrong
@@ -47,14 +48,8 @@ noneOf :: [Char] -> Parser Char
 noneOf xs = satisfy (\x -> notElem x xs)
 
 chunk :: String -> Parser String
-chunk xs = Parser {parse = f} where
-  f (cs) = case g xs cs of
-             Right ks -> Right (ks, xs)
-             Left _   -> Left SomethingWentWrong
-
-  g :: String -> String -> Either ParseError String
-  g []     []     = Right ""
-  g (h:hs) (j:js)
-    | h == j      = g hs js
-    | otherwise   = Left SomethingWentWrong                    
-  g _      _      = Left SomethingWentWrong
+chunk []     = fmap (\x -> "") eof
+chunk (x:xs) = pure (++) <*> g <*> chunk xs
+  where
+    g :: Parser String
+    g = fmap (\x -> [x]) (single x)
