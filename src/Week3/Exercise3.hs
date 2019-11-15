@@ -20,8 +20,8 @@ instance Applicative Parser where
       out s = case pf s of
         Right (fStr, f) -> case pa fStr of
           Right (aStr, a) -> Right (aStr, f a)
-          Left left -> Left left
-        Left left -> Left left
+          left -> left
+        left -> left
 
 eof :: Parser ()
 eof = Parser {parse = g} where
@@ -36,7 +36,7 @@ satisfy f = Parser {parse = g} where
 
 single :: Char -> Parser Char
 single x = satisfy (==x)
-  
+
 anySingleBut :: Char -> Parser Char
 anySingleBut x = satisfy (/=x)
 
