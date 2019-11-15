@@ -1,4 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
+{-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 module Week3.Excercise2 where
 
 import Prelude hiding (Applicative, pure, (<*>))
@@ -11,6 +12,7 @@ import Control.Dsl.Cont as C
 import Data.Proxy
 import Data.Sequence.Internal
 
+--------------------------------------------------------------------------------
 
 class Functor f => Applicative f where
   pure :: a -> f a
@@ -19,14 +21,26 @@ class Functor f => Applicative f where
 
 --------------------------------------------------------------------------------
 
--- Pure for Sum f g a is probably impossible
--- we don't have an instance of g or f to make pure. So this is not an applicative
-{-    
-instance (Applicative f, Applicative g) => Applicative (Sum f g) where
-  pure x = undefined --- :: Sum f g a -| x :: a
-  (InL f) <*> (InL y) = InL (f <*> y)
-  (InR f) <*> (InR y) = InR (f <*> y)
+{-
+identity
+    pure id <*> v = v
+
+composition
+    pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
+
+homomorphism
+    pure f <*> pure x = pure (f x)
+
+interchange
+    u <*> pure y = pure ($ y) <*> u
 -}
+    
+-- here are multiple different ways to define this. 
+instance (Applicative f, Applicative g) => Applicative (Sum f g) where
+  pure x = InR pure x --- :: Sum f g a -| x :: a
+  (InR f) <*> fu = f <$> fu
+  (InL f) <*> fu  = inL f
+
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Product f g) where
@@ -41,27 +55,16 @@ instance Applicative Identity where
 
 --------------------------------------------------------------------------------
 
-instance Monoid m => Applicative (Const m) where
-    pure _ = Const mempty
-    Const f <*> Const v = Const (f <> v)
-
---------------------------------------------------------------------------------
-
-instance Applicative (Cont a) where
-    pure x = Cont (\f-> f x) 
-    Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
-    
-instance Functor (Cont a) where
-  fmap f (Cont xs) = Cont (xs . e)
-    where
-      e ca = ca . f
-
---------------------------------------------------------------------------------
-
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
   pure x = undefined
   (Compose f) <*> functor = undefined-- fmap f functor
                   -- Expected type (a -> b), ^ Actual type f (g (a -> b)) 
+
+--------------------------------------------------------------------------------
+
+instance Monoid m => Applicative (Const m) where
+    pure _ = Const mempty
+    Const f <*> Const v = Const (f <> v)
 
 --------------------------------------------------------------------------------
 
@@ -76,3 +79,20 @@ instance Applicative (State s) where
   State f <*> State g=  State $ \ h ->(h, ((snd  (f h)) (snd  (g h))))
    
 --------------------------------------------------------------------------------
+
+instance Applicative (Cont a) where
+    pure x = Cont (\f-> f x) 
+    Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
+    
+instance Functor (Cont a) where
+  fmap f (Cont xs) = Cont (xs . e)
+    where
+      e ca = ca . f
+
+--------------------------------------------------------------------------------
+
+instance Applicative (Star f d) where
+  pure x = Star (\t -> pure x)
+  
+  
+  
