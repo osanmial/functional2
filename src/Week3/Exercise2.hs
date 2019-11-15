@@ -10,7 +10,7 @@ import Data.Functor.Const
 import Control.Dsl.Cont as C
 import Data.Proxy
 import Data.Sequence.Internal
-
+import Data.Functor.Yoneda
 
 class Functor f => Applicative f where
   pure :: a -> f a
@@ -58,9 +58,8 @@ instance Functor (Cont a) where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
-  pure x = undefined
-  (Compose f) <*> functor = undefined-- fmap f functor
-                  -- Expected type (a -> b), ^ Actual type f (g (a -> b)) 
+  pure x = Compose (pure (pure x))
+  (Compose f) <*> (Compose x) = undefined
 
 --------------------------------------------------------------------------------
 
@@ -75,3 +74,11 @@ instance Applicative (State s) where
   State f <*> State g=  State $ \ h ->(h, ((snd  (f h)) (snd  (g h))))
    
 --------------------------------------------------------------------------------
+
+-- idk check hoogle source
+instance Applicative m => Applicative (Yoneda m) where
+  pure x = Yoneda $ \y -> pure (y x)
+  Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
+
+--------------------------------------------------------------------------------
+  
