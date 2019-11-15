@@ -20,12 +20,13 @@ class Functor f => Applicative f where
 --------------------------------------------------------------------------------
 
 -- Pure for Sum f g a is probably impossible
-
+-- we don't have an instance of g or f to make pure. So this is not an applicative
+{-    
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
   pure x = undefined --- :: Sum f g a -| x :: a
   (InL f) <*> (InL y) = InL (f <*> y)
   (InR f) <*> (InR y) = InR (f <*> y)
-
+-}
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Product f g) where
