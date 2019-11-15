@@ -10,7 +10,7 @@ import Data.Functor.Const
 import Control.Dsl.Cont as C
 import Data.Proxy
 import Data.Sequence.Internal
-
+import Data.Functor.Yoneda
 
 class Functor f => Applicative f where
   pure :: a -> f a
@@ -20,16 +20,17 @@ class Functor f => Applicative f where
 --------------------------------------------------------------------------------
 
 -- Pure for Sum f g a is probably impossible
-
+-- we don't have an instance of g or f to make pure. So this is not an applicative
+{-    
 instance (Applicative f, Applicative g) => Applicative (Sum f g) where
   pure x = undefined --- :: Sum f g a -| x :: a
   (InL f) <*> (InL y) = InL (f <*> y)
   (InR f) <*> (InR y) = InR (f <*> y)
-
+-}
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Product f g) where
-  pure x = undefined
+  pure x = Pair (pure x) (pure x)
   (Pair x1 x2) <*> (Pair y1 y2) = Pair (x1 <*> y1) (x2 <*> y2)
 
 --------------------------------------------------------------------------------
@@ -58,10 +59,10 @@ instance Functor (Cont a) where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
+
   pure x = Compose $ pure $pure x
   Compose f  <*> Compose x=  Compose $ (fmap (<*>)  f ) <*> x
-                  -- Expected type (a -> b), ^ Actual type f (g (a -> b)) 
-
+ 
 --------------------------------------------------------------------------------
 
 instance Applicative Proxy where
@@ -75,3 +76,11 @@ instance Applicative (State s) where
   State f <*> State g=  State $ \ h ->(h, ((snd  (f h)) (snd  (g h))))
    
 --------------------------------------------------------------------------------
+
+-- idk check hoogle source
+instance Applicative m => Applicative (Yoneda m) where
+  pure x = Yoneda $ \y -> pure (y x)
+  Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
+
+--------------------------------------------------------------------------------
+  
