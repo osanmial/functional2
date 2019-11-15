@@ -29,7 +29,7 @@ instance (Applicative f, Applicative g) => Applicative (Sum f g) where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Product f g) where
-  pure x = undefined
+  pure x = Pair (pure x) (pure x)
   (Pair x1 x2) <*> (Pair y1 y2) = Pair (x1 <*> y1) (x2 <*> y2)
 
 --------------------------------------------------------------------------------

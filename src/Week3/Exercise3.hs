@@ -51,5 +51,4 @@ chunk :: String -> Parser String
 chunk []     = fmap (\x -> "") eof
 chunk (x:xs) = pure (++) <*> g <*> chunk xs
   where
-    g :: Parser String
     g = fmap (\x -> [x]) (single x)
