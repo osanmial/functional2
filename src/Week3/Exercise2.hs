@@ -58,8 +58,8 @@ instance Functor (Cont a) where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
-  pure x = undefined
-  (Compose f) <*> functor = undefined-- fmap f functor
+  pure x = Compose $ pure $pure x
+  Compose f  <*> Compose x=  Compose $ (fmap (<*>)  f ) <*> x
                   -- Expected type (a -> b), ^ Actual type f (g (a -> b)) 
 
 --------------------------------------------------------------------------------
