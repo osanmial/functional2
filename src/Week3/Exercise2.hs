@@ -10,6 +10,7 @@ import Data.Functor.Compose
 import Data.Functor.Const
 import Control.Dsl.Cont as C
 import Data.Proxy
+import Data.Profunctor
 import Data.Sequence.Internal
 import Data.Functor.Yoneda
 
@@ -21,25 +22,12 @@ class Functor f => Applicative f where
 
 --------------------------------------------------------------------------------
 
-{-
-identity
-    pure id <*> v = v
-
-composition
-    pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
-
-homomorphism
-    pure f <*> pure x = pure (f x)
-
-interchange
-    u <*> pure y = pure ($ y) <*> u
--}
-
--- here are multiple different ways to define this. 
---instance (Applicative f, Applicative g) => Applicative (Sum f g) where
---  pure x = InR pure x --- :: Sum f g a -| x :: a
---  (InR f) <*> fu = f <$> fu
---  (InL f) <*> fu  = inL f
+--there does not appear to be any way to combine InR f and InL a. So no applicative can be found.
+-- instance (Applicative f, Applicative g) => Applicative (Sum f g) where
+--   pure x = InR $ pure x --- :: Sum f g a -| x :: a
+--   (InR f) <*> (InR a) = InR $ f <*> a
+--   (InR f) <*> (InL c) = InR $ f <*> c -- no work
+--   (InL c) <*> fu  = InL c -- In case we have InL f and InR a then there is no f to convert a to b. as such there cant be a functor instance? 
 
 --------------------------------------------------------------------------------
 
@@ -91,8 +79,15 @@ instance Functor (Cont a) where
 
 --------------------------------------------------------------------------------
 
---instance Applicative (Star f d) where
---  pure x = Star (\t -> pure x)
+instance Applicative f => Applicative (Star f d) where
+  pure x = Star (\t -> pure x)
+  (Star sf) <*> (Star fun) = Star $ \d -> (sf d <*> fun d)
+
+--------------------------------------------------------------------------------
+
+instance Applicative f => Applicative (Costar f c) where
+  pure x = Costar (\fd -> x)
+  (Costar csf) <*> (Costar fun) = Costar (\fd -> (csf fd) (fun fd))
   
 --------------------------------------------------------------------------------  
 -- idk check hoogle source
