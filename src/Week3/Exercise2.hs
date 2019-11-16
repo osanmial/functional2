@@ -44,7 +44,8 @@ instance Applicative Identity where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
-
+-- Very important refrence: enjoy :)
+--https://medium.com/@fintan.halpenny/compose-tetris-196b70035aff
   pure x = Compose $ pure $pure x
   Compose f  <*> Compose x=  Compose $ (fmap (<*>)  f ) <*> x
  
