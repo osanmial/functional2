@@ -90,3 +90,4 @@ noneOf xs = satisfy (\x -> notElem x xs)
 chunk :: String -> Parser String
 chunk []     = fmap (\x -> "") eof
 chunk (x:xs) = pure (++) <*> (fmap (\x -> [x]) (single x)) <*> chunk xs
+

@@ -1,6 +1,6 @@
-{-# LANGUAGE ExistentialQuantification, RankNTypes #-}
+{-# LANGUAGE ExistentialQuantification, RankNTypes, InstanceSigs #-}
 {-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
-module Week3.Excercise2 where
+module Week3.Exercise2 where
 
 import Prelude hiding (Applicative, pure, (<*>))
 import Data.Functor.Sum
@@ -13,12 +13,12 @@ import Data.Proxy
 import Data.Profunctor
 import Data.Sequence.Internal
 import Data.Functor.Yoneda
+import Week3.Exercise1
 
-
-class Functor f => Applicative f where
-  pure :: a -> f a
-  (<*>) :: f (a -> b) -> f a -> f b
-  infixl 4 <*>
+-- class Functor f => Applicative f where
+--   pure :: a -> f a
+--   (<*>) :: f (a -> b) -> f a -> f b
+--   infixl 4 <*>
 
 --------------------------------------------------------------------------------
 
@@ -91,10 +91,39 @@ instance Applicative f => Applicative (Costar f c) where
   
 --------------------------------------------------------------------------------  
 -- idk check hoogle source
+-- instance Applicative m => Applicative (Yoneda m) where
+--   pure x = Yoneda $ \y -> pure (y x)
+--   Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
+
+
 instance Applicative m => Applicative (Yoneda m) where
-  pure x = Yoneda $ \y -> pure (y x)
-  Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
+  pure x = Yoneda (\f -> pure (f x))
+
+{-
+we have:
+Yoneda (flip fmap mf :: m (a->b)))
+Yoneda (flip fmap a :: m a))
+we want to use this like:
+Yoneda (flip fmap b :: mb)
+Whith the applicative instance of yoneda we can do this.
+-}
+--  (<*>) :: Yoneda f (a -> b) -> Yoneda f a -> Yoneda f b
+-- (((a -> b) -> e) -> f e) ->    First Yoneda takes a function mapping functions and applies it to a structure. This suggest that there exists an fmap that has a structure containing functions as a parameter.
+-- ((a -> k) -> f k) ->    Second Yoneda takes a function and maps it to a structure
+-- (b -> c) -> f c    Output yoneda takes a function and maps it to a structure
+-- So we have a structure containing functions wrapped in an fmap.
+-- We have an stucture containing values wrapped in an fmap
+-- Actually what we want is a mapping from the output
+  (Yoneda yf) <*> (Yoneda ya) = Yoneda g where
+    g h = yf ((.) h) <*> ya id
+
+testYonedaApp = let
+  inY1 = Yoneda (flip fmap [(1+),(10+),(100+)])
+  inY2 = Yoneda (flip fmap [1,2,3])
+  in runYoneda (inY1 <*> inY2) (+1)
+
+
+--------------------------------------------------------------------------------  
 
 
 
-  
