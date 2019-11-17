@@ -13,7 +13,9 @@ import Data.Proxy
 import Data.Profunctor
 import Data.Sequence.Internal
 import Data.Functor.Yoneda
+import Data.Functor.Coyoneda
 import Week3.Exercise1
+
 
 -- class Functor f => Applicative f where
 --   pure :: a -> f a
@@ -125,5 +127,30 @@ testYonedaApp = let
 
 --------------------------------------------------------------------------------  
 
+-- fmap :: (a -> b) -> t a -> t b
+-- (((a -> b) -> e) -> f e) ->  ((a -> k) -> f k) ->  (b -> c) -> f c
+
+--En käsitä yhtään.
+
+--contramap :: (b -> a) -> f a -> f b
+--sisältää contravariantin functorin käärittynä contramappiin? -- Väärin. Ei näin. Ei sisällä.
+--Pahoittelut nimeämiskäytänteistä, jotka putosivat lattialle ja hajosivat tuhannen palasiksi.
+instance Applicative f => Applicative (Coyoneda f) where
+  --Miksi? Miksi id? Ainut vaihtoehto? Mikä tämä on?
+  pure x = Coyoneda id $ pure x
+  --(<*>) :: Coyoneda f (a->b) -> Coyoneda f a -> Coyoneda f b
+  --(<*>) :: forall. x y z.
+  --     Coy ((x -> (a->b))) (f x)
+  --  -> Coy ((y -> a)) (f y)
+  --  -> Coy ((z -> b)) (f z)
+  
+  (Coyoneda xf fy) <*> (Coyoneda xa fy') = Coyoneda id fz where
+    fz = fb
+    fb = fab <*> fa
+    fab = xf <$> fy
+    fa = xa <$> fy' -- :: (z -> b)
+
+    -- Ei tässä kyllä ole mitään järkeä. En ymmärrä. Mikä tämä Coyoneda on? Miksi tämä applicatiivi instanssi olisi yhtään järkevä? En ikinä olisi itse keksinyt tuota id:tä tuonne.
 
 
+  
