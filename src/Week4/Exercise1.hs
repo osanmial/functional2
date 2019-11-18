@@ -89,3 +89,7 @@ instance Monad IO where
   (IO m) >>= am = IO $ \s -> case m s of
     (# s', r #) -> case (am r) of 
       (IO am') -> am' s'
+
+---------------------------------------------------------------------------------
+
+-- Map if we have time
