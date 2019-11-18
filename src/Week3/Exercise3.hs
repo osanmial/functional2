@@ -12,6 +12,7 @@ Combines parsers one after another and operator determines how their a's are com
 Structure: PARSER <|> PARSER
 Returns the function result that passes, if both would pass it returns the first one
 
+--this makes little sense to do this way
 Structure: PARSER_CONSTRUCTOR <$> PARSER(3)
 Creates a parser(1) that has a parser(2) inside it, the parser(2) seems to be based on
 the parser(3) and the input of the parser(1)
