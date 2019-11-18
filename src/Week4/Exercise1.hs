@@ -20,7 +20,7 @@ instance Monad [] where
     xs >>= f = concat (map f xs)  
  --------------------------------------------------------------------------------
  
----nstance Monad ((,)a) where
- --  return x = (empty,x)
- --  (x,y) >>= f = undefined
+instance Monoid a => Monad ((,) a) where
+    return x = (mempty,x)
+    (x,y) >>= f = (x, snd (f y))
 --------------------------------------------------------------------------------
