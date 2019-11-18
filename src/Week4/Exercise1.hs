@@ -14,3 +14,7 @@ instance Monad Maybe where
     Nothing >>= f = Nothing  
     Just x >>= f  = f x  
  --------------------------------------------------------------------------------
+ instance Monad [] where  
+    return x = [x]  
+    xs >>= f = concat (map f xs)  
+    
