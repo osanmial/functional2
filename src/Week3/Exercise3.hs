@@ -92,3 +92,6 @@ chunk :: String -> Parser String
 chunk []     = fmap (\x -> "") eof
 chunk (x:xs) = pure (++) <*> (fmap (\x -> [x]) (single x)) <*> chunk xs
 
+chunk2 :: String -> Parser String
+chunk2 []     = Parser (\x -> Right (x, ""))
+chunk2 (x:xs) = (\f -> ([f] ++)) <$> single x <*> chunk2 xs
