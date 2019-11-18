@@ -1,6 +1,6 @@
-{-# LANGUAGE ExistentialQuantification, RankNTypes #-}
+{-# LANGUAGE ExistentialQuantification, RankNTypes, InstanceSigs #-}
 {-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
-module Week3.Excercise2 where
+module Week3.Exercise2 where
 
 import Prelude hiding (Applicative, pure, (<*>))
 import Data.Functor.Sum
@@ -13,12 +13,14 @@ import Data.Proxy
 import Data.Profunctor
 import Data.Sequence.Internal
 import Data.Functor.Yoneda
+import Data.Functor.Coyoneda
+import Week3.Exercise1
 
 
-class Functor f => Applicative f where
-  pure :: a -> f a
-  (<*>) :: f (a -> b) -> f a -> f b
-  infixl 4 <*>
+-- class Functor f => Applicative f where
+--   pure :: a -> f a
+--   (<*>) :: f (a -> b) -> f a -> f b
+--   infixl 4 <*>
 
 --------------------------------------------------------------------------------
 
@@ -92,10 +94,64 @@ instance Applicative f => Applicative (Costar f c) where
   
 --------------------------------------------------------------------------------  
 -- idk check hoogle source
-instance Applicative m => Applicative (Yoneda m) where
-  pure x = Yoneda $ \y -> pure (y x)
-  Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
+-- instance Applicative m => Applicative (Yoneda m) where
+--   pure x = Yoneda $ \y -> pure (y x)
+--   Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
 
+
+instance Applicative m => Applicative (Yoneda m) where
+  pure x = Yoneda (\f -> pure (f x))
+
+{-
+we have:
+Yoneda (flip fmap mf :: m (a->b)))
+Yoneda (flip fmap a :: m a))
+we want to use this like:
+Yoneda (flip fmap b :: mb)
+Whith the applicative instance of yoneda we can do this.
+-}
+--  (<*>) :: Yoneda f (a -> b) -> Yoneda f a -> Yoneda f b
+-- (((a -> b) -> e) -> f e) ->    First Yoneda takes a function mapping functions and applies it to a structure. This suggest that there exists an fmap that has a structure containing functions as a parameter.
+-- ((a -> k) -> f k) ->    Second Yoneda takes a function and maps it to a structure
+-- (b -> c) -> f c    Output yoneda takes a function and maps it to a structure
+-- So we have a structure containing functions wrapped in an fmap.
+-- We have an stucture containing values wrapped in an fmap
+-- Actually what we want is a mapping from the output
+  (Yoneda yf) <*> (Yoneda ya) = Yoneda g where
+    g h = yf ((.) h) <*> ya id
+
+testYonedaApp = let
+  inY1 = Yoneda (flip fmap [(1+),(10+),(100+)])
+  inY2 = Yoneda (flip fmap [1,2,3])
+  in runYoneda (inY1 <*> inY2) (+1)
+
+
+--------------------------------------------------------------------------------  
+
+-- fmap :: (a -> b) -> t a -> t b
+-- (((a -> b) -> e) -> f e) ->  ((a -> k) -> f k) ->  (b -> c) -> f c
+
+--En käsitä yhtään.
+
+--contramap :: (b -> a) -> f a -> f b
+--sisältää contravariantin functorin käärittynä contramappiin? -- Väärin. Ei näin. Ei sisällä.
+--Pahoittelut nimeämiskäytänteistä, jotka putosivat lattialle ja hajosivat tuhannen palasiksi.
+instance Applicative f => Applicative (Coyoneda f) where
+  --Miksi? Miksi id? Ainut vaihtoehto? Mikä tämä on?
+  pure x = Coyoneda id $ pure x
+  --(<*>) :: Coyoneda f (a->b) -> Coyoneda f a -> Coyoneda f b
+  --(<*>) :: forall. x y z.
+  --     Coy ((x -> (a->b))) (f x)
+  --  -> Coy ((y -> a)) (f y)
+  --  -> Coy ((z -> b)) (f z)
+  
+  (Coyoneda xf fy) <*> (Coyoneda xa fy') = Coyoneda id fz where
+    fz = fb
+    fb = fab <*> fa
+    fab = xf <$> fy
+    fa = xa <$> fy' -- :: (z -> b)
+
+    -- Ei tässä kyllä ole mitään järkeä. En ymmärrä. Mikä tämä Coyoneda on? Miksi tämä applicatiivi instanssi olisi yhtään järkevä? En ikinä olisi itse keksinyt tuota id:tä tuonne.
 
 
   
