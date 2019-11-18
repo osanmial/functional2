@@ -24,3 +24,8 @@ instance Monoid a => Monad ((,) a) where
     return x = (mempty,x)
     (x,y) >>= f = (x, snd (f y))
 --------------------------------------------------------------------------------
+instance Monad (Either a ) where
+   return x= Right x 
+   (Right x ) >>= f = f x
+   (Left x ) >>= f = Left x 
+   --------------------------------------------------------------------------------
