@@ -26,5 +26,6 @@ library
                   Week3.Exercise1
                   Week3.Exercise2
                   Week3.Exercise3
+                  Week3.Exercise4
                   
   build-depends: base >= 4.7 && < 5, mtl, containers, endo, control-dsl, profunctors, kan-extensions, bifunctors
