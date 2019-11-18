@@ -18,6 +18,12 @@ instance Monad Maybe where
     Nothing >>= f = Nothing  
     Just x >>= f  = f x  
 --------------------------------------------------------------------------------
+instance Monad (Either a ) where
+   return x= Right x 
+   (Right x ) >>= f = f x
+   (Left x ) >>= f = Left x 
+--------------------------------------------------------------------------------
+
 instance Monad [] where
     xs >>= f = concat (Prelude.map f xs)  
 --------------------------------------------------------------------------------
@@ -31,4 +37,3 @@ instance Monad NonEmpty where
 instance Monoid a => Monad ((,) a) where
     (x,y) >>= f = (x, snd (f y))
 --------------------------------------------------------------------------------
-
