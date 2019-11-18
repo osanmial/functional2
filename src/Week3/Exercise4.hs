@@ -11,10 +11,9 @@ recordSeparator = single '\n'
 unit = unitValueUnquoted <|> unitValueQuoted
 unitValueUnquoted = some (noneOf [',', '\n', '\r', '"'])
 unitValueQuoted = flip const <$> single '"'
-                  <*> (const <$> some (anySingleBut '"')
+                  <*> (const <$> insideQuotes
                        <*> single '"')
---doesn't work
-insideQuotes = fmap concat (some ((chunk "\"\"") <|> fmap (\x -> [x]) (anySingleBut '"')))
+insideQuotes = fmap concat (some ((chunk2 "\"\"") <|> fmap (\x -> [x]) (anySingleBut '"')))
 
 unitSeparator = single ','
 
