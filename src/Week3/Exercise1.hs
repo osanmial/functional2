@@ -45,6 +45,10 @@ instance Monoid a => Applicative ((,) a) where
 
 --------------------------------------------------------------------------------
 
+-- Op not a functor
+
+--------------------------------------------------------------------------------
+
 instance Applicative ((->) a) where
   pure x = const x
   f <*> functor = \x -> f x (functor x)
