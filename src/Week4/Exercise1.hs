@@ -1,28 +1,36 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week4.Exercise1 where
-import Prelude hiding (Monad, return, (>>=))
---import Week3.Exercise1
+import Prelude hiding (Monad, return, (>>=), (>>))
+import Data.List.NonEmpty as Esko hiding (map)
 
-class Applicative  m=> Monad m where  
-    return :: a -> m a  
-    (>>=) :: m a -> (a -> m b) -> m b  
----------------------------------------------------------------------------------
+import GHC.Base hiding (Monad, (>>=), (>>))
+import GHC.ST
+import GHC.Exception
+import GHC.Show
+import Data.Maybe
+
+import {-# SOURCE #-} GHC.IO.Exception ( userError )
+
+
+class Applicative m => Monad m where  
+    return :: a -> m a
+    return = pure
+    (>>=) :: m a -> (a -> m b) -> m b
+    (>>)  :: m a -> m b -> m b
+    m >> n = m >>= \_ -> n
+
+--------------------------------------------------------------------------------
 
 -- Bool is not a Monad
 
 ---------------------------------------------------------------------------------
+
 instance Monad Maybe where
     return x = Just x
     Nothing >>= f = Nothing
     Just x >>= f  = f x
     
----------------------------------------------------------------------------------
-
-instance Monad [] where
-    return x = [x]
-    xs >>= f = concat (map f xs)
-
 ---------------------------------------------------------------------------------
 
 ---nstance Monad ((,)a) where
@@ -51,16 +59,33 @@ instance Monad ((->) c) where
 
 ---------------------------------------------------------------------------------
 
-{-
-defined something like:
-data IO = (\s -> (s,a))
-where
-  getMaskingState# s
-gives us t
+instance Monad (Either a ) where
+   return x= Right x 
+   (Right x ) >>= f = f x
+   (Left x ) >>= f = Left x
+   
+---------------------------------------------------------------------------------
 
--}
+instance Monad [] where
+    xs >>= f = concat (Prelude.map f xs)
+    
+---------------------------------------------------------------------------------
 
+instance Monad NonEmpty where
+  (x :| xs) >>= f = y :| ys ++ zs
+    where
+      (y :| ys) = f x
+      zs = xs >>= (toList . f)
+      toList (c :| cs) = c:cs
+      
+---------------------------------------------------------------------------------
 
-instance Monad (IO a1) where
-  a >>= b = 
-    a = 
+instance Monoid a => Monad ((,) a) where
+    (x,y) >>= f = (x, snd (f y))
+    
+---------------------------------------------------------------------------------
+
+instance Monad IO where
+  (IO m) >>= am = IO $ \s -> case m s of
+    (# s', r #) -> case (am r) of 
+      (IO am') -> am' s'
