@@ -17,11 +17,6 @@ import Data.Functor.Coyoneda
 import Week3.Exercise1
 
 
--- class Functor f => Applicative f where
---   pure :: a -> f a
---   (<*>) :: f (a -> b) -> f a -> f b
---   infixl 4 <*>
-
 --------------------------------------------------------------------------------
 
 --there does not appear to be any way to combine InR f and InL a. So no applicative can be found.
@@ -46,8 +41,6 @@ instance Applicative Identity where
 --------------------------------------------------------------------------------
 
 instance (Applicative f, Applicative g) => Applicative (Compose f g) where
--- Very important refrence: enjoy :)
---https://medium.com/@fintan.halpenny/compose-tetris-196b70035aff
   pure x = Compose $ pure $pure x
   Compose f  <*> Compose x=  Compose $ (fmap (<*>)  f ) <*> x
  
@@ -93,7 +86,6 @@ instance Applicative f => Applicative (Costar f c) where
   (Costar csf) <*> (Costar fun) = Costar (\fd -> (csf fd) (fun fd))
   
 --------------------------------------------------------------------------------  
--- idk check hoogle source
 -- instance Applicative m => Applicative (Yoneda m) where
 --   pure x = Yoneda $ \y -> pure (y x)
 --   Yoneda f <*> Yoneda x = Yoneda $ (\y -> f (y .) <*> x id)
@@ -128,16 +120,8 @@ testYonedaApp = let
 
 --------------------------------------------------------------------------------  
 
--- fmap :: (a -> b) -> t a -> t b
--- (((a -> b) -> e) -> f e) ->  ((a -> k) -> f k) ->  (b -> c) -> f c
-
---En käsitä yhtään.
-
---contramap :: (b -> a) -> f a -> f b
---sisältää contravariantin functorin käärittynä contramappiin? -- Väärin. Ei näin. Ei sisällä.
---Pahoittelut nimeämiskäytänteistä, jotka putosivat lattialle ja hajosivat tuhannen palasiksi.
 instance Applicative f => Applicative (Coyoneda f) where
-  --Miksi? Miksi id? Ainut vaihtoehto? Mikä tämä on?
+
   pure x = Coyoneda id $ pure x
   --(<*>) :: Coyoneda f (a->b) -> Coyoneda f a -> Coyoneda f b
   --(<*>) :: forall. x y z.
@@ -150,8 +134,6 @@ instance Applicative f => Applicative (Coyoneda f) where
     fb = fab <*> fa
     fab = xf <$> fy
     fa = xa <$> fy' -- :: (z -> b)
-
-    -- Ei tässä kyllä ole mitään järkeä. En ymmärrä. Mikä tämä Coyoneda on? Miksi tämä applicatiivi instanssi olisi yhtään järkevä? En ikinä olisi itse keksinyt tuota id:tä tuonne.
 
 
   
