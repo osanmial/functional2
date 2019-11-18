@@ -16,6 +16,7 @@ Structure: PARSER_CONSTRUCTOR <$> PARSER(3)
 Creates a parser(1) that has a parser(2) inside it, the parser(2) seems to be based on
 the parser(3) and the input of the parser(1)
 
+
 Structure: some PARSER
 Applies parser constantly until if fails, returns a result
 If it doesn't succeed a single time returns left
@@ -24,7 +25,7 @@ Structure: many PARSER
 Same as some, but never returns a left
 
 Structure: optional PARSER
-Never returns a left, a is just wrapped into a maybe
+Never returns a left, 'a' is just wrapped into a maybe
 
 Structure: empty
 Always returns left
