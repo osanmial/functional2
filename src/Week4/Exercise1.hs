@@ -1,6 +1,7 @@
 module Week4.Exercise1 where
-import Prelude hiding (Monad, return, (>>=))
-
+import Prelude hiding (Monad, return, (>>=)) 
+import Data.List.NonEmpty as NonEmpty
+import Data.Map as Map
 
 class Applicative  m=> Monad m where  
     return :: a -> m a  
@@ -17,7 +18,7 @@ instance Monad Maybe where
  --------------------------------------------------------------------------------
 instance Monad [] where  
     return x = [x]  
-    xs >>= f = concat (map f xs)  
+    xs >>= f = Prelude.concat (Prelude.map f xs)  
  --------------------------------------------------------------------------------
  
 instance Monoid a => Monad ((,) a) where
@@ -28,4 +29,14 @@ instance Monad (Either a ) where
    return x= Right x 
    (Right x ) >>= f = f x
    (Left x ) >>= f = Left x 
-   --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+instance Monad NonEmpty where
+   return x = (x :| [])
+   (x :| xs) >>= f =  f x :| ( xs >>= f) 
+--------------------------------------------------------------------------------
+--instance for Map will be implemented later  if we have more time
+--------------------------------------------------------------------------------    
+   
+   
+   
+   
