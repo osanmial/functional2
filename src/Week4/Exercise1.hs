@@ -1,5 +1,5 @@
 module Week4.Exercise1 where
-import Prelude hiding (Monad, return, (>>=))
+import Prelude hiding (Monad, return, (>>=), (>>))
 import Data.List.NonEmpty as Esko
 
 

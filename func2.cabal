@@ -27,5 +27,11 @@ library
                   Week3.Exercise2
                   Week3.Exercise3
                   Week3.Exercise4
+                  Week4.Exercise1
+                  Week4.Exercise2
+                  Week4.Exercise3
+                  Week4.Exercise4
+                  Utility.Simple
+                  Utility.Complex
                   
   build-depends: base >= 4.7 && < 5, mtl, containers, endo, control-dsl, profunctors, kan-extensions, bifunctors
