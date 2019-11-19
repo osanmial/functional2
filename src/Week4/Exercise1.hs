@@ -10,7 +10,7 @@ import GHC.Exception
 import GHC.Show
 import Data.Maybe
 
-import {-# SOURCE #-} GHC.IO.Exception ( userError )
+--import {-# SOURCE #-} GHC.IO.Exception ( userError )
 
 class Applicative m => Monad m where  
     return :: a -> m a

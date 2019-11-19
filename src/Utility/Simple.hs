@@ -1,9 +1,5 @@
-module Utility.Simple (
-  module NonEmpty,
-  module Map,
-  module Foldable
-  ) where
+module Utility.Simple where
 
-import Data.List.NonEmpty
+import Data.List.NonEmpty as NonEmpty
 import Data.Map as Map
-import Data.Foldable
+import Data.Foldable as Foldable
