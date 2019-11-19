@@ -16,9 +16,9 @@ instance (Monad m , Monad n)=>Monad (Product m n)  where
 -- Sum m n a is not applicative so no instance
 
 --------------------------------------------------------------------------------
-
-
--- TODO Identity
+instance Monad Identity where
+    return x = Identity x1
+    (Identity x) >>= f = f x 
 
 --------------------------------------------------------------------------------
 
