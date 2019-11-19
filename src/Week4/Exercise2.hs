@@ -18,11 +18,16 @@ instance (Monad m , Monad n)=>Monad (Product m n)  where
 --------------------------------------------------------------------------------
 
 instance Monad Identity where
-    (Identity x) >>= f = f x 
+  (Identity x) >>= f = f x 
 
 --------------------------------------------------------------------------------
 
--- TODO Compose m n a, instances for m and n given
+-- The idea in bind is to combine monadic value ma containing values of type a 
+--  and a function which operates on a value v of type a, returning the monadic 
+--  value mb. 
+
+--One can do Monads compose, but the result might not be a monad. 
+-- There is a kind of statment says : "Applicatives compose, monads don't."
 
 --------------------------------------------------------------------------------
 
@@ -36,6 +41,7 @@ instance Monad Proxy where
   _ >>= _ = Proxy
 
 --------------------------------------------------------------------------------
+
 
 instance Monad (State s) where
   State ms >>= toNewMs = State (\s'' -> p (ms s'')) where
