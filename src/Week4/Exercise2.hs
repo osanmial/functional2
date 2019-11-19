@@ -21,9 +21,12 @@ instance Monad Identity where
     (Identity x) >>= f = f x 
 
 --------------------------------------------------------------------------------
+-- The idea in bind is to combine monadic value ma containing values of type a 
+--  and a function which operates on a value v of type a, returning the monadic 
+--  value mb. 
 
--- TODO Compose m n a, instances for m and n given
-
+--One can do Monads compose, but the result might not be a monad. 
+-- There is a kind of statment says : "Applicatives compose, monads don't."
 --------------------------------------------------------------------------------
 
 -- TODO Const ab
