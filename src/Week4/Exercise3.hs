@@ -1,19 +1,55 @@
 module Week4.Exercise3 where
+import Control.Exception
+import Data.Map
+import System.IO.Unsafe (unsafePerformIO)
 
-data Expr = Add Expr Expr | Zero | Mul Expr Expr | One
-          deriving Show
+data Expr = Add Expr Expr | Zero | Mul Expr Expr | One |
+  Let String Expr Expr | Var String
+  deriving Show
 
-(#+) = add
-(#*) = mul
+join :: Monad m => m (m a) -> m a
+join mma = mma >>= id
+{-
+  mma
+  >>= :: m ma -> (ma-> m b) -> mb
+  mb
+-}
 
-add :: Expr -> Expr -> Expr
-add x    Zero = x
-add Zero y    = y
-add x    y    = Add x y
+closedDeep =
+  Let "two" (Add One One) $
+  Let "three" (Add One (Var "two")) $
+  Let "nine" (Mul (Var "three") (Var "three")) $
+  Add One (Mul (Var "three") (Add One (Var "nine")))
+  
+openDeep = Add One undefined
 
-mul :: Expr -> Expr -> Expr
-mul x   One = x
-mul One y   = y
-mul x (Add a b) = Add (Mul x a) (Mul x b)
-mul (Add a b) x = Add (Mul x a) (Mul x b)
-mul x   y   = Mul x y
+evalDeep inp = let
+  x = (evalDeep' (inp, empty))
+  in
+    unsafePerformIO (catch (seq x (pure (pure (Just x))))
+                     (\ e -> seq (e :: SomeException) (pure Nothing)))
+
+
+evalDeep' :: (Expr, Map String Int) -> Int
+evalDeep' (x,vars) = case x of
+  One -> 1
+  Zero -> 0
+  Var var -> vars ! var
+  Add a b -> evalDeep' (a,vars) + evalDeep' (b,vars) 
+  Mul a b -> evalDeep' (a,vars) * evalDeep' (b,vars)
+  Let name a b -> evalDeep' (b , insert name (evalDeep' (a,vars)) vars)
+
+
+-- a version with Maybe
+evalDeep'' :: (Expr, Map String (Maybe Int)) -> Maybe Int
+evalDeep'' (x,vars) = case x of
+  One -> Just 1
+  Zero -> Just 0
+  Var str -> join $ vars !? str
+  Add a b -> (+) <$> evalDeep'' (a,vars) <*> evalDeep'' (b,vars) 
+  Mul a b -> (*) <$> evalDeep'' (a,vars) <*> evalDeep'' (b,vars)
+  Let name a b -> evalDeep'' (b , insert name (evalDeep'' (a,vars)) vars)
+
+
+
+
