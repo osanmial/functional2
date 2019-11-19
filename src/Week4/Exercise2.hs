@@ -17,7 +17,7 @@ instance (Monad m , Monad n)=>Monad (Product m n)  where
 
 --------------------------------------------------------------------------------
 instance Monad Identity where
-    return x = Identity x	
+    return x = Identity x
     (Identity x) >>= f = f x 
 
 --------------------------------------------------------------------------------
