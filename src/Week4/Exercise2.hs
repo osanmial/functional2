@@ -22,6 +22,7 @@ instance Monad Identity where
 
 --------------------------------------------------------------------------------
 
+-- instance Monad Compose 
 -- The idea in bind is to combine monadic value ma containing values of type a 
 --  and a function which operates on a value v of type a, returning the monadic 
 --  value mb. 
@@ -41,7 +42,6 @@ instance Monad Proxy where
   _ >>= _ = Proxy
 
 --------------------------------------------------------------------------------
-
 
 instance Monad (State s) where
   State ms >>= toNewMs = State (\s'' -> p (ms s'')) where
