@@ -2,20 +2,21 @@ module Week4.Exercise2 where
 
 import Prelude hiding (Monad, return, (>>=), (>>))
 import Week4.Exercise1
-import Utility.Complex
+import Utility.Complex  
 
-instance (Applicative m, Applicative n) => Monad (Product m n) where
-  _ >>= _ = undefined
 
+instance (Monad m , Monad n)=>Monad (Product m n)  where
+    return x =Pair (pure x) (pure x)
+    (Pair x1 y1) >>= f=  Pair (x1 >>= (fst'.f)) (y1 >>= (snd'.f))
+            where 
+                fst' (Pair fx _)= fx
+                snd' (Pair _ fy)= fy
 --------------------------------------------------------------------------------
 
 -- Sum m n a is not applicative so no instance
 
 --------------------------------------------------------------------------------
 
--- TODO product
-
---------------------------------------------------------------------------------
 
 -- TODO Identity
 
