@@ -17,7 +17,7 @@ instance (Monad m , Monad n)=>Monad (Product m n)  where
 
 --------------------------------------------------------------------------------
 instance Monad Identity where
-    return x = Identity x1
+    return x = Identity x	
     (Identity x) >>= f = f x 
 
 --------------------------------------------------------------------------------
@@ -38,8 +38,8 @@ instance Monad Identity where
 --------------------------------------------------------------------------------
 
 -- TODO Instances for State a b.
-
 --------------------------------------------------------------------------------
+
 
 instance Monad (State s) where
   State ms >>= toNewMs = State (\s'' -> p (ms s'')) where
