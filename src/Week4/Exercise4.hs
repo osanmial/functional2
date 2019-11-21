@@ -1,8 +1,9 @@
 module Week4.Exercise4 where
-import Week4.Exercise3 -- (Expr (..), evalDeep)
-import Week3.Exercise3 -- (Parser (..), single, oneOf)
+import Week4.Exercise3
+import Week3.Exercise3
 import Control.Applicative
 import Data.List
+import Debug.Trace
 --grammar parser:
 
 -- parseGrammar :: String -> Expr
@@ -15,76 +16,108 @@ instance Monad Parser where
       Left e -> Left e
       Right (s,a) -> runParse (faPmb a) s
 
+-- lexems:
+--   lADD +
+--   lMul *
+--   lLet let
+--   lIn in
+--   lEq =
+--   lLBr (
+--   lRBr )
+--   lOne 1
+--   lZero 0
+--   lIdent words
+--   lEoF ""
+
+--end :: Parser 
+--end = do 
+
+--pExpr:: Parser Expr
 pExpr :: Parser Expr
-pExpr = pAdd
+pExpr = pLeft <|> pLet <|> pSub <|> pVar --pOne <|> pZero
 
-pAdd :: Parser Expr
-pAdd = do
-  add <- pAdd
-  space <- removeEmpties
-  term <- single '+'
-  space <- removeEmpties
-  mul <- pMul
-  (return $ Add add mul) <|> pAdd
+pLeft = (do
+  n <- pNum
+  c <- pCalc n
+  (pure c)) <|> pNum
+  -- (pure pMul One) <|> (end)
+pNum = pOne <|> pZero
 
-pMul :: Parser Expr
-pMul = do
-  mul <- pMul
+pCalc :: Expr -> Parser Expr
+pCalc left = pMul left <|> pAdd left
+
+pAdd left  = do
+  removeEmpties
+  term          <- single '+'
+  removeEmpties
+  right         <- pLeft 
+  (return $ Add left right)
+
+pMul left = do
   space <- removeEmpties
   term <- single '*'
   space <- removeEmpties
-  other <- pOther
-  (pure $ Mul mul other) <|> pOther
+  right <- pOther
+  (pure $ Mul left right)
 
 pOther :: Parser Expr
 pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
-
+  
 -- sub : '(' add ')' ;
 pSub :: Parser Expr
 pSub = do
   single '('
-  add <- pAdd
+  ex <- pExpr
   single ')'
-  pure add
+  pure ex
   
 pZero :: Parser Expr
 pZero = do
   single '0'
   pure Zero
+  
 pOne :: Parser Expr
 pOne = do
   single '1'
   pure One
+
+
 pLet :: Parser Expr  
 pLet = do
+  removeEmpties
   chunk2 "let"
-  var <- pIdent
+  removeEmpties
+  var           <- pIdent
+  removeEmpties
   single '='
-  expr1 <- pAdd
+  removeEmpties
+  expr1         <- pExpr
+  removeEmpties
   chunk2 "in"
-  expr2 <- pAdd
+  removeEmpties
+  expr2         <- pExpr
+  removeEmpties
   pure $ Let var expr1 expr2
-  
+
 pVar :: Parser Expr
 pVar = do
   out <- pIdent
   pure $ Var out
 
 pIdent :: Parser String
-pIdent = do
+pIdent = (do
   a1 <- pSmall
   a2 <- pIdent'
-  pure (a1 : a2) <|> (:[])<$> pSmall --Yerm wherm germ erm dweeh.
+  pure (a1 : a2)) <|> (:[]) <$> pSmall
 
 pIdent' :: Parser String
-pIdent' = do
-  a1 <- pIdent'
+pIdent' = (do
+  a1 <- oneFromLiftedParserList
   a2 <- pIdent'
-  pure (a1 ++ a2) <|> liftedParserList -- TODO replace ++ with those fancy stuff perhaps even maybe?
-  -- { ! getText().equals("let") && ! getText().equals("in") }? ;
+  pure (a1 ++ a2)) <|> oneFromLiftedParserList --replace ++ with something more effective. It happens backwards here I think.
 
-liftedParserList :: Parser [Char]
-liftedParserList = foldl1' (<|>) $ (fmap (:[])) <$> [pSmall, pLarge, pDigit, pPrime] --Herm erm gerum dwereh.
+oneFromLiftedParserList :: Parser [Char]
+oneFromLiftedParserList = foldl1' (<|>) $ (fmap (:[])) <$> [pSmall, pLarge, pDigit, pPrime]
   
 pSmall :: Parser Char
 pSmall = oneOf ['a'..'z'] -- [a-z] | [_] ;
@@ -94,12 +127,14 @@ pDigit :: Parser Char
 pDigit =oneOf ['0'..'9'] -- [0-9] ;
 pPrime :: Parser Char
 pPrime =single '\'' -- ['] ;
+
 removeEmpties :: Parser String
-removeEmpties = do
-  e1 <- oneOf ['\t','\n','\f','\r']
+removeEmpties = (do
+  e1 <- oneOf ['\t','\n','\f','\r', ' ']
   e2 <- removeEmpties
-  (pure "") <|> (pure "") -- have no clue what is a "line tabulation" or how to deal with it: '\u000b'
+  (pure "")) <|> (:[])<$> (oneOf ['\t','\n','\f','\r']) <|> (pure "") -- have no clue what is a "line tabulation" or how to deal with it: '\u000b'
   -- [\t\n\u000b\f\r ] + -> skip ;
+
 
 
 {-
@@ -126,12 +161,16 @@ Space : [\t\n\u000b\f\r ] + -> skip ;
 
 -}      
 
-test = case test' of
+test x = case test' x of
   Right (s,e) -> evalDeep e
   Left _ -> Just (-100)
---recursion goes on for ever and ever.
---Some of the Expression Parser structures get stuck on infinite structre when thy don't know how to proceed....
 
-test' :: Either ParseError (String, Expr)
-test' = runParse pExpr "1+1"
+---ääh tässä on vielä aika bugejah.
+test' x = runParse pExpr x
+
+--"let 1+1=two in (let two+two = nelja in (1 + 0 * nelja + 1))"
+
+--TODO let ei toimi. varför? 
+--TODO 1*0+1 ==> 0?
+--TODO test "let kissa = 1+1 in kissa*0" ==> 2?
 
