@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification, RankNTypes #-}
-module Week3.Exercise3 where
+module Week3.Exercise3 where --(Parser (..), single, oneOf)
 import Control.Applicative
 
 import Data.Typeable
@@ -33,7 +33,7 @@ Always returns left
 
 -}
 
-newtype Parser a = Parser {parse :: String -> Either ParseError (String, a)}
+newtype Parser a = Parser {runParse :: String -> Either ParseError (String, a)}
 
 data ParseError = SomethingWentWrong
   deriving Show
@@ -64,14 +64,14 @@ instance Alternative Parser where
       c s = case f s of
               Left _ -> g s
               v      -> v
-      
+
 eof :: Parser ()
-eof = Parser {parse = g} where
+eof = Parser {runParse = g} where
   g [] = Right ("", ())
   g _  = Left SomethingWentWrong
 
 satisfy :: (Char -> Bool) -> Parser Char
-satisfy f = Parser {parse = g} where
+satisfy f = Parser {runParse = g} where
   g []          = Left SomethingWentWrong
   g (c:cs)
     | f c       = Right (cs, c)
@@ -85,14 +85,14 @@ anySingleBut x = satisfy (/=x)
 
 oneOf :: [Char] -> Parser Char
 oneOf xs = satisfy (\x -> elem x xs) 
-    
+
 noneOf :: [Char] -> Parser Char
 noneOf xs = satisfy (\x -> notElem x xs)
 
 chunk :: String -> Parser String
 chunk []     = fmap (\x -> "") eof
-chunk (x:xs) = pure (++) <*> (fmap (\x -> [x]) (single x)) <*> chunk xs
+chunk (x:xs) = (:) <$> single x <*> chunk xs --pure (++) <*> (fmap (\x -> [x]) (single x)) <*> chunk xs
 
 chunk2 :: String -> Parser String
 chunk2 []     = Parser (\x -> Right (x, ""))
-chunk2 (x:xs) = (\f -> ([f] ++)) <$> single x <*> chunk2 xs
+chunk2 (x:xs) = (:) <$> single x <*> chunk2 xs -- (\f -> ([f] ++)) <$> single x <*> chunk2 xs

@@ -20,14 +20,14 @@ closedDeep =
   Let "three" (Add One (Var "two")) $
   Let "nine" (Mul (Var "three") (Var "three")) $
   Add One (Mul (Var "three") (Add One (Var "nine")))
-  
-openDeep = Add One undefined
 
-evalDeep inp = let
-  x = (evalDeep' (inp, empty))
-  in
-    unsafePerformIO (catch (seq x (pure (pure (Just x))))
-                     (\ e -> seq (e :: SomeException) (pure Nothing)))
+-- I didin't manage to make this work with just a plain undefined without capturing it in a catch, but if we consider that it is supposed to represent a value without a definition then this should be comparable.
+openDeep = Add One (Var "undefined")
+
+evalDeep inp = (evalDeep'' (inp, empty))
+  -- in
+  --   unsafePerformIO (catch (seq x (pure (pure (Just x))))
+  --                    (\ e -> seq (e :: SomeException) (pure Nothing)))
 
 
 evalDeep' :: (Expr, Map String Int) -> Int
@@ -49,6 +49,7 @@ evalDeep'' (x,vars) = case x of
   Add a b -> (+) <$> evalDeep'' (a,vars) <*> evalDeep'' (b,vars) 
   Mul a b -> (*) <$> evalDeep'' (a,vars) <*> evalDeep'' (b,vars)
   Let name a b -> evalDeep'' (b , insert name (evalDeep'' (a,vars)) vars)
+
 
 
 
