@@ -125,3 +125,13 @@ Prime : ['] ;
 Space : [\t\n\u000b\f\r ] + -> skip ;
 
 -}      
+
+test = case test' of
+  Right (s,e) -> evalDeep e
+  Left _ -> Just (-100)
+--recursion goes on for ever and ever.
+--Some of the Expression Parser structures get stuck on infinite structre when thy don't know how to proceed....
+
+test' :: Either ParseError (String, Expr)
+test' = runParse pExpr "1+1"
+
