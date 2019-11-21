@@ -2,7 +2,8 @@ module Week4.Exercise2 where
 
 import Prelude hiding (Monad, return, (>>=), (>>))
 import Week4.Exercise1
-import Utility.Complex
+import Week3.Exercise2
+import Utility.Complex  
 
 
 instance (Monad m , Monad n)=>Monad (Product m n)  where
@@ -48,7 +49,29 @@ instance Monad (State s) where
     p (s', v) = runState (toNewMs v) s'
 
 --------------------------------------------------------------------------------  
+--In continuation-passing style, computations are built up from sequences 
+--of nested continuations, terminated by a final continuation (often id) which 
+--produces the final result. 
 
+-- Only the last part  runCont (gs i) h is not clear to me since : 
+-- Cont f>>=  gs = Cont $ \ h -> f $ \ i ->  _ 
+-- f: (a1->a) ->a
+-- gs ::  a1-> Cont a b
+-- h:: b ->a
+-- i:: a1 -> a 
+-- _ :: a
+----------------------------------------------------------------------------------
+
+instance Monad (Cont a )  where
+  Cont f  >>=  gs = Cont $ \ h -> f $ \ i -> runCont (gs i) h 
+
+
+
+
+instance Applicative (Cont a) where
+    pure x = Cont (\f-> f x) 
+    Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
+    
 -- TODO Instances for Cont a b.
 
 --------------------------------------------------------------------------------  
@@ -74,3 +97,4 @@ instance Monad (Costar f c) where
 
 -- TODO Instances for Coyoneda m a.
 --------------------------------------------------------------------------------  
+   
