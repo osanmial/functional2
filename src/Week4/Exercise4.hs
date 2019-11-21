@@ -170,7 +170,6 @@ test' x = runParse pExpr x
 
 --"let 1+1=two in (let two+two = nelja in (1 + 0 * nelja + 1))"
 
---TODO let ei toimi. varför? 
 --TODO 1*0+1 ==> 0?
 --TODO test "let kissa = 1+1 in kissa*0" ==> 2?
 
