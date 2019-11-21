@@ -3,17 +3,7 @@
 module Week3.Exercise2 where
 
 import Prelude hiding (Applicative, pure, (<*>))
-import Data.Functor.Sum
-import Data.Functor.Product
-import Data.Functor.Identity
-import Data.Functor.Compose
-import Data.Functor.Const
-import Control.Dsl.Cont as C
-import Data.Proxy
-import Data.Profunctor
-import Data.Sequence.Internal
-import Data.Functor.Yoneda
-import Data.Functor.Coyoneda
+import Utility.Complex
 import Week3.Exercise1
 
 
@@ -66,7 +56,7 @@ instance Applicative (State s) where
 
 instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
-    Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
+    Cont  f <*> Cont g = Cont $ \h -> f $ \k -> g $ \x -> h (k x)
     
 instance Functor (Cont a) where
   fmap f (Cont xs) = Cont (xs . e)

@@ -10,7 +10,7 @@ import GHC.Exception
 import GHC.Show
 import Data.Maybe
 
-import {-# SOURCE #-} GHC.IO.Exception ( userError )
+--import {-# SOURCE #-} GHC.IO.Exception ( userError )
 
 class Applicative m => Monad m where  
     return :: a -> m a
@@ -43,6 +43,7 @@ instance Monoid a => Monad ((,) a) where
     (x,y) >>= f = (x, snd (f y))
 
 ---------------------------------------------------------------------------------
+
 -- Endo not applicative so not monad.
 
 ---------------------------------------------------------------------------------
@@ -54,11 +55,12 @@ instance Monad ((->) c) where
     -- (\a -> f (ar a))
 
 ---------------------------------------------------------------------------------
+
 -- Op not a functor so not an applicative so not a monad
 
 ---------------------------------------------------------------------------------
 
--- No instance for Void as it is of the wrong type kind
+-- () is not a functor
 
 --------------------------------------------------------------------------------    
 instance Monad [] where  
@@ -67,14 +69,17 @@ instance Monad [] where
  
 --------------------------------------------------------------------------------    
 
-
 instance Monad NonEmpty where
   (x :| xs) >>= f = y :| ys ++ zs
     where
       (y :| ys) = f x
       zs = xs >>= (toList . f)
       toList (c :| cs) = c:cs
-   
+
+--------------------------------------------------------------------------------
+
+-- No instance for Void as it is of the wrong type kind
+
 ---------------------------------------------------------------------------------
 
 instance Monad IO where
