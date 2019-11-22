@@ -66,8 +66,6 @@ instance Monad (Cont a )  where
   Cont f  >>=  gs = Cont $ \ h -> f $ \ i -> runCont (gs i) h 
 
 
-
-
 instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
     Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
@@ -80,7 +78,6 @@ instance Monad f => Monad (Star f a) where
    a <- fss h    
    runStar (g a) h 
     
-      
 --------------------------------------------------------------------------------  
 
 instance Monad (Costar f c) where
