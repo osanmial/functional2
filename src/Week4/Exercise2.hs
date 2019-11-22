@@ -33,10 +33,13 @@ instance Monad Identity where
 -- There is a kind of statment says : "Applicatives compose, monads don't."
 
 --------------------------------------------------------------------------------
-
---Giving a value to 'f' might be impossible
-instance Monoid a => Monad (Const a) where
-  Const x >>= f = undefined --f 
+-- There is no monad for Const because it breaks the monad law of the  Left identity this should be 
+-- If we have function 
+-- f = \ Const ( x + 1 ) 
+-- Let us check if 
+-- return x >>= f =? f x 
+-- LHS = Const mempty
+-- RHS = Const (x+1 )
 
 --------------------------------------------------------------------------------
 
