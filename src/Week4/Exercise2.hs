@@ -7,6 +7,12 @@ import Week3.Exercise2
 import Utility.Complex  
 
 
+--------------------------------------------------------------------------------
+
+-- Sum m n a is not applicative so no instance
+
+--------------------------------------------------------------------------------
+
 instance (Monad m , Monad n)=>Monad (Product m n)  where
     (Pair x1 y1) >>= f=  Pair (x1 >>= (fst'.f)) (y1 >>= (snd'.f))
             where 
@@ -14,11 +20,6 @@ instance (Monad m , Monad n)=>Monad (Product m n)  where
                 snd' (Pair _ fy)= fy
 
 --------------------------------------------------------------------------------
-
--- Sum m n a is not applicative so no instance
-
---------------------------------------------------------------------------------
-
 instance Monad Identity where
   (Identity x) >>= f = f x 
 
@@ -64,7 +65,7 @@ instance Monad (State s) where
 -- h:: b ->a
 -- i:: a1 -> a 
 -- _ :: a
-----------------------------------------------------------------------------------
+
 instance Monad (Cont a )  where
   Cont f  >>=  gs = Cont $ \ h -> f $ \ i -> runCont (gs i) h 
 
