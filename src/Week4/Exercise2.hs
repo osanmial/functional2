@@ -62,7 +62,6 @@ instance Monad (State s) where
 -- i:: a1 -> a 
 -- _ :: a
 ----------------------------------------------------------------------------------
-
 instance Monad (Cont a )  where
   Cont f  >>=  gs = Cont $ \ h -> f $ \ i -> runCont (gs i) h 
 
@@ -73,11 +72,9 @@ instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
     Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
     
--- TODO Instances for Cont a b.
+
 
 --------------------------------------------------------------------------------  
-
--- TODO Instances for Star m a b, given instances for m.
 instance Monad f => Monad (Star f a) where
   Star fss >>= g  = Star $ \ h -> do 
    a <- fss h    
