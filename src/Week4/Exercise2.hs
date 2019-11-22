@@ -1,3 +1,4 @@
+{-#LANGUAGE RebindableSyntax #-}
 module Week4.Exercise2 where
 
 import Prelude hiding (Monad, return, (>>=), (>>))
@@ -77,13 +78,11 @@ instance Applicative (Cont a) where
 --------------------------------------------------------------------------------  
 
 -- TODO Instances for Star m a b, given instances for m.
-instance Monad f => Monad (Star f d) where
-  Star x >>= fun = Star a
-    where
-      a = undefined-- \y -> do
-        --b <- x y
-        --runStar (fun b) y
-        
+instance Monad f => Monad (Star f a) where
+  Star fss >>= g  = Star $ \ h -> do 
+   a <- fss h    
+   runStar (g a) h 
+    
       
 --------------------------------------------------------------------------------  
 
