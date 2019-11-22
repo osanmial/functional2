@@ -74,8 +74,6 @@ instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
     Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
     
-
-
 --------------------------------------------------------------------------------  
 instance Monad f => Monad (Star f a) where
   Star fss >>= g  = Star $ \ h -> do 
@@ -89,7 +87,18 @@ instance Monad (Costar f c) where
 
 --------------------------------------------------------------------------------  
 
--- TODO Instances for Yoneda m a, given instances for m.
+-- Yoneda f >>= g = Yoneda \ h -> _ 
+-- f :: forall b. (a -> b) -> f b
+-- g :: a -> Yoneda f b
+-- h :: b1 -> b 
+-- _ :: f b1 
+-- id :: a -> a 
+-- runYoneda :: Yoneda f b  ->( b -> b1 ) -> f b1 
+instance Monad m => Monad (Yoneda m) where
+  Yoneda f>>= g = Yoneda  $ \ h -> do 
+    x <- f id  -- x :: a 
+    runYoneda (g x) h -- g x :: Yoneda f b 
+ 
 --------------------------------------------------------------------------------  
 
 -- TODO Instances for Coyoneda m a.
