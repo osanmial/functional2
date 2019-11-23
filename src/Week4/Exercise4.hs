@@ -4,17 +4,13 @@ import Week3.Exercise3
 import Control.Applicative
 import Data.List
 import Debug.Trace
---grammar parser:
-
--- parseGrammar :: String -> Expr
--- parseGrammar x = do
---   any
 
 instance Monad Parser where
   (Parser ma) >>= faPmb = Parser (\s -> g s) where
     g s = case ma s of
       Left e -> Left e
       Right (s,a) -> runParse (faPmb a) s
+
 -- lexems:
 --   lADD +
 --   lMul *
@@ -28,10 +24,6 @@ instance Monad Parser where
 --   lIdent words
 --   lEoF ""
 
---end :: Parser 
---end = do 
-
---pExpr:: Parser Expr
 pExpr :: Parser Expr
 pExpr = pAdd
 
@@ -70,7 +62,14 @@ removeEmpties = (do
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-pPrim :: Parser Expr -> Parser (Maybe Expr) -> (Expr -> Expr -> Expr) -> Parser Expr
+
+--Primitive instance for things that takes
+-- first value: Monad with plain value inside it
+-- second value: Monad with a maybe inside it
+-- aconstructor
+-- returns the plain value if second value is nothing
+-- if second is Just, it returns the both values combined with the constructor
+pPrim :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
 pPrim fst snd cons = do
   x <- fst
   y <- snd
@@ -80,50 +79,29 @@ pPrim fst snd cons = do
 
 
 pAdd :: Parser Expr
-pAdd = do
-  x <- pMul
-  y <- pAdds
-  case y of
-    Nothing -> return x
-    Just y  -> return $ Add x y
-  
+pAdd = pPrim pMul pAdds Add
 
 pAdds :: Parser (Maybe Expr)
 pAdds = optional pAdds'
 
-
 pAdds' :: Parser Expr
 pAdds' = do
   single '+'
-  x <- pMul
-  y <- pAdds
-  case y of
-    Nothing -> return x
-    Just y  -> return $ Add x y
+  pPrim pMul pAdds Add
 
+  
 pMul :: Parser Expr
-pMul = do
-  x <- pOther
-  y <- pMuls
-  case y of
-    Nothing -> return x
-    Just y  -> return $ Mul x y
-
+pMul = pPrim pOther pMuls Mul
 
 pMuls :: Parser (Maybe Expr)
 pMuls = optional pMuls'
-
 
 -- Parses structure: ('*' other pMuls)
 pMuls' :: Parser Expr
 pMuls' = do
   single '*'
-  x <- pOther
-  y <- pMuls
-  case y of
-    Nothing -> do return x
-    Just y  -> do return $ Mul x y
-
+  pPrim pOther pMuls Mul
+  
 
 pOther :: Parser Expr
 pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
