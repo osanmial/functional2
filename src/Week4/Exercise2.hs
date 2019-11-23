@@ -1,3 +1,4 @@
+{-#LANGUAGE RebindableSyntax #-}
 module Week4.Exercise2 where
 
 import Prelude hiding (Monad, return, (>>=), (>>))
@@ -6,6 +7,12 @@ import Week3.Exercise2
 import Utility.Complex  
 
 
+--------------------------------------------------------------------------------
+
+-- Sum m n a is not applicative so no instance
+
+--------------------------------------------------------------------------------
+
 instance (Monad m , Monad n)=>Monad (Product m n)  where
     (Pair x1 y1) >>= f=  Pair (x1 >>= (fst'.f)) (y1 >>= (snd'.f))
             where 
@@ -13,11 +20,6 @@ instance (Monad m , Monad n)=>Monad (Product m n)  where
                 snd' (Pair _ fy)= fy
 
 --------------------------------------------------------------------------------
-
--- Sum m n a is not applicative so no instance
-
---------------------------------------------------------------------------------
-
 instance Monad Identity where
   (Identity x) >>= f = f x 
 
@@ -32,10 +34,13 @@ instance Monad Identity where
 -- There is a kind of statment says : "Applicatives compose, monads don't."
 
 --------------------------------------------------------------------------------
-
---Giving a value to 'f' might be impossible
-instance Monoid a => Monad (Const a) where
-  Const x >>= f = undefined --f 
+-- There is no monad for Const because it breaks the monad law of the  Left identity this should be 
+-- If we have function 
+-- f = \ Const ( x + 1 ) 
+-- Let us check if 
+-- return x >>= f =? f x 
+-- LHS = Const mempty
+-- RHS = Const (x+1 )
 
 --------------------------------------------------------------------------------
 
@@ -60,31 +65,21 @@ instance Monad (State s) where
 -- h:: b ->a
 -- i:: a1 -> a 
 -- _ :: a
-----------------------------------------------------------------------------------
 
 instance Monad (Cont a )  where
   Cont f  >>=  gs = Cont $ \ h -> f $ \ i -> runCont (gs i) h 
-
-
 
 
 instance Applicative (Cont a) where
     pure x = Cont (\f-> f x) 
     Cont  f <*> Cont g = Cont $ \ h -> f $ \ k -> g $ \ x -> h (k x)
     
--- TODO Instances for Cont a b.
-
 --------------------------------------------------------------------------------  
-
--- TODO Instances for Star m a b, given instances for m.
-instance Monad f => Monad (Star f d) where
-  Star x >>= fun = Star a
-    where
-      a = undefined-- \y -> do
-        --b <- x y
-        --runStar (fun b) y
-        
-      
+instance Monad f => Monad (Star f a) where
+  Star fss >>= g  = Star $ \ h -> do 
+   a <- fss h    
+   runStar (g a) h 
+    
 --------------------------------------------------------------------------------  
 
 instance Monad (Costar f c) where
@@ -92,9 +87,42 @@ instance Monad (Costar f c) where
 
 --------------------------------------------------------------------------------  
 
--- TODO Instances for Yoneda m a, given instances for m.
+-- Yoneda f >>= g = Yoneda \ h -> _ 
+-- f :: forall b. (a -> b) -> f b
+-- g :: a -> Yoneda f b
+-- h :: b1 -> b 
+-- _ :: f b1 
+-- id :: a -> a 
+-- runYoneda :: Yoneda f b  ->( b -> b1 ) -> f b1 
+instance Monad m => Monad (Yoneda m) where
+  Yoneda f>>= g = Yoneda  $ \ h -> do 
+    x <- f id  -- x :: a 
+    runYoneda (g x) h -- g x :: Yoneda f b 
+ 
 --------------------------------------------------------------------------------  
+-- (Coyoneda  f x) >>= g  =$ _
+-- g :: a -> Coyoneda m b 
+-- x :: m b1 
+-- f :: b1 -> a
+-- _ :: Coyoneda m b
+instance Monad m => Monad (Coyoneda m) where
+  Coyoneda f x >>= g =liftCoyoneda' $ do 
+     v <- x                                -- v :: b1
+     lowerCoyoneda' ( g (f v))     -- f v :: a 
+                                              -- g (f v ):: Coyoneda m b
+                                             -- All the expression :: m b
+-- I have to ask Sampsa about second approch 
+--  Coyoneda  f x >>=  g = liftCoyoneda' $ lowerCoyoneda'  $ g $ do --  g (f v):: Coyoneda m b
+--    v <- x    -- v :: b1 
+--    f v  -- f v :: a   
+----------------------------------------------------------------------------------------
+-- Helper functions from Sampsa
+liftCoyoneda' :: m a -> Coyoneda m a
+liftCoyoneda'= Coyoneda id
 
--- TODO Instances for Coyoneda m a.
---------------------------------------------------------------------------------  
-   
+lowerCoyoneda':: Functor m => Coyoneda m a -> m a
+lowerCoyoneda' (Coyoneda f xs) = fmap f xs
+    
+
+
+--------------------------------------------------------------------------------
