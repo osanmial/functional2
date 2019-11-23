@@ -100,7 +100,29 @@ instance Monad m => Monad (Yoneda m) where
     runYoneda (g x) h -- g x :: Yoneda f b 
  
 --------------------------------------------------------------------------------  
+-- (Coyoneda  f x) >>= g  =$ _
+-- g :: a -> Coyoneda m b 
+-- x :: m b1 
+-- f :: b1 -> a
+-- _ :: Coyoneda m b
+instance Monad m => Monad (Coyoneda m) where
+  Coyoneda f x >>= g =liftCoyoneda' $ do 
+     v <- x                                -- v :: b1
+     lowerCoyoneda' ( g (f v))     -- f v :: a 
+                                              -- g (f v ):: Coyoneda m b
+                                             -- All the expression :: m b
+-- I have to ask Sampsa about second approch 
+--  Coyoneda  f x >>=  g = liftCoyoneda' $ lowerCoyoneda'  $ g $ do --  g (f v):: Coyoneda m b
+--    v <- x    -- v :: b1 
+--    f v  -- f v :: a   
+----------------------------------------------------------------------------------------
+-- Helper functions from Sampsa
+liftCoyoneda' :: m a -> Coyoneda m a
+liftCoyoneda'= Coyoneda id
 
--- TODO Instances for Coyoneda m a.
---------------------------------------------------------------------------------  
-   
+lowerCoyoneda':: Functor m => Coyoneda m a -> m a
+lowerCoyoneda' (Coyoneda f xs) = fmap f xs
+    
+
+
+--------------------------------------------------------------------------------
