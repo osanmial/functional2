@@ -130,8 +130,6 @@ pLet = do
   chunk2 "in"
   removeEmpties
   expr2         <- pExpr
-  -- /\ this part fails in situations like "let abc = 1 in 1 + 1 * 1"
-  -- it doesn't parse past multiplication
   removeEmpties
   pure $ Let var expr1 expr2
 
@@ -183,15 +181,6 @@ Space : [\t\n\u000b\f\r ] + -> skip ;
 
 -}      
 
-test x = case test' x of
-  Right (s,e) -> evalDeep e
-  Left _ -> Just (-100)
-
----ääh tässä on vielä aika bugejah.
-test' x = runParse pExpr x
-
---"let 1+1=two in (let two+two = nelja in (1 + 0 * nelja + 1))"
-
---TODO 1*0+1 ==> 0?
---TODO test "let kissa = 1+1 in kissa*0" ==> 2?
-
+test str = case (runParse pExpr) str of
+             Right (s, v) -> (s, evalDeep v)
+             Left _       -> ("", Nothing)
