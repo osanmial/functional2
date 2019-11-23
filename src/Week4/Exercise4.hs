@@ -111,7 +111,7 @@ pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
 pSub :: Parser Expr
 pSub = do
   single '('
-  ex <- pAdd
+  ex <- pExpr
   single ')'
   pure ex
  
