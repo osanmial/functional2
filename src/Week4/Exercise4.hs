@@ -15,7 +15,6 @@ instance Monad Parser where
     g s = case ma s of
       Left e -> Left e
       Right (s,a) -> runParse (faPmb a) s
-
 -- lexems:
 --   lADD +
 --   lMul *
@@ -34,8 +33,9 @@ instance Monad Parser where
 
 --pExpr:: Parser Expr
 pExpr :: Parser Expr
-pExpr = pLeft <|> pLet <|> pSub <|> pVar --pOne <|> pZero
+pExpr = pAdd
 
+--------------------------------------------------------------------------------
 ----Primitive 'number' parsers--------------------------------------------------
 
 pZero :: Parser Expr
@@ -47,9 +47,7 @@ pOne :: Parser Expr
 pOne = do
   single '1'
   pure One
-
-pNum = pOne <|> pZero
-
+  
 --------------------------------------------------------------------------------
 ----Character parsers-----------------------------------------------------------
 
@@ -70,53 +68,72 @@ removeEmpties = (do
   -- have no clue what is a "line tabulation" or how to deal with it: '\u000b'
   -- [\t\n\u000b\f\r ] + -> skip ;
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+pPrim :: Parser Expr -> Parser (Maybe Expr) -> (Expr -> Expr -> Expr) -> Parser Expr
+pPrim fst snd cons = do
+  x <- fst
+  y <- snd
+  case y of
+    Nothing -> return x
+    Just y  -> return $ cons x y
 
--- Parses beginning of an expression
--- 1 ...
-pLeft = (do
-  n <- pNum
-  c <- pCalc n
-  (pure c)) <|> pNum
-  -- (pure pMul One) <|> (end)
 
--- Parses the tail of an expression
--- General version
--- ... + 1 * 1
-pCalc :: Expr -> Parser Expr
-pCalc left = pMul left <|> pAdd left
+pAdd :: Parser Expr
+pAdd = do
+  x <- pMul
+  y <- pAdds
+  case y of
+    Nothing -> return x
+    Just y  -> return $ Add x y
+  
 
--- Parses the tail of an expression
--- In the case that it's a plus 
-pAdd :: Expr -> Parser Expr
-pAdd left  = do
-  removeEmpties
+pAdds :: Parser (Maybe Expr)
+pAdds = optional pAdds'
+
+
+pAdds' :: Parser Expr
+pAdds' = do
   single '+'
-  removeEmpties
-  right         <- pLeft 
-  (return $ Add left right)
+  x <- pMul
+  y <- pAdds
+  case y of
+    Nothing -> return x
+    Just y  -> return $ Add x y
 
--- Parses the tail of an expression
--- In the case that it's a multiplication
-pMul :: Expr -> Parser Expr
-pMul left = do
-  removeEmpties
+pMul :: Parser Expr
+pMul = do
+  x <- pOther
+  y <- pMuls
+  case y of
+    Nothing -> return x
+    Just y  -> return $ Mul x y
+
+
+pMuls :: Parser (Maybe Expr)
+pMuls = optional pMuls'
+
+
+-- Parses structure: ('*' other pMuls)
+pMuls' :: Parser Expr
+pMuls' = do
   single '*'
-  removeEmpties
-  right <- pOther
-  (pure $ Mul left right)
+  x <- pOther
+  y <- pMuls
+  case y of
+    Nothing -> do return x
+    Just y  -> do return $ Mul x y
 
 
 pOther :: Parser Expr
 pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
-  
+
+
 -- sub : '(' add ')' ;
 pSub :: Parser Expr
 pSub = do
   single '('
-  ex <- pExpr
+  ex <- pAdd
   single ')'
   pure ex
  
