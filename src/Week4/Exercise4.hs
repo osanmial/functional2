@@ -11,21 +11,24 @@ instance Monad Parser where
       Left e -> Left e
       Right (s,a) -> runParse (faPmb a) s
 
--- lexems:
---   lADD +
---   lMul *
---   lLet let
---   lIn in
---   lEq =
---   lLBr (
---   lRBr )
---   lOne 1
---   lZero 0
---   lIdent words
---   lEoF ""
 
 pExpr :: Parser Expr
 pExpr = pAdd
+
+
+-- lexems:
+--   Add +
+--   Mul *
+--   Let let
+--   In in
+--   Eq =
+--   LBr (
+--   RBr )
+--   One 1
+--   Zero 0
+--   Ident words
+--   empty symbols
+--   EoF ""
 
 --------------------------------------------------------------------------------
 ----Primitive 'number' parsers--------------------------------------------------
@@ -34,12 +37,12 @@ pZero :: Parser Expr
 pZero = do
   single '0'
   pure Zero
-  
+
 pOne :: Parser Expr
 pOne = do
   single '1'
   pure One
-  
+
 --------------------------------------------------------------------------------
 ----Character parsers-----------------------------------------------------------
 
@@ -51,6 +54,26 @@ pDigit :: Parser Char
 pDigit = oneOf ['0'..'9'] -- [0-9] ;
 pPrime :: Parser Char
 pPrime = single '\'' -- ['] ;
+
+-- Parser to find if a char is written according to a rule from the set.
+oneOfCharParsers :: Parser Char
+oneOfCharParsers = foldl1' (<|>) [pSmall, pLarge, pDigit, pPrime]
+
+--------------------------------------------------------------------------------
+----String parsers-----------------------------------------------------------
+
+pIdent :: Parser String
+pIdent = (do
+  a1 <- pSmall
+  a2 <- pIdent'
+  pure (a1 : a2)) <|> (:[]) <$> pSmall
+
+pIdent' :: Parser String
+pIdent' = (do
+  a1 <- oneOfCharParsers
+  a2 <- pIdent'
+  pure (a1 : a2)) <|> (:[]) <$> oneOfCharParsers 
+
 
 removeEmpties :: Parser String
 removeEmpties = (do
@@ -69,10 +92,14 @@ removeEmpties = (do
 -- aconstructor
 -- returns the plain value if second value is nothing
 -- if second is Just, it returns the both values combined with the constructor
-pPrim :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
+--pPrim :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
+pPrim :: Parser a -> Parser (Maybe a) -> (a -> a -> a) -> Parser a
 pPrim fst snd cons = do
+  removeEmpties
   x <- fst
+  removeEmpties
   y <- snd
+  removeEmpties
   case y of
     Nothing -> return x
     Just y  -> return $ cons x y
@@ -138,22 +165,7 @@ pVar = do
   out <- pIdent
   pure $ Var out
 
-pIdent :: Parser String
-pIdent = (do
-  a1 <- pSmall
-  a2 <- pIdent'
-  pure (a1 : a2)) <|> (:[]) <$> pSmall
 
-pIdent' :: Parser String
-pIdent' = (do
-  a1 <- oneFromLiftedParserList
-  a2 <- pIdent'
-  pure (a1 ++ a2)) <|> oneFromLiftedParserList
-  --replace ++ with something more effective. It happens backwards here I think.
-
-oneFromLiftedParserList :: Parser [Char]
-oneFromLiftedParserList = foldl1' (<|>) $ (fmap (:[])) <$> [pSmall, pLarge, pDigit, pPrime]
-  
 
 
 
@@ -184,3 +196,5 @@ Space : [\t\n\u000b\f\r ] + -> skip ;
 test str = case (runParse pExpr) str of
              Right (s, v) -> (s, evalDeep v)
              Left _       -> ("", Nothing)
+
+--Failure: test "let x = 1+1 in (2*2)*(x+x)"
