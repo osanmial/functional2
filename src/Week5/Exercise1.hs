@@ -1,14 +1,15 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
-import Prelude hiding (Foldable, foldMap, foldr)
+import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse)
 import Utility.Simple
 
 
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
 
- 
+class (Functor t, Foldable t) => Traversable t where
+  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
 
 --Instances for Bool.
 -- Bool has a wrong kind
@@ -19,13 +20,21 @@ instance Foldable Maybe where
   foldMap f (Just x) = f x
   foldMap _ Nothing  = mempty 
 
-
+instance Traversable Maybe where
+  traverse f (Just x) = Just <$> f x
+  traverse _ Nothing  = pure Nothing
+  
 ---------------------------------------------------------------------
---Instances for Either a b.
+
 instance Foldable (Either a) where
     foldMap f  e = case e of 
             Right a -> f a
             Left _ -> mempty 
+
+instance Traversable (Either a) where
+  traverse f (Right x) = Right <$> f x
+  traverse _ (Left x)  = pure (Left x)
+  
 ---------------------------------------------------------------------
 
 instance Foldable ((,) a) where
