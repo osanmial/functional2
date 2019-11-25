@@ -75,11 +75,8 @@ pIdent' = (do
   pure (a1 : a2)) <|> (:[]) <$> oneOfCharParsers 
 
 
-removeEmpties :: Parser String
-removeEmpties = (do
-  e1 <- oneOf ['\t','\n','\f','\r', ' ']
-  e2 <- removeEmpties
-  (pure "")) <|> (:[]) <$> (oneOf ['\t','\n','\f','\r']) <|> (pure "")
+removeEmpties :: Parser ()
+removeEmpties = (\x -> ()) <$> many (oneOf ['\t','\n','\f','\r', ' '])
   -- have no clue what is a "line tabulation" or how to deal with it: '\u000b'
   -- [\t\n\u000b\f\r ] + -> skip ;
 
@@ -92,21 +89,17 @@ removeEmpties = (do
 -- aconstructor
 -- returns the plain value if second value is nothing
 -- if second is Just, it returns the both values combined with the constructor
---pPrim :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
-pPrim :: Parser a -> Parser (Maybe a) -> (a -> a -> a) -> Parser a
-pPrim fst snd cons = do
-  removeEmpties
+defaulCombine :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
+defaulCombine fst snd cons = do
   x <- fst
-  removeEmpties
   y <- snd
-  removeEmpties
   case y of
     Nothing -> return x
     Just y  -> return $ cons x y
 
 
 pAdd :: Parser Expr
-pAdd = pPrim pMul pAdds Add
+pAdd = defaulCombine pMul pAdds Add
 
 pAdds :: Parser (Maybe Expr)
 pAdds = optional pAdds'
@@ -114,11 +107,11 @@ pAdds = optional pAdds'
 pAdds' :: Parser Expr
 pAdds' = do
   single '+'
-  pPrim pMul pAdds Add
+  defaulCombine pMul pAdds Add
 
   
 pMul :: Parser Expr
-pMul = pPrim pOther pMuls Mul
+pMul = defaulCombine pOther pMuls Mul
 
 pMuls :: Parser (Maybe Expr)
 pMuls = optional pMuls'
@@ -127,7 +120,7 @@ pMuls = optional pMuls'
 pMuls' :: Parser Expr
 pMuls' = do
   single '*'
-  pPrim pOther pMuls Mul
+  defaulCombine pOther pMuls Mul
   
 
 pOther :: Parser Expr
