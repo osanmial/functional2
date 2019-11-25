@@ -1,14 +1,16 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
-import Prelude hiding (Foldable, foldMap, foldr)
+import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse)
 import Utility.Simple
 
 
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
 
- 
+class (Functor t, Foldable t) => Traversable t where
+  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
+
 
 --Instances for Bool.
 -- Bool has a wrong kind
@@ -19,13 +21,21 @@ instance Foldable Maybe where
   foldMap f (Just x) = f x
   foldMap _ Nothing  = mempty 
 
-
+instance Traversable Maybe where
+  traverse f (Just x) = Just <$> f x
+  traverse _ Nothing  = pure Nothing
+  
 ---------------------------------------------------------------------
---Instances for Either a b.
+
 instance Foldable (Either a) where
     foldMap f  e = case e of 
             Right a -> f a
             Left _ -> mempty 
+
+instance Traversable (Either a) where
+  traverse f (Right x) = Right <$> f x
+  traverse _ (Left x)  = pure (Left x)
+  
 ---------------------------------------------------------------------
 
 instance Foldable ((,) a) where
@@ -38,9 +48,9 @@ instance Foldable ((,) a) where
 ---------------------------------------------------------------------
 
 --instance Foldable ((->) a)
--- I cannot get rid of the input of the function to get access to the wrapped value I actually wish to handle. And so I can't convert this to a aritrary monoid.
+--I cannot get rid of the input of the function to get access to the wrapped value I actually wish to handle. And so I can't convert this to a aritrary monoid.
   
--- OP does not work with foldMap as we would require a contravariant like function to alter the type and we have just a normal one.
+--OP does not work with foldMap as we would require a contravariant like function to alter the type and we have just a normal one.
 
 ---------------------------------------------------------------------
 
@@ -64,10 +74,13 @@ instance Foldable NonEmpty where
 --Void has a wrong kind
 
 ---------------------------------------------------------------------
---Instances for IO a.
-instance Foldable IO where
-  foldMap f x = undefined
-  
+--Instances for IO a. it is not doable because ther is no way to extract Monoid from IO 
+--  foldMap :: Monoid m => (a -> m) -> t a -> m
+--instance Foldable IO where
+--  foldMap f i=do 
+--    x <- i
+--    return (f  x)
+-- 
 ---------------------------------------------------------------------
 --Instances for Map k a.
 instance Foldable (Map k) where
