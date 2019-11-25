@@ -1,20 +1,27 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
-import Prelude hiding (Monad, return, (>>=), (>>))
+import Prelude hiding (Foldable,Monad, return, (>>=), (>>))
 import Data.List.NonEmpty as Esko hiding (map)
 
 import GHC.Base hiding (Monad, (>>=), (>>))
 
+
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
-  foldr :: (a -> b -> b) -> b -> t a -> b 
+ 
 
 --Instances for Bool.
+
 ---------------------------------------------------------------------
 --Instances for Maybe a.
+
 ---------------------------------------------------------------------
 --Instances for Either a b.
+instance Foldable (Either a) where
+    foldMap f  e = case e of 
+            Right a -> f a
+            Left _ -> mempty 
 ---------------------------------------------------------------------
 --Instances for (,) a b.
 ---------------------------------------------------------------------
