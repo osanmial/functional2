@@ -4,6 +4,7 @@ import Week3.Exercise3
 import Control.Applicative
 import Data.List
 import Debug.Trace
+import Data.Either.Combinators
 
 instance Monad Parser where
   (Parser ma) >>= faPmb = Parser (\s -> g s) where
@@ -154,3 +155,45 @@ closedString = "let \
   \ three = 1 + two in let \
   \ nine = three * three in \
   \ 1 + three * (1 + nine)"
+
+
+logicloop = do
+  inp <- getLine
+  let continue = case (inp) of
+        ':':'q':ys -> pure ()
+        _ -> do
+          let out = (runParse (pExpr) inp)
+          putStrLn $show out
+          putStrLn $ show $ evalDeep . snd <$> (rightToMaybe out)
+          logicloop
+  continue
+  
+
+ma :: IO ()
+ma = do
+  putStrLn "Im a calculator! Give me calculable!"
+  putStrLn "Quit by writing :q"
+  logicloop
+  return ()
+
+
+--I cound test micro lenses here.
+--test inp = show $ evalDeep . snd <$> (rightToMaybe (runParse (pExpr) inp))
+
+-- Why have tuples no classes in hoogle?
+tests = (test <$> )<$>
+  [( "27", "let a = 1+1+1+1+1 in 1+a*a+1")
+  ,( "0", "let a = 1+1+1+1+1 in a*a*0")
+  ,( "0", "let a = 1+1+1+1+1 in 0*a*1")
+  ,( "50", "let a = 1+1+1+1+1 in a*a+a*a")
+  ,( "250", "let a = 1+1+1+1+1 in a*(a+a)*a")
+  ,( "5", "let a = 1+1+1+1+1 in let b=1+1 in let a = b + 1 in a+b")
+  ,( "-> Nothing", "let a = 1+1+1+1+1 in let b=1+1 in let a = b + 1 in a+b+c") --shoul fail
+  ,( "-> Nothing", "let a = 1+1 in 1+1+1+1+1+1+") --should fail
+  ,( "-> Nothing", "1 (1+1") --should fail? but does currently not.
+  ,( "-> Nothing", "1 1") --should fail? but does currently not.
+  ,( "-> Nothing", "-1") --should fail, "-> Nothing"
+  ,( "-> Nothing", "+0")--should fail
+  ,( "-> Nothing", "1kissa") --should fail? but does not.
+  ,( "-> Nothing", "kissa")] --should fail
+  --Errors don't rise up from the end. It just stops parsing.
