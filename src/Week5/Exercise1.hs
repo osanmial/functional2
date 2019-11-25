@@ -33,8 +33,15 @@ instance Foldable ((,) a) where
 
 ---------------------------------------------------------------------
 --Instances for Endo a.
+--No instance of foldmap for endo as we would require something
+--with the strength of profunctor to alter its type.
 ---------------------------------------------------------------------
---Instances for (->) a b and Op a b.
+
+--instance Foldable ((->) a)
+-- I cannot get rid of the input of the function to get access to the wrapped value I actually wish to handle. And so I can't convert this to a aritrary monoid.
+  
+-- OP does not work with foldMap as we would require a contravariant like function to alter the type and we have just a normal one.
+
 ---------------------------------------------------------------------
 
 --Instances for ().
@@ -54,7 +61,7 @@ instance Foldable NonEmpty where
 ---------------------------------------------------------------------
 
 --Instances for Void.
--- Void has a wrong kind
+--Void has a wrong kind
 
 ---------------------------------------------------------------------
 --Instances for IO a.
@@ -65,3 +72,4 @@ instance Foldable IO where
 --Instances for Map k a.
 instance Foldable (Map k) where
   foldMap f x = undefined
+
