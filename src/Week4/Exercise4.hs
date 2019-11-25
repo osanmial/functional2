@@ -14,9 +14,57 @@ instance Monad Parser where
 --------------------------------------------------------------------------------
 ----Grammar parsers-------------------------------------------------------------
 
-
 pExpr :: Parser Expr
 pExpr = pAdd <* removeEmpties <* eof
+
+pAdd :: Parser Expr
+pAdd = defaulCombine pMul pAdds Add
+
+pAdds :: Parser (Maybe Expr)
+pAdds = optional pAdds'
+
+pAdds' :: Parser Expr
+pAdds' = do
+  eSingle '+'
+  defaulCombine pMul pAdds Add
+  
+pMul :: Parser Expr
+pMul = defaulCombine pOther pMuls Mul
+
+pMuls :: Parser (Maybe Expr)
+pMuls = optional pMuls'
+
+-- Parses structure: ('*' other pMuls)
+pMuls' :: Parser Expr
+pMuls' = do
+  eSingle '*'
+  defaulCombine pOther pMuls Mul
+
+pOther :: Parser Expr
+pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
+
+-- sub : '(' add ')' ;
+pSub :: Parser Expr
+pSub = do
+  eSingle '('
+  ex <- pAdd
+  eSingle ')'
+  pure ex
+
+pLet :: Parser Expr  
+pLet = do
+  eChunk2 "let"
+  var           <- pIdent
+  eSingle '='
+  expr1         <- pAdd
+  eChunk2 "in"
+  expr2         <- pAdd
+  pure $ Let var expr1 expr2
+
+pVar :: Parser Expr
+pVar = do
+  out <- pIdent
+  pure $ Var out
 
 --------------------------------------------------------------------------------
 ----Primitives that handle empty spaces-----------------------------------------
@@ -95,83 +143,6 @@ defaulCombine fst snd cons = do
   case y of
     Nothing -> return x
     Just y  -> return $ cons x y
-
-
-pAdd :: Parser Expr
-pAdd = defaulCombine pMul pAdds Add
-
-pAdds :: Parser (Maybe Expr)
-pAdds = optional pAdds'
-
-pAdds' :: Parser Expr
-pAdds' = do
-  eSingle '+'
-  defaulCombine pMul pAdds Add
-  
-pMul :: Parser Expr
-pMul = defaulCombine pOther pMuls Mul
-
-pMuls :: Parser (Maybe Expr)
-pMuls = optional pMuls'
-
--- Parses structure: ('*' other pMuls)
-pMuls' :: Parser Expr
-pMuls' = do
-  eSingle '*'
-  defaulCombine pOther pMuls Mul
-
-pOther :: Parser Expr
-pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
-
--- sub : '(' add ')' ;
-pSub :: Parser Expr
-pSub = do
-  eSingle '('
-  ex <- pAdd
-  eSingle ')'
-  pure ex
-
-pLet :: Parser Expr  
-pLet = do
-  eChunk2 "let"
-  var           <- pIdent
-  eSingle '='
-  expr1         <- pAdd
-  eChunk2 "in"
-  expr2         <- pAdd
-  pure $ Let var expr1 expr2
-
-pVar :: Parser Expr
-pVar = do
-  out <- pIdent
-  pure $ Var out
-
-
-
-
-{-
-
-grammar ExprLR ;
-
-expr : add ;
-add : add '+' mul | mul ;
-mul : mul '*' other | other ;
-other : sub | zero | one | let | var ;
-sub : '(' add ')' ;
-zero : '0' ;
-one : '1' ;
-let : 'let' Ident '=' add 'in' add ;
-var : Ident ;
-
-Ident : Small ( Small | Large | Digit | Prime ) *
-  { ! getText().equals("let") && ! getText().equals("in") }? ;
-Small : [a-z] | [_] ;
-Large : [A-Z] ;
-Digit : [0-9] ;
-Prime : ['] ;
-Space : [\t\n\u000b\f\r ] + -> skip ;
-
--}      
 
 test str = case (runParse pExpr) str of
              Right (s, v) -> (s, evalDeep v)
