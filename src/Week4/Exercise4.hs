@@ -16,102 +16,39 @@ instance Monad Parser where
 
 
 pExpr :: Parser Expr
-pExpr = pAdd
+pExpr = pAdd <* removeEmpties <* eof
 
-pAdd :: Parser Expr
-pAdd = pPrim pMul pAdds Add
+--------------------------------------------------------------------------------
+----Primitives that handle empty spaces-----------------------------------------
 
-pAdds :: Parser (Maybe Expr)
-pAdds = optional pAdds'
+eSingle x  = removeEmpties *> single x
+eOneOf xs  = removeEmpties *> oneOf xs
+eChunk2 xs = removeEmpties *> chunk2 xs
 
-pAdds' :: Parser Expr
-pAdds' = do
-  single '+'
-  pPrim pMul pAdds Add
-
-pMul :: Parser Expr
-pMul = pPrim pOther pMuls Mul
-
-pMuls :: Parser (Maybe Expr)
-pMuls = optional pMuls'
-
--- Parses structure: ('*' other pMuls)
-pMuls' :: Parser Expr
-pMuls' = do
-  single '*'
-  pPrim pOther pMuls Mul
-
-pOther :: Parser Expr
-pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
-
--- sub : '(' add ')' ;
-pSub :: Parser Expr
-pSub = do
-  single '('
-  ex <- pExpr
-  single ')'
-  pure ex
-
-pLet :: Parser Expr  
-pLet = do
-  removeEmpties
-  chunk2 "let"
-  removeEmpties
-  var           <- pIdent
-  removeEmpties
-  single '='
-  removeEmpties
-  expr1         <- pExpr
-  removeEmpties
-  chunk2 "in"
-  removeEmpties
-  expr2         <- pExpr
-  removeEmpties
-  pure $ Let var expr1 expr2
-
-pVar :: Parser Expr
-pVar = do
-  out <- pIdent
-  pure $ Var out
+--------------------------------------------------------------------------------
+----Primitive 'number' parsers--------------------------------------------------
 
 pZero :: Parser Expr
 pZero = do
-  single '0'
+  eSingle '0'
   pure Zero
 
 pOne :: Parser Expr
 pOne = do
-  single '1'
+  eSingle '1'
   pure One
-
-
-
--- lexems:
---   Add +
---   Mul *
---   Let let
---   In in
---   Eq =
---   LBr (
---   RBr )
---   One 1
---   Zero 0
---   Ident words
---   empty symbols
---   EoF ""
-
 
 --------------------------------------------------------------------------------
 ----Character parsers-----------------------------------------------------------
 
 pSmall :: Parser Char
-pSmall = oneOf ['a'..'z'] -- [a-z] | [_] ;
+pSmall = eOneOf ['a'..'z'] -- [a-z] | [_] ;
 pLarge :: Parser Char
-pLarge = oneOf ['A'..'Z'] -- [A-Z] ;
+pLarge = eOneOf ['A'..'Z'] -- [A-Z] ;
 pDigit :: Parser Char
-pDigit = oneOf ['0'..'9'] -- [0-9] ;
+pDigit = eOneOf ['0'..'9'] -- [0-9] ;
 pPrime :: Parser Char
-pPrime = single '\'' -- ['] ;
+pPrime = eSingle '\'' -- ['] ;
 
 -- Parser to find if a char is written according to a rule from the set.
 oneOfCharParsers :: Parser Char
@@ -137,11 +74,8 @@ pIdent' = let manyCharacters = do
             manyCharacters <|> (:[]) <$> oneOfCharParsers 
 
 
-removeEmpties :: Parser String
-removeEmpties = (do
-  e1 <- oneOf ['\t','\n','\f','\r', ' ']
-  e2 <- removeEmpties
-  (pure "")) <|> (:[]) <$> (oneOf ['\t','\n','\f','\r']) <|> (pure "")
+removeEmpties :: Parser ()
+removeEmpties = (\x -> ()) <$> many (oneOf ['\t','\n','\f','\r', ' '])
   -- have no clue what is a "line tabulation" or how to deal with it: '\u000b'
   -- [\t\n\u000b\f\r ] + -> skip ;
 
@@ -154,18 +88,63 @@ removeEmpties = (do
 -- aconstructor
 -- returns the plain value if second value is nothing
 -- if second is Just, it returns the both values combined with the constructor
---pPrim :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
-pPrim :: Parser a -> Parser (Maybe a) -> (a -> a -> a) -> Parser a
-pPrim fst snd cons = do
-  removeEmpties
+defaulCombine :: Monad m => m a -> m (Maybe a) -> (a -> a -> a) -> m a
+defaulCombine fst snd cons = do
   x <- fst
-  removeEmpties
   y <- snd
-  removeEmpties
   case y of
     Nothing -> return x
     Just y  -> return $ cons x y
 
+
+pAdd :: Parser Expr
+pAdd = defaulCombine pMul pAdds Add
+
+pAdds :: Parser (Maybe Expr)
+pAdds = optional pAdds'
+
+pAdds' :: Parser Expr
+pAdds' = do
+  eSingle '+'
+  defaulCombine pMul pAdds Add
+  
+pMul :: Parser Expr
+pMul = defaulCombine pOther pMuls Mul
+
+pMuls :: Parser (Maybe Expr)
+pMuls = optional pMuls'
+
+-- Parses structure: ('*' other pMuls)
+pMuls' :: Parser Expr
+pMuls' = do
+  eSingle '*'
+  defaulCombine pOther pMuls Mul
+
+pOther :: Parser Expr
+pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
+
+-- sub : '(' add ')' ;
+pSub :: Parser Expr
+pSub = do
+  eSingle '('
+  ex <- pAdd
+  eSingle ')'
+  pure ex
+
+pLet :: Parser Expr  
+pLet = do
+  eChunk2 "let"
+  var           <- pIdent
+  eSingle '='
+  expr1         <- pAdd
+  eChunk2 "in"
+  expr2         <- pAdd
+  pure $ Let var expr1 expr2
+
+pVar :: Parser Expr
+pVar = do
+  out <- pIdent
+  pure $ Var out
 
 
 
