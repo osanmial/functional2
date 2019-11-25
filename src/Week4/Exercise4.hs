@@ -13,47 +13,39 @@ instance Monad Parser where
 
 
 pExpr :: Parser Expr
-pExpr = pAdd
+pExpr = pAdd <* removeEmpties <* eof
 
+--------------------------------------------------------------------------------
+----Primitives that handle empty spaces-----------------------------------------
 
--- lexems:
---   Add +
---   Mul *
---   Let let
---   In in
---   Eq =
---   LBr (
---   RBr )
---   One 1
---   Zero 0
---   Ident words
---   empty symbols
---   EoF ""
+eSingle x  = removeEmpties *> single x
+eOneOf xs  = removeEmpties *> oneOf xs
+eChunk2 xs = removeEmpties *> chunk2 xs
 
 --------------------------------------------------------------------------------
 ----Primitive 'number' parsers--------------------------------------------------
 
 pZero :: Parser Expr
 pZero = do
-  single '0'
+  eSingle '0'
   pure Zero
 
 pOne :: Parser Expr
 pOne = do
-  single '1'
+  eSingle '1'
   pure One
 
 --------------------------------------------------------------------------------
 ----Character parsers-----------------------------------------------------------
 
 pSmall :: Parser Char
-pSmall = oneOf ['a'..'z'] -- [a-z] | [_] ;
+pSmall = eOneOf ['a'..'z'] -- [a-z] | [_] ;
 pLarge :: Parser Char
-pLarge = oneOf ['A'..'Z'] -- [A-Z] ;
+pLarge = eOneOf ['A'..'Z'] -- [A-Z] ;
 pDigit :: Parser Char
-pDigit = oneOf ['0'..'9'] -- [0-9] ;
+pDigit = eOneOf ['0'..'9'] -- [0-9] ;
 pPrime :: Parser Char
-pPrime = single '\'' -- ['] ;
+pPrime = eSingle '\'' -- ['] ;
 
 -- Parser to find if a char is written according to a rule from the set.
 oneOfCharParsers :: Parser Char
@@ -106,7 +98,7 @@ pAdds = optional pAdds'
 
 pAdds' :: Parser Expr
 pAdds' = do
-  single '+'
+  eSingle '+'
   defaulCombine pMul pAdds Add
 
   
@@ -119,7 +111,7 @@ pMuls = optional pMuls'
 -- Parses structure: ('*' other pMuls)
 pMuls' :: Parser Expr
 pMuls' = do
-  single '*'
+  eSingle '*'
   defaulCombine pOther pMuls Mul
   
 
@@ -130,27 +122,20 @@ pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
 -- sub : '(' add ')' ;
 pSub :: Parser Expr
 pSub = do
-  single '('
-  ex <- pExpr
-  single ')'
+  eSingle '('
+  ex <- pAdd
+  eSingle ')'
   pure ex
  
 
 pLet :: Parser Expr  
 pLet = do
-  removeEmpties
-  chunk2 "let"
-  removeEmpties
+  eChunk2 "let"
   var           <- pIdent
-  removeEmpties
-  single '='
-  removeEmpties
-  expr1         <- pExpr
-  removeEmpties
-  chunk2 "in"
-  removeEmpties
-  expr2         <- pExpr
-  removeEmpties
+  eSingle '='
+  expr1         <- pAdd
+  eChunk2 "in"
+  expr2         <- pAdd
   pure $ Let var expr1 expr2
 
 pVar :: Parser Expr
