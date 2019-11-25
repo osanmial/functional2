@@ -36,6 +36,7 @@ instance Foldable ((,) a) where
 --Instances for Endo a.
 ---------------------------------------------------------------------
 --Instances for (->) a b and Op a b.
+
 ---------------------------------------------------------------------
 
 --Instances for ().
@@ -58,10 +59,13 @@ instance Foldable NonEmpty where
 -- Void has a wrong kind
 
 ---------------------------------------------------------------------
---Instances for IO a.
-instance Foldable IO where
-  foldMap f x = undefined
-  
+--Instances for IO a. it is not doable because ther is no way to extract Monoid from IO 
+--  foldMap :: Monoid m => (a -> m) -> t a -> m
+--instance Foldable IO where
+--  foldMap f i=do 
+--    x <- i
+--    return (f  x)
+-- 
 ---------------------------------------------------------------------
 --Instances for Map k a.
 instance Foldable (Map k) where
