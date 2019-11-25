@@ -188,12 +188,11 @@ tests = (test <$> )<$>
   ,( "50", "let a = 1+1+1+1+1 in a*a+a*a")
   ,( "250", "let a = 1+1+1+1+1 in a*(a+a)*a")
   ,( "5", "let a = 1+1+1+1+1 in let b=1+1 in let a = b + 1 in a+b")
-  ,( "-> Nothing", "let a = 1+1+1+1+1 in let b=1+1 in let a = b + 1 in a+b+c") --shoul fail
-  ,( "-> Nothing", "let a = 1+1 in 1+1+1+1+1+1+") --should fail
-  ,( "-> Nothing", "1 (1+1") --should fail? but does currently not.
-  ,( "-> Nothing", "1 1") --should fail? but does currently not.
-  ,( "-> Nothing", "-1") --should fail, "-> Nothing"
-  ,( "-> Nothing", "+0")--should fail
-  ,( "-> Nothing", "1kissa") --should fail? but does not.
-  ,( "-> Nothing", "kissa")] --should fail
-  --Errors don't rise up from the end. It just stops parsing.
+  ,( "-> Nothing", "let a = 1+1+1+1+1 in let b=1+1 in let a = b + 1 in a+b+c")
+  ,( "-> Nothing", "let a = 1+1 in 1+1+1+1+1+1+")
+  ,( "-> Nothing", "1 (1+1")
+  ,( "-> Nothing", "1 1")
+  ,( "-> Nothing", "-1")
+  ,( "-> Nothing", "+0")
+  ,( "-> Nothing", "1kissa")
+  ,( "-> Nothing", "kissa")]
