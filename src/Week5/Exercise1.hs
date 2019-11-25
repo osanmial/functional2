@@ -2,8 +2,7 @@
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
 import Prelude hiding (Foldable, foldMap, foldr)
-import Data.List.NonEmpty as Esko hiding (map)
-import Data.Monoid.Endo
+import Utility.Simple
 
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
