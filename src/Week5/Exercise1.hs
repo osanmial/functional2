@@ -11,6 +11,7 @@ class Foldable t where
 
  
 
+
 --Instances for Bool.
 -- Bool has a wrong kind
 
