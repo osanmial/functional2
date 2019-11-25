@@ -11,9 +11,79 @@ instance Monad Parser where
       Left e -> Left e
       Right (s,a) -> runParse (faPmb a) s
 
+--------------------------------------------------------------------------------
+----Grammar parsers-------------------------------------------------------------
+
 
 pExpr :: Parser Expr
 pExpr = pAdd
+
+pAdd :: Parser Expr
+pAdd = pPrim pMul pAdds Add
+
+pAdds :: Parser (Maybe Expr)
+pAdds = optional pAdds'
+
+pAdds' :: Parser Expr
+pAdds' = do
+  single '+'
+  pPrim pMul pAdds Add
+
+pMul :: Parser Expr
+pMul = pPrim pOther pMuls Mul
+
+pMuls :: Parser (Maybe Expr)
+pMuls = optional pMuls'
+
+-- Parses structure: ('*' other pMuls)
+pMuls' :: Parser Expr
+pMuls' = do
+  single '*'
+  pPrim pOther pMuls Mul
+
+pOther :: Parser Expr
+pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
+
+-- sub : '(' add ')' ;
+pSub :: Parser Expr
+pSub = do
+  single '('
+  ex <- pExpr
+  single ')'
+  pure ex
+
+pLet :: Parser Expr  
+pLet = do
+  removeEmpties
+  chunk2 "let"
+  removeEmpties
+  var           <- pIdent
+  removeEmpties
+  single '='
+  removeEmpties
+  expr1         <- pExpr
+  removeEmpties
+  chunk2 "in"
+  removeEmpties
+  expr2         <- pExpr
+  removeEmpties
+  pure $ Let var expr1 expr2
+
+pVar :: Parser Expr
+pVar = do
+  out <- pIdent
+  pure $ Var out
+
+pZero :: Parser Expr
+pZero = do
+  single '0'
+  pure Zero
+
+pOne :: Parser Expr
+pOne = do
+  single '1'
+  pure One
+
 
 
 -- lexems:
@@ -30,18 +100,6 @@ pExpr = pAdd
 --   empty symbols
 --   EoF ""
 
---------------------------------------------------------------------------------
-----Primitive 'number' parsers--------------------------------------------------
-
-pZero :: Parser Expr
-pZero = do
-  single '0'
-  pure Zero
-
-pOne :: Parser Expr
-pOne = do
-  single '1'
-  pure One
 
 --------------------------------------------------------------------------------
 ----Character parsers-----------------------------------------------------------
@@ -60,19 +118,23 @@ oneOfCharParsers :: Parser Char
 oneOfCharParsers = foldl1' (<|>) [pSmall, pLarge, pDigit, pPrime]
 
 --------------------------------------------------------------------------------
-----String parsers-----------------------------------------------------------
+----String parsers--------------------------------------------------------------
 
 pIdent :: Parser String
-pIdent = (do
-  a1 <- pSmall
-  a2 <- pIdent'
-  pure (a1 : a2)) <|> (:[]) <$> pSmall
+pIdent = let manyCharacters = do
+               a1 <- pSmall
+               a2 <- pIdent'
+               pure (a1 : a2)
+         in
+           manyCharacters <|> (:[]) <$> pSmall
 
 pIdent' :: Parser String
-pIdent' = (do
-  a1 <- oneOfCharParsers
-  a2 <- pIdent'
-  pure (a1 : a2)) <|> (:[]) <$> oneOfCharParsers 
+pIdent' = let manyCharacters = do
+                a1 <- oneOfCharParsers
+                a2 <- pIdent'
+                pure (a1 : a2)
+          in
+            manyCharacters <|> (:[]) <$> oneOfCharParsers 
 
 
 removeEmpties :: Parser String
@@ -103,67 +165,6 @@ pPrim fst snd cons = do
   case y of
     Nothing -> return x
     Just y  -> return $ cons x y
-
-
-pAdd :: Parser Expr
-pAdd = pPrim pMul pAdds Add
-
-pAdds :: Parser (Maybe Expr)
-pAdds = optional pAdds'
-
-pAdds' :: Parser Expr
-pAdds' = do
-  single '+'
-  pPrim pMul pAdds Add
-
-  
-pMul :: Parser Expr
-pMul = pPrim pOther pMuls Mul
-
-pMuls :: Parser (Maybe Expr)
-pMuls = optional pMuls'
-
--- Parses structure: ('*' other pMuls)
-pMuls' :: Parser Expr
-pMuls' = do
-  single '*'
-  pPrim pOther pMuls Mul
-  
-
-pOther :: Parser Expr
-pOther =  pSub <|> pZero <|> pOne <|> pLet <|> pVar
-
-
--- sub : '(' add ')' ;
-pSub :: Parser Expr
-pSub = do
-  single '('
-  ex <- pExpr
-  single ')'
-  pure ex
- 
-
-pLet :: Parser Expr  
-pLet = do
-  removeEmpties
-  chunk2 "let"
-  removeEmpties
-  var           <- pIdent
-  removeEmpties
-  single '='
-  removeEmpties
-  expr1         <- pExpr
-  removeEmpties
-  chunk2 "in"
-  removeEmpties
-  expr2         <- pExpr
-  removeEmpties
-  pure $ Let var expr1 expr2
-
-pVar :: Parser Expr
-pVar = do
-  out <- pIdent
-  pure $ Var out
 
 
 
