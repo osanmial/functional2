@@ -4,8 +4,11 @@ module Week5.Exercise1 where
 import Prelude hiding (Foldable, foldMap, foldr)
 import Utility.Simple
 
+
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
+
+ 
 
 --Instances for Bool.
 -- Bool has a wrong kind
@@ -16,8 +19,13 @@ instance Foldable Maybe where
   foldMap f (Just x) = f x
   foldMap _ Nothing  = mempty 
 
+
 ---------------------------------------------------------------------
 --Instances for Either a b.
+instance Foldable (Either a) where
+    foldMap f  e = case e of 
+            Right a -> f a
+            Left _ -> mempty 
 ---------------------------------------------------------------------
 
 instance Foldable ((,) a) where
