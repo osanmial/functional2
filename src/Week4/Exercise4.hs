@@ -197,4 +197,9 @@ test str = case (runParse pExpr) str of
              Right (s, v) -> (s, evalDeep v)
              Left _       -> ("", Nothing)
 
---Failure: test "let x = 1+1 in (2*2)*(x+x)"
+closedString :: String
+closedString = "let \
+  \ two = 1 + 1 in let \
+  \ three = 1 + two in let \
+  \ nine = three * three in \
+  \ 1 + three * (1 + nine)"
