@@ -10,7 +10,7 @@ class Foldable t where
 
 class (Functor t, Foldable t) => Traversable t where
   traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
-
+  sequenceA :: Applicative f => t (f a) -> f (t a)
 
 --Instances for Bool.
 -- Bool has a wrong kind
@@ -40,6 +40,8 @@ instance Traversable (Either a) where
 
 instance Foldable ((,) a) where
   foldMap f (_, x) = f x
+instance Traversable ((,) a) where
+  traverse f (x,y) =  (\ z -> (,) x z) <$> f y
 
 ---------------------------------------------------------------------
 --Instances for Endo a.
@@ -56,7 +58,9 @@ instance Foldable ((,) a) where
 instance Foldable [] where
   foldMap f (x:xs) = f x <> foldMap f xs
   foldMap _ []     = mempty
-
+--traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
+instance Traversable [] where
+    traverse f (x:xs)= undefined 
 ---------------------------------------------------------------------
 
 instance Foldable NonEmpty where
@@ -68,7 +72,8 @@ instance Foldable NonEmpty where
 -- Void has a wrong kind
 
 ---------------------------------------------------------------------
---Instances for IO a. it is not doable because ther is no way to extract Monoid from IO 
+--Instances for IO a. it is not doable because ther is no way to extract Monoid from IO
+-- Since it is not Foldable so it is not Traversable 
 --  foldMap :: Monoid m => (a -> m) -> t a -> m
 --instance Foldable IO where
 --  foldMap f i=do 
