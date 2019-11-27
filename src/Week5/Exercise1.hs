@@ -1,8 +1,9 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
-import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse, sequenceA)
+import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse,sequenceA)
 import Utility.Simple
+
 -- In the following I put to do list to complete this exercies. 
 -- To do that I choose that we have to implement on  of
 -- the following function for traverse or sequenceA where I thinki we 
@@ -58,15 +59,15 @@ instance Traversable ((,) a) where
 ---------------------------------------------------------------------
 
 --Instances for Endo a.
---No instance of foldmap for endo as we would require something
---with the strength of profunctor to alter its type.
+-- No instance of foldmap for endo as we would require something
+-- with the strength of profunctor to alter its type.
 
 ---------------------------------------------------------------------
 
---instance Foldable ((->) a)
---I cannot get rid of the input of the function to get access to the wrapped value I actually wish to handle. And so I can't convert this to a aritrary monoid.
+--Instance Foldable ((->) a)
+-- I cannot get rid of the input of the function to get access to the wrapped value I actually wish to handle. And so I can't convert this to a aritrary monoid.
   
---OP does not work with foldMap as we would require a contravariant like function to alter the type and we have just a normal one.
+-- OP does not work with foldMap as we would require a contravariant like function to alter the type and we have just a normal one.
 
 ---------------------------------------------------------------------
 
@@ -78,11 +79,10 @@ instance Traversable ((,) a) where
 instance Foldable [] where
   foldMap f (x:xs) = f x <> foldMap f xs
   foldMap _ []     = mempty
---traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
-instance Traversable [] where
-    traverse f (x:xs) = undefined 
-    sequenceA = undefined
 
+instance Traversable [] where
+  sequenceA (x:xs) = (:) <$> x <*> sequenceA xs
+    
 ---------------------------------------------------------------------
 
 instance Foldable NonEmpty where
