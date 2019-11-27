@@ -1,7 +1,7 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
-import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse)
+import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse,sequenceA)
 import Utility.Simple
 -- In the following I put to do list to complete this exercies. 
 -- To do that I choose that we have to implement on  of
@@ -72,10 +72,11 @@ instance Traversable ((,) a) where
 instance Foldable [] where
   foldMap f (x:xs) = f x <> foldMap f xs
   foldMap _ []     = mempty
---traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
+--  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
+--  sequenceA :: Applicative f => t (f a) -> f (t a)
 instance Traversable [] where
-    traverse f (x:xs)= undefined 
-    sequenceA = undefined
+    sequenceA (x:xs) = (:) <$> x <*> sequenceA xs
+    
 ---------------------------------------------------------------------
 
 instance Foldable NonEmpty where
