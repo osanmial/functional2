@@ -83,7 +83,8 @@ instance Foldable [] where
 --  sequenceA :: Applicative f => t (f a) -> f (t a)
 instance Traversable [] where
 
-    sequenceA (x:xs) = (:) <$> x <*> sequenceA xs
+    sequenceA (f:fs) =  (:) <$>  f  <*> sequenceA fs
+
     
 ---------------------------------------------------------------------
 
