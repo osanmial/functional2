@@ -6,3 +6,9 @@ import Data.List.NonEmpty as Esko hiding (map)
 
 import GHC.Base hiding (Monad, (>>=), (>>))
 
+--   a -> ExceptT Problem (ReaderT (Maybe Int) (State (Set a))) b
+--   a -> ExceptT Problem  (State (Set a)) (ReaderT (Maybe Int) ) b
+-- a- > StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) b
+-- a -> StateT (Set a)    (Except Problem (ReaderT (Maybe Int) )) b
+-- a -> ReaderT (Maybe Int) ( Except Problem (StateT (Set a)  ))
+-- a -> ReaderT (Maybe Int) ( StateT (Set a)  (Except Problem))
