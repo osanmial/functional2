@@ -1,7 +1,7 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MagicHash, UnboxedTuples #-}
 module Week5.Exercise1 where
-import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse)
+import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse, sequenceA)
 import Utility.Simple
 -- In the following I put to do list to complete this exercies. 
 -- To do that I choose that we have to implement on  of
@@ -17,8 +17,10 @@ class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
 
 class (Functor t, Foldable t) => Traversable t where
-  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
+  traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+  traverse f = sequenceA . fmap f
   sequenceA :: Applicative f => t (f a) -> f (t a)
+  sequenceA = traverse id
 
 --Instances for Bool.
 -- Bool has a wrong kind
@@ -32,7 +34,7 @@ instance Foldable Maybe where
 instance Traversable Maybe where
   traverse f (Just x) = Just <$> f x
   traverse _ Nothing  = pure Nothing
-  sequenceA = undefined
+  
 ---------------------------------------------------------------------
 
 instance Foldable (Either a) where
@@ -50,11 +52,13 @@ instance Foldable ((,) a) where
   foldMap f (_, x) = f x
 instance Traversable ((,) a) where
   traverse f (x,y) =  (\ z -> (,) x z) <$> f y
-  sequenceA=undefined
+  
 ---------------------------------------------------------------------
+
 --Instances for Endo a.
 --No instance of foldmap for endo as we would require something
 --with the strength of profunctor to alter its type.
+
 ---------------------------------------------------------------------
 
 --instance Foldable ((->) a)
@@ -76,21 +80,23 @@ instance Foldable [] where
 instance Traversable [] where
     traverse f (x:xs)= undefined 
     sequenceA = undefined
+
 ---------------------------------------------------------------------
 
 instance Foldable NonEmpty where
   foldMap f (x :| xs) = f x <> foldMap f xs
 
-
 instance Traversable NonEmpty where
     traverse f (x:|xs)= undefined 
     sequenceA = undefined
+
 ---------------------------------------------------------------------
 
 --Instances for Void.
 --Void has a wrong kind
 
 ---------------------------------------------------------------------
+
 --Instances for IO a. it is not doable because ther is no way to extract Monoid from IO
 -- Since it is not Foldable so it is not Traversable 
 --  foldMap :: Monoid m => (a -> m) -> t a -> m
@@ -98,8 +104,9 @@ instance Traversable NonEmpty where
 --  foldMap f i=do 
 --    x <- i
 --    return (f  x)
--- 
+
 ---------------------------------------------------------------------
+
 --Instances for Map k a.
 instance Foldable (Map k) where
   foldMap f x = undefined
