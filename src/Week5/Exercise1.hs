@@ -12,7 +12,7 @@ import Utility.Simple
 -- do not need to do both (one is enough)
 
 -- TODO: 
--- traverse or sequenceA for NonEmpty
+
 -- traverse or sequenceA for Map
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
@@ -90,7 +90,7 @@ instance Foldable NonEmpty where
 --  sequenceA :: Applicative f => t (f a) -> f (t a)
 --  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
 instance Traversable NonEmpty where
-        sequenceA = (:) <$>  f  <*> sequenceA fs
+        sequenceA (f :|fs)= (:|) <$>  f  <*> sequenceA fs
 
 ---------------------------------------------------------------------
 
