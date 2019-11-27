@@ -4,14 +4,6 @@ module Week5.Exercise1 where
 import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse,sequenceA)
 import Utility.Simple
 
--- In the following I put to do list to complete this exercies. 
--- To do that I choose that we have to implement on  of
--- the following function for traverse or sequenceA where I thinki we 
--- do not need to do both (one is enough)
-
--- TODO: 
-
--- traverse or sequenceA for Map
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
 
