@@ -77,8 +77,6 @@ instance Traversable [] where
 instance Foldable NonEmpty where
   foldMap f (x :| xs) = f x <> foldMap f xs
 
---  sequenceA :: Applicative f => t (f a) -> f (t a)
---  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
 instance Traversable NonEmpty where
         sequenceA (f :|fs)= (:|) <$>  f  <*> sequenceA fs
 
@@ -103,6 +101,8 @@ instance Traversable NonEmpty where
 instance Foldable (Map k) where
   foldMap f mp = foldMap f (elems mp)
   
+--  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
+--  sequenceA :: Applicative f => t (f a) -> f (t a)
 instance Traversable (Map k) where
     traverse f mp = traverseWithKey (\_ -> f) mp
 
