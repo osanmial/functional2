@@ -111,9 +111,9 @@ instance Traversable NonEmpty where
 
 --Instances for Map k a.
 instance Foldable (Map k) where
-  foldMap f x = undefined
+  foldMap f mp = foldMap f (elems mp)
   
 instance Traversable (Map k) where
-    traverse = undefined 
-    sequenceA = undefined
+    traverse f mp = undefined
+    sequenceA mp = undefined
 
