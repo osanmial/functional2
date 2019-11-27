@@ -22,6 +22,8 @@ class (Functor t, Foldable t) => Traversable t where
   sequenceA :: Applicative f => t (f a) -> f (t a)
   sequenceA = traverse id
 
+---------------------------------------------------------------------
+
 --Instances for Bool.
 -- Bool has a wrong kind
 
@@ -45,13 +47,13 @@ instance Foldable (Either a) where
 instance Traversable (Either a) where
   traverse f (Right x) = Right <$> f x
   traverse _ (Left x)  = pure (Left x)
-  sequenceA=undefined
+  
 ---------------------------------------------------------------------
 
 instance Foldable ((,) a) where
   foldMap f (_, x) = f x
 instance Traversable ((,) a) where
-  traverse f (x,y) =  (\ z -> (,) x z) <$> f y
+  traverse f (x, y) =  (\z -> (x, z)) <$> f y
   
 ---------------------------------------------------------------------
 
@@ -78,7 +80,7 @@ instance Foldable [] where
   foldMap _ []     = mempty
 --traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
 instance Traversable [] where
-    traverse f (x:xs)= undefined 
+    traverse f (x:xs) = undefined 
     sequenceA = undefined
 
 ---------------------------------------------------------------------
