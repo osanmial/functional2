@@ -12,9 +12,8 @@ import Utility.Simple
 -- do not need to do both (one is enough)
 
 -- TODO: 
--- traverse or  sequenceA for []
+
 -- traverse or sequenceA for NonEmpty
--- foldMap for Map
 -- traverse or sequenceA for Map
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
