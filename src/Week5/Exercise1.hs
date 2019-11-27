@@ -112,6 +112,5 @@ instance Foldable (Map k) where
   foldMap f mp = foldMap f (elems mp)
   
 instance Traversable (Map k) where
-    traverse f mp = undefined
-    sequenceA mp = undefined
+    traverse f mp = traverseWithKey (\_ -> f) mp
 
