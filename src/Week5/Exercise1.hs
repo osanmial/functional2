@@ -3,8 +3,16 @@
 module Week5.Exercise1 where
 import Prelude hiding (Foldable, foldMap, foldr, Traversable, traverse)
 import Utility.Simple
+-- In the following I put to do list to complete this exercies. 
+-- To do that I choose that we have to implement on  of
+-- the following function for traverse or sequenceA where I thinki we 
+-- do not need to do both (one is enough)
 
-
+-- TODO: 
+-- traverse or  sequenceA for []
+-- traverse or sequenceA for NonEmpty
+-- foldMap for Map
+-- traverse or sequenceA for Map
 class Foldable t where
   foldMap :: Monoid m => (a -> m) -> t a -> m
 
@@ -24,7 +32,7 @@ instance Foldable Maybe where
 instance Traversable Maybe where
   traverse f (Just x) = Just <$> f x
   traverse _ Nothing  = pure Nothing
-  
+  sequenceA = undefined
 ---------------------------------------------------------------------
 
 instance Foldable (Either a) where
@@ -35,14 +43,14 @@ instance Foldable (Either a) where
 instance Traversable (Either a) where
   traverse f (Right x) = Right <$> f x
   traverse _ (Left x)  = pure (Left x)
-  
+  sequenceA=undefined
 ---------------------------------------------------------------------
 
 instance Foldable ((,) a) where
   foldMap f (_, x) = f x
 instance Traversable ((,) a) where
   traverse f (x,y) =  (\ z -> (,) x z) <$> f y
-
+  sequenceA=undefined
 ---------------------------------------------------------------------
 --Instances for Endo a.
 --No instance of foldmap for endo as we would require something
@@ -67,11 +75,16 @@ instance Foldable [] where
 --traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
 instance Traversable [] where
     traverse f (x:xs)= undefined 
+    sequenceA = undefined
 ---------------------------------------------------------------------
 
 instance Foldable NonEmpty where
   foldMap f (x :| xs) = f x <> foldMap f xs
 
+
+instance Traversable NonEmpty where
+    traverse f (x:|xs)= undefined 
+    sequenceA = undefined
 ---------------------------------------------------------------------
 
 --Instances for Void.
@@ -90,4 +103,8 @@ instance Foldable NonEmpty where
 --Instances for Map k a.
 instance Foldable (Map k) where
   foldMap f x = undefined
+  
+instance Traversable (Map k) where
+    traverse = undefined 
+    sequenceA = undefined
 
