@@ -12,7 +12,6 @@ import Utility.Simple
 -- do not need to do both (one is enough)
 
 -- TODO: 
-
 -- traverse or sequenceA for NonEmpty
 -- traverse or sequenceA for Map
 class Foldable t where
@@ -78,8 +77,6 @@ instance Traversable ((,) a) where
 instance Foldable [] where
   foldMap f (x:xs) = f x <> foldMap f xs
   foldMap _ []     = mempty
---  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
---  sequenceA :: Applicative f => t (f a) -> f (t a)
 instance Traversable [] where
 
     sequenceA (f:fs) =  (:) <$>  f  <*> sequenceA fs
@@ -90,9 +87,10 @@ instance Traversable [] where
 instance Foldable NonEmpty where
   foldMap f (x :| xs) = f x <> foldMap f xs
 
+--  sequenceA :: Applicative f => t (f a) -> f (t a)
+--  traverse :: Applicative f => (a -> f b) -> t a -> f (t b) 
 instance Traversable NonEmpty where
-    traverse f (x:|xs)= undefined 
-    sequenceA = undefined
+        sequenceA = (:) <$>  f  <*> sequenceA fs
 
 ---------------------------------------------------------------------
 
