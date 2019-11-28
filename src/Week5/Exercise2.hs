@@ -30,7 +30,7 @@ safeToCollatz n
   | otherwise = n > minBound `div` 3 && n < maxBound `div` 3
 
 collatzBound :: Intlike a => Maybe a
-collatzBound = Just 18
+collatzBound = Just 2
 
 data Variable = Value | Counter | Cache
   deriving Show
@@ -38,50 +38,11 @@ data Variable = Value | Counter | Cache
 data Problem = Loop | Bound Variable
   deriving Show
 
+type CollatzType a = StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) Int
 
--- a -> ExceptT Problem (ReaderT (Maybe Int) (State (Set a))) b --Sampsa
--- a -> ExceptT Problem (State (Set a) (ReaderT (Maybe Int))) b
--- a -> StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) b --Sampsa
--- a -> StateT (Set a) (Except Problem (ReaderT (Maybe Int))) b
--- a -> ReaderT (Maybe Int) (Except Problem (StateT (Set a))) b
--- a -> ReaderT (Maybe Int) (StateT (Set a) (Except Problem)) b
-
-checkCollatzSRE :: (Intlike a, Intlike b) =>
-  a -> ExceptT Problem (ReaderT (Maybe Int) (State (Set a))) b
-checkCollatzSRE = let
-  f :: (Intlike a, Intlike b) =>
-    a -> ExceptT Problem (ReaderT (Maybe Int) (State (Set a))) b
-  f n = do
-    ps <- (lift . lift) get
-    if Set.member n ps then
-      throwE Loop else do
-      ms <- lift ask
-      case ms of
-        Nothing -> if Set.size ps >= maxBound then
-          throwE (Bound Cache) else
-          (lift . lift) (put (Set.insert n ps))
-        Just m -> if Set.size ps >= m then
-          pure () else
-          (lift . lift) (put (Set.insert n ps))
-      if abs n == 1 then
-        pure 0 else do
-        if not (safeToCollatz n) then
-          throwE (Bound Value) else let
-          p = collatz n in do
-          q <- f p
-          if not (safeToCount q) then
-            throwE (Bound Counter) else
-            pure (count q) in
-  \ n -> catchE (f n) $ \ e -> case e of
-    Bound Cache -> mapExceptT (local (const collatzBound)) (f n)
-    _ -> throwE e
-
-
-checkCollatzERS :: (Intlike a, Intlike b) =>
-  a -> StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) b
-checkCollatzERS = let
-  f :: (Intlike a, Intlike b) =>
-    a -> StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) b
+checkCollatz :: Intlike a => a -> CollatzType a
+checkCollatz = let
+  f :: Intlike a => a -> CollatzType a
   f n = do
     ps <- get --Get the Set inside the State
     if Set.member n ps then --Check if n is inside the Set
@@ -107,3 +68,7 @@ checkCollatzERS = let
   \ n -> (State.liftCatch . Reader.liftCatch) catchE (f n) $ \ e -> case e of
     Bound Cache -> mapStateT (local (const collatzBound)) (f n)
     _ -> (lift . lift) (throwE e)
+
+
+runCollatz :: CollatzType a -> Either Problem (Int, Set a)
+runCollatz ts = runExcept (runReaderT (runStateT ts Set.empty) collatzBound)
