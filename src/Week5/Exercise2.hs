@@ -2,7 +2,6 @@
 module Week5.Exercise2 where
 
 import Text.Show.Functions
-
 import Data.Int (Int8 (..), Int16 (..))
 import Data.Set (Set (..))
 import qualified Data.Set as Set
@@ -72,3 +71,4 @@ checkCollatz = let
 
 runCollatz :: CollatzType a -> Either Problem (Int, Set a)
 runCollatz ts = runExcept (runReaderT (runStateT ts Set.empty) collatzBound)
+
