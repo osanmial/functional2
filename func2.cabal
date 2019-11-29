@@ -38,4 +38,4 @@ library
                   Utility.Simple
                   Utility.Complex
                   
-  build-depends: base >= 4.7 && < 5, mtl, containers, endo, control-dsl, profunctors, kan-extensions, bifunctors, either, transformers
+  build-depends: base >= 4.7 && < 5, mtl, containers, endo, control-dsl, profunctors, kan-extensions, bifunctors, either, transformers, aeson

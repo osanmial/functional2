@@ -3,7 +3,7 @@
  --         That specify:  1. which address to check. 
  --                                  2. how many times to repeat the check in case of
  --                                                     2.a recoverable failure 
- --                                                     2. band whether to present the results 
+ --                                                     2. b and whether to present the results 
  --                                                          of the checks in color.
  
  --The program should then issue a HEAD request to each address 
