@@ -37,6 +37,13 @@ data Variable = Value | Counter | Cache
 data Problem = Loop | Bound Variable
   deriving Show
 
+--------------------------------------------------------------------------------
+
+runCollatz :: CollatzType a -> Either Problem (Int, Set a)
+runCollatz ts = runExcept (runReaderT (runStateT ts Set.empty) collatzBound)
+
+--------------------------------------------------------------------------------
+
 type CollatzType a = StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) Int
 
 checkCollatz :: Intlike a => a -> CollatzType a
@@ -69,5 +76,3 @@ checkCollatz = let
     _ -> (lift . lift) (throwE e)
 
 
-runCollatz :: CollatzType a -> Either Problem (Int, Set a)
-runCollatz ts = runExcept (runReaderT (runStateT ts Set.empty) collatzBound)
