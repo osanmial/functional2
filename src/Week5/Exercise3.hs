@@ -1,15 +1,15 @@
 {-# LANGUAGE ConstraintKinds #-}
 module Week5.Exercise3 where
 
-import           Text.Show.Functions
+import Text.Show.Functions
 
-import           Control.Monad.Trans.Class
-import           Control.Monad.Trans.Except
-import           Control.Monad.Trans.Reader       as Reader
-import           Control.Monad.Trans.State.Strict as State
-import           Data.Int                         (Int16 (..), Int8 (..))
-import           Data.Set                         (Set (..))
-import qualified Data.Set                         as Set
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Except
+import Control.Monad.Trans.Reader as Reader
+import Control.Monad.Trans.State.Strict as State
+import Data.Int (Int16 (..), Int8 (..))
+import Data.Set (Set (..))
+import qualified Data.Set as Set
 
 type Intlike a = (Bounded a, Integral a)
 
