@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 module Week5.Exercise3 where
 
 import Text.Show.Functions
