@@ -3,10 +3,10 @@ module Week5.Exercise3 where
 
 import Text.Show.Functions
 
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.Except
-import Control.Monad.Trans.Reader as Reader
-import Control.Monad.Trans.State.Strict as State
+import Control.Monad.Cont.Class
+import Control.Monad.Except
+import Control.Monad.Reader as Reader
+import Control.Monad.State.Strict as State
 import Data.Int (Int16 (..), Int8 (..))
 import Data.Set (Set (..))
 import qualified Data.Set as Set
