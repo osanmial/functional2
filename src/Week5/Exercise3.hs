@@ -1,15 +1,15 @@
 {-# LANGUAGE ConstraintKinds #-}
 module Week5.Exercise3 where
 
-import Text.Show.Functions
+import           Text.Show.Functions
 
-import Data.Int (Int8 (..), Int16 (..))
-import Data.Set (Set (..))
-import qualified Data.Set as Set
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.Except
-import Control.Monad.Trans.Reader as Reader
-import Control.Monad.Trans.State.Strict as State
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Except
+import           Control.Monad.Trans.Reader       as Reader
+import           Control.Monad.Trans.State.Strict as State
+import           Data.Int                         (Int16 (..), Int8 (..))
+import           Data.Set                         (Set (..))
+import qualified Data.Set                         as Set
 
 type Intlike a = (Bounded a, Integral a)
 
@@ -30,7 +30,7 @@ safeToCollatz n
   | otherwise = n > minBound `div` 3 && n < maxBound `div` 3
 
 collatzBound :: Intlike a => Maybe a
-collatzBound = Just 2
+collatzBound = Nothing
 
 data Variable = Value | Counter | Cache
   deriving Show
@@ -74,6 +74,6 @@ checkCollatz = let
             pure (count q) in
   \ n -> (State.liftCatch . Reader.liftCatch) catchE (f n) $ \ e -> case e of
     Bound Cache -> mapStateT (local (const collatzBound)) (f n)
-    _ -> (lift . lift) (throwE e)
+    _           -> (lift . lift) (throwE e)
 
 
