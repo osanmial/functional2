@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Week5.Exercise3 where
 
 import Text.Show.Functions
@@ -40,40 +41,43 @@ data Problem = Loop | Bound Variable
 
 --------------------------------------------------------------------------------
 
-runCollatz :: CollatzType a -> Either Problem (Int, Set a)
+type CollatzRunType a = StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) Int
+
+runCollatz :: CollatzRunType a -> Either Problem (Int, Set a)
 runCollatz ts = runExcept (runReaderT (runStateT ts Set.empty) collatzBound)
 
 --------------------------------------------------------------------------------
 
-type CollatzType a = StateT (Set a) (ReaderT (Maybe Int) (Except Problem)) Int
+type CollatzType m a = (MonadError Problem m,
+                        MonadReader (Maybe Int) m,
+                        MonadState (Set a) m)
 
-checkCollatz :: Intlike a => a -> CollatzType a
+checkCollatz :: (CollatzType m a, Intlike a) => a -> m a
 checkCollatz = let
-  f :: Intlike a => a -> CollatzType a
+  f :: (CollatzType m a, Intlike a) => a -> m a
   f n = do
-    ps <- get --Get the Set inside the State
-    if Set.member n ps then --Check if n is inside the Set
-      (lift . lift) (throwE Loop) else do --if it is, throw exception
-      ms <- lift ask --get Maybe Int inside the Reader
-                     -- ms represents another max bound to Set size
+    ps <- get
+    if Set.member n ps then
+      throwError Loop else do
+      ms <- ask
       case ms of
-        Nothing -> if Set.size ps >= maxBound then --if Set is too big, throw exception
-          (lift . lift) (throwE (Bound Cache)) else
+        Nothing -> if Set.size ps >= maxBound then
+          throwError (Bound Cache) else
           put (Set.insert n ps)
-        Just m -> if Set.size ps >= m then -- if Set is too big, return pure
+        Just m -> if Set.size ps >= m then
           pure () else
           put (Set.insert n ps)
       if abs n == 1 then
         pure 0 else
         if not (safeToCollatz n) then
-          (lift . lift) (throwE (Bound Value)) else let
+          throwError (Bound Value) else let
           p = collatz n in do
           q <- f p
           if not (safeToCount q) then
-            (lift . lift) (throwE (Bound Counter)) else
+            throwError (Bound Counter) else
             pure (count q) in
-  \ n -> (State.liftCatch . Reader.liftCatch) catchE (f n) $ \ e -> case e of
-    Bound Cache -> mapStateT (local (const collatzBound)) (f n)
-    _           -> (lift . lift) (throwE e)
+    \n -> catchError (f n) $ \e -> case e of
+      Bound Cache -> local (const collatzBound) (f n)
+      _           -> throwError e
 
 
