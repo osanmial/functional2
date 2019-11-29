@@ -4,4 +4,5 @@
 .directory
 .stack-work
 src/Esko.hs
-
+*.hi
+*.o
