@@ -69,7 +69,7 @@ io = do
  --               the summary should be decorated with bright colors.
  --
 
-duck = Site "www.duckduckgo.com" 200 1 5 True
+duck = Site "www.duckduckgo.com" 200 1 5 False
 
 data Site = Site {
   siteName :: String,
