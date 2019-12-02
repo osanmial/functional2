@@ -121,23 +121,23 @@ printSite (Site name response attempts totalTries color) = do
 
   if color then do
     setSGR [ SetColor Foreground Vivid White ]
-    Prelude.putStr name
-    Prelude.putStr " "
+    P.putStr name
+    P.putStr " "
     setSGR [ SetColor Foreground Dull White ]
-    Prelude.putStr (show response)
-    Prelude.putStr " "
+    P.putStr (show response)
+    P.putStr " "
     setSGR [ SetColor Background Dull Blue ]
-    Prelude.putStr (Prelude.take attempts (Prelude.repeat ' '))
+    P.putStr (P.take attempts (P.repeat ' '))
     setSGR [ SetColor Background Dull White ]
-    Prelude.putStr (Prelude.take (totalTries - attempts) (Prelude.repeat ' '))
+    P.putStr (P.take (totalTries - attempts) (P.repeat ' '))
     setSGR [ Reset ]
-    Prelude.putStrLn ""
+    P.putStrLn ""
     else do
-    Prelude.putStr name
-    Prelude.putStr " "
-    Prelude.putStr (show response)
-    Prelude.putStr " "
-    Prelude.putStr (Prelude.take attempts (Prelude.repeat '='))
-    Prelude.putStrLn (Prelude.take (totalTries - attempts) (Prelude.repeat '-'))
+    P.putStr name
+    P.putStr " "
+    P.putStr (show response)
+    P.putStr " "
+    P.putStr (P.take attempts (P.repeat '='))
+    P.putStrLn (P.take (totalTries - attempts) (P.repeat '-'))
   
 
