@@ -11,133 +11,114 @@
 module Week5.Exercise4 where
 import Network.HTTP.Client.TLS  hiding (Proxy)
 --import Network.HTTP.Simple hiding (Proxy)
-import Prelude as P
-import Data.ByteString.Lazy as BS hiding (head)
-import Data.ByteString.Lazy.Char8 as BS8 hiding (head)
-import Servant.Client hiding (responseBody)
+import Prelude hiding (readFile)
+import Data.ByteString.Lazy as BS hiding (head, putStrLn, putStr, repeat, take)
+--import Data.ByteString.Lazy.Char8 as BS8 hiding (head)
+--import Servant.Client
 import Network.HTTP.Types.Status (statusCode)
 --import Servant.Docs
-import Servant.API
+--import Servant.API
 import Options.Generic --(<?>)
 import Data.Aeson
-import GHC.Generics
-import Data.Map as M
-import Data.Proxy
+--import GHC.Generics
+--import Data.Map as M
+--import Data.Proxy
 import Network.HTTP.Client hiding (Proxy)
-import Data.Maybe
+--import Data.Maybe
 
 import System.Console.ANSI
 
 
---toEncoding = genericToEncoding defaultOptions
+data MyJson = MyJson [AddressLine] deriving (Generic, Show)
 
---Example change to better fit us.
-data MyJson = Config {addresses :: [String]} deriving (Generic, Show)
 instance ToJSON MyJson
 instance FromJSON MyJson
 
 
+data AddressLine = AddressLine {
+  url :: String,
+  numberOfRepeats :: Int,
+  useColor :: Bool
+  } deriving (Generic, Show)
+
+instance ToJSON AddressLine
+instance FromJSON AddressLine
 
 
-myReadFile :: IO ByteString
-myReadFile = do
-  file <- BS.readFile "conffi.json"
-  let myJsonVal = head . addresses <$> (decode file)
-  let
-    out :: ByteString
-    out = case myJsonVal of
-        Just ioval -> BS8.pack ioval
-        Nothing -> file
-  pure out
+dothething = do
+  MyJson addresses <- readJSON "test.json"
+  let iolines = fmap handleLine addresses
+  lines <- sequenceA iolines
+  printSites lines
+  
 
-data IP = IP {ip :: String} deriving (Generic, Show)
-
---type Addr = String deriving (Generic, Show)
-
-instance ToJSON IP
-instance FromJSON IP
-
-data Empty a = Empty a deriving (Generic, Show)
-instance ToJSON a => ToJSON (Empty a)
-instance FromJSON a => FromJSON (Empty a)
+readJSON :: FilePath -> IO MyJson
+readJSON fileName = do
+  file <- readFile fileName
+  case decode file :: Maybe MyJson of
+    Just x  -> return x
+    Nothing -> return (MyJson [])
 
 
-type Head contentTypes a = Verb 'HEAD 200 contentTypes a
-type API = Get '[JSON] IP --Get '[JSON] IP --Works
-api :: Proxy API
-api = Proxy
+handleLine :: AddressLine -> IO Site
+handleLine line = do
+  (res, att) <- connectUrl (url line) (numberOfRepeats line)
+  return $ Site (url line) res att (numberOfRepeats line) (useColor line)
+
+connectUrl :: String -> Int -> IO (Int, Int)
+connectUrl url maxAttempts = do
+  res <- requestUrl url
+  return (res, 1)
 
 
-api' = client api
+requestUrl :: String -> IO Int
+requestUrl url = do
+  manager <- newTlsManagerWith tlsManagerSettings
 
---getHead :: ClientM ()
-getHead = do
-  out <- api'
-  pure out
-
---headHTTP :: String -> IO (Either String String)
---headHTTP :: String -> IO ()
-headHTTP hostName = do
-  let bUrl = BaseUrl Http hostName 80 ""  -- parseBaseUrl hostName
-  manager' <- newManager defaultManagerSettings
-  let clientEnv = mkClientEnv manager' bUrl
-  res <- runClientM (getHead) clientEnv
-  case res of
-    Left err     -> P.putStrLn $ "Error " ++ show err
-    Right alpaca -> P.putStrLn $ "output "++  show alpaca
-
-
-
-requ :: String -> IO ()
-requ url = do
-  manager <- newManager defaultManagerSettings
-
-  request <- parseRequest $ "http://" ++ url
+  request <- parseRequest $ url
   let inittedReq = request {method = "HEAD"}
-  response <- httpLbs request manager
+  response <- httpLbs inittedReq manager
 
-  P.putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
-  print $ responseBody response
-
-
-iotest :: IO ()
-iotest = do
-  host <- myReadFile
-  requ (BS8.unpack host)
+  return (statusCode $ responseStatus response)
 
 
-duck = Site "www.duckduckgo.com" 200 1 5 False
+
+duck = Site "www.duckduckgo.com" 200 1 5 True
 
 data Site = Site {
   siteName :: String,
-  response :: Int,
-  attempts :: Int,
+  siteResponse :: Int,
+  siteAttempts :: Int,
   totalTries:: Int,
   colors :: Bool
   } deriving Show
 
+printSites :: [Site] -> IO ()
+printSites []     = pure ()
+printSites (x:xs) = printSite x >> printSites xs
 
+printSite :: Site -> IO ()
 printSite (Site name response attempts totalTries color) = do
 
   if color then do
     setSGR [ SetColor Foreground Vivid White ]
-    P.putStr name
-    P.putStr " "
+    putStr name
+    putStr " "
     setSGR [ SetColor Foreground Dull White ]
-    P.putStr (show response)
-    P.putStr " "
+    putStr (show response)
+    putStr " "
     setSGR [ SetColor Background Dull Blue ]
-    P.putStr (P.take attempts (P.repeat ' '))
+    putStr (take attempts (repeat ' '))
     setSGR [ SetColor Background Dull White ]
-    P.putStr (P.take (totalTries - attempts) (P.repeat ' '))
+    putStr (take (totalTries - attempts) (repeat ' '))
     setSGR [ Reset ]
-    P.putStrLn ""
+    putStrLn ""
     else do
-    P.putStr name
-    P.putStr " "
-    P.putStr (show response)
-    P.putStr " "
-    P.putStr (P.take attempts (P.repeat '='))
-    P.putStrLn (P.take (totalTries - attempts) (P.repeat '-'))
+    putStr name
+    putStr " "
+    putStr (show response)
+    putStr " "
+    putStr (take attempts (repeat '='))
+    putStrLn (take (totalTries - attempts) (repeat '-'))
   
 
