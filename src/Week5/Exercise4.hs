@@ -8,24 +8,21 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
+--TODO:
+-- The current solution only tries once, in connectUrl
+-- Handle errors, in requestUrl
+-- Even out the lines in printing
+
+
+
 module Week5.Exercise4 where
 import Network.HTTP.Client.TLS  hiding (Proxy)
---import Network.HTTP.Simple hiding (Proxy)
 import Prelude hiding (readFile)
 import Data.ByteString.Lazy as BS hiding (head, putStrLn, putStr, repeat, take)
---import Data.ByteString.Lazy.Char8 as BS8 hiding (head)
---import Servant.Client
 import Network.HTTP.Types.Status (statusCode)
---import Servant.Docs
---import Servant.API
-import Options.Generic --(<?>)
+import Options.Generic
 import Data.Aeson
---import GHC.Generics
---import Data.Map as M
---import Data.Proxy
 import Network.HTTP.Client hiding (Proxy)
---import Data.Maybe
-
 import System.Console.ANSI
 
 
@@ -62,13 +59,13 @@ readJSON fileName = do
 
 handleLine :: AddressLine -> IO Site
 handleLine line = do
-  (res, att) <- connectUrl (url line) (numberOfRepeats line)
+  (res, att) <- connectUrl (url line) 1 (numberOfRepeats line)
   return $ Site (url line) res att (numberOfRepeats line) (useColor line)
 
-connectUrl :: String -> Int -> IO (Int, Int)
-connectUrl url maxAttempts = do
+connectUrl :: String -> Int -> Int -> IO (Int, Int)
+connectUrl url curAttempt maxAttempts = do
   res <- requestUrl url
-  return (res, 1)
+  return (res, curAttempt)
 
 
 requestUrl :: String -> IO Int
@@ -81,9 +78,6 @@ requestUrl url = do
 
   return (statusCode $ responseStatus response)
 
-
-
-duck = Site "www.duckduckgo.com" 200 1 5 True
 
 data Site = Site {
   siteName :: String,
@@ -104,7 +98,7 @@ printSite (Site name response attempts totalTries color) = do
     setSGR [ SetColor Foreground Vivid White ]
     putStr name
     putStr " "
-    setSGR [ SetColor Foreground Dull White ]
+    setSGR [ SetColor Foreground Vivid Green ]
     putStr (show response)
     putStr " "
     setSGR [ SetColor Background Dull Blue ]
