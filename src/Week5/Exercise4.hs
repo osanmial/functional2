@@ -9,11 +9,14 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Week5.Exercise4 where
-import Prelude hiding ()
+import Network.HTTP.Client.TLS  hiding (Proxy)
+--import Network.HTTP.Simple hiding (Proxy)
+import Prelude as P
 import Data.ByteString.Lazy as BS hiding (head)
 import Data.ByteString.Lazy.Char8 as BS8 hiding (head)
-import Servant.Client
-import Servant.Docs
+import Servant.Client hiding (responseBody)
+import Network.HTTP.Types.Status (statusCode)
+--import Servant.Docs
 import Servant.API
 import Options.Generic --(<?>)
 import Data.Aeson
@@ -34,40 +37,74 @@ instance ToJSON MyJson
 instance FromJSON MyJson
 
 
-io = do
+
+
+myReadFile :: IO ByteString
+myReadFile = do
   file <- BS.readFile "conffi.json"
   let myJsonVal = head . addresses <$> (decode file)
-      
   let
     out :: ByteString
     out = case myJsonVal of
         Just ioval -> BS8.pack ioval
         Nothing -> file
-  BS8.putStrLn out
-  
+  pure out
+
+data IP = IP {ip :: String} deriving (Generic, Show)
+
+--type Addr = String deriving (Generic, Show)
+
+instance ToJSON IP
+instance FromJSON IP
+
+data Empty a = Empty a deriving (Generic, Show)
+instance ToJSON a => ToJSON (Empty a)
+instance FromJSON a => FromJSON (Empty a)
+
+
+type Head contentTypes a = Verb 'HEAD 200 contentTypes a
+type API = Get '[JSON] IP --Get '[JSON] IP --Works
+api :: Proxy API
+api = Proxy
+
+
+api' = client api
+
+--getHead :: ClientM ()
+getHead = do
+  out <- api'
+  pure out
+
+--headHTTP :: String -> IO (Either String String)
+--headHTTP :: String -> IO ()
+headHTTP hostName = do
+  let bUrl = BaseUrl Http hostName 80 ""  -- parseBaseUrl hostName
+  manager' <- newManager defaultManagerSettings
+  let clientEnv = mkClientEnv manager' bUrl
+  res <- runClientM (getHead) clientEnv
+  case res of
+    Left err     -> P.putStrLn $ "Error " ++ show err
+    Right alpaca -> P.putStrLn $ "output "++  show alpaca
 
 
 
+requ :: String -> IO ()
+requ url = do
+  manager <- newManager defaultManagerSettings
 
- -- The program should read and parse the provided JSON config files 
- --   That specify:
- --     1. which address to check. 
- --     2. a) how many times to repeat the check in case of a recoverable failure 
- --        b) and whether to present the results of the checks in color.
- 
- -- The program should then issue a HEAD request to each address 
- -- and see what status code the response contains.
- --              1. If the status code indicates a recoverable failure and 
- --                 the maximum number of repetitions has not been exhausted, 
- --                 the program should try again after a short delay. 
- --              2. Otherwise, the program should stop making requests to the address.
+  request <- parseRequest $ "http://" ++ url
+  let inittedReq = request {method = "HEAD"}
+  response <- httpLbs request manager
 
- 
- -- The program should finally collect the results and print a nicely formatted
- -- summary into the terminal.
- --               If so requested and supported by the terminal, 
- --               the summary should be decorated with bright colors.
- --
+  P.putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
+  print $ responseBody response
+
+
+iotest :: IO ()
+iotest = do
+  host <- myReadFile
+  requ (BS8.unpack host)
+
 
 duck = Site "www.duckduckgo.com" 200 1 5 True
 
@@ -103,3 +140,4 @@ printSite (Site name response attempts totalTries color) = do
     Prelude.putStr (Prelude.take attempts (Prelude.repeat '='))
     Prelude.putStrLn (Prelude.take (totalTries - attempts) (Prelude.repeat '-'))
   
+
