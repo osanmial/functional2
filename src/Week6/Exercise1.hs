@@ -7,10 +7,10 @@ import Data.Functor.Identity
 newtype WrappedTraversable m a = WrapTraversable {unwrapTraversable :: m a}
 
 instance Traversable m => Functor (WrappedTraversable m) where
-  fmap f (WrapTraversable xs) = WrapTraversable (fmap f xs)
+  fmap f  =  runIdentity . traverse (Identity . f)
 
 instance Traversable m => Foldable (WrappedTraversable m) where
-  foldMap f (WrapTraversable xs) = foldMap f xs
+  foldMap f  = getConst . traverse (Const . f)
 
 instance Traversable m => Traversable (WrappedTraversable m) where
   sequenceA = traverse id
