@@ -23,6 +23,8 @@ import Data.Proxy
 import Network.HTTP.Client hiding (Proxy)
 import Data.Maybe
 
+import System.Console.ANSI
+
 
 --toEncoding = genericToEncoding defaultOptions
 
@@ -45,6 +47,8 @@ io = do
   
 
 
+
+
  -- The program should read and parse the provided JSON config files 
  --   That specify:
  --     1. which address to check. 
@@ -64,3 +68,38 @@ io = do
  --               If so requested and supported by the terminal, 
  --               the summary should be decorated with bright colors.
  --
+
+duck = Site "www.duckduckgo.com" 200 1 5 True
+
+data Site = Site {
+  siteName :: String,
+  response :: Int,
+  attempts :: Int,
+  totalTries:: Int,
+  colors :: Bool
+  } deriving Show
+
+
+printSite (Site name response attempts totalTries color) = do
+
+  if color then do
+    setSGR [ SetColor Foreground Vivid White ]
+    Prelude.putStr name
+    Prelude.putStr " "
+    setSGR [ SetColor Foreground Dull White ]
+    Prelude.putStr (show response)
+    Prelude.putStr " "
+    setSGR [ SetColor Background Dull Blue ]
+    Prelude.putStr (Prelude.take attempts (Prelude.repeat ' '))
+    setSGR [ SetColor Background Dull White ]
+    Prelude.putStr (Prelude.take (totalTries - attempts) (Prelude.repeat ' '))
+    setSGR [ Reset ]
+    Prelude.putStrLn ""
+    else do
+    Prelude.putStr name
+    Prelude.putStr " "
+    Prelude.putStr (show response)
+    Prelude.putStr " "
+    Prelude.putStr (Prelude.take attempts (Prelude.repeat '='))
+    Prelude.putStrLn (Prelude.take (totalTries - attempts) (Prelude.repeat '-'))
+  
