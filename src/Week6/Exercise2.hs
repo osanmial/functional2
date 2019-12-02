@@ -17,10 +17,10 @@ class Monoidal m => Triad m where
 newtype WrappedFunctor m a = WrapFunctor {unwrapFunctor :: m a}
 
 instance Covariant m => Functor (WrappedFunctor m) where
-  fmap f (WrapFunctor xs) = undefined
+  fmap f (WrapFunctor xs) =WrapFunctor $  xs <&> f  
 
 instance Functor m => Covariant (WrappedFunctor m) where
-  WrapFunctor xs <&> f = undefined
+  WrapFunctor xs <&> f = WrapFunctor $ fmap f xs
 
 newtype WrappedCovariant m a = WrapCovariant {unwrapCovariant :: m a}
 
