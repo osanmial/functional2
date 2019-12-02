@@ -4,4 +4,8 @@
 .directory
 .stack-work
 src/Esko.hs
+src/Week5/Url.hs
+test.json
+*.hi
+*.o
 
