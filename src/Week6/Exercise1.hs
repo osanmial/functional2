@@ -19,6 +19,7 @@ instance Traversable m => Functor (WrappedTraversable m) where
   -- fmap f (WrapTraversable xs) =  WrapTraversable . runIdentity . traverse (Identity . f) $ xs
 
 instance Traversable m => Foldable (WrappedTraversable m) where
+   
    -- traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
    -- The below is working:
    --foldMap f  (WrapTraversable xs)= WrapTraversable $ (getConst . traverse (Const . f) ) xs
