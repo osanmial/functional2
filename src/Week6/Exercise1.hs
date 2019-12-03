@@ -16,5 +16,21 @@ instance Traversable m => Foldable (WrappedTraversable m) where
 
 instance Traversable m => Traversable (WrappedTraversable m) where
   sequenceA = traverse id
-  traverse k = traverse k
+  traverse k ma = sequenceA $ fmap k ma
+  -- I will require some form of traversable function to already be implmented in order to do either of the above as
+  -- as the unique properties custom to traversable are required.
+
+  -- m (f b)
+  -- > f (m b)
+
 --  traverse k (WrapTraversable xs) =  WrapTraversable <$> traverse k xs
+-- traverse :: (a -> f b) -> W m a -> f (W m b)
+--     fmap :: (a -> b)   -> W m a -> W m b
+--     fmap :: (a -> f b) -> W m a -> W m (f b)
+
+--  foldMap :: (a -> m1) -> W m a -> m1
+
+
+-- (f b) -> b
+
+--     fmap :: (a -> f b)   -> m a -> m (f b)

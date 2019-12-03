@@ -43,8 +43,13 @@ instance Functor m => Covariant (WrappedApplicative m) where
     (unwrapFunctor (WrapFunctor xs <&> f))
 
 instance Monoidal m => Applicative (WrappedApplicative m) where
-  pure x = undefined --WrapApplicative x
-  (WrapApplicative fs) <*> (WrapApplicative xs) = undefined -- _2 
+  pure x = WrapApplicative $ unit <&> (const x)
+  (WrapApplicative fs) <*> (WrapApplicative xs) = undefined -- _2
+
+-- >*<
+-- (<*>) :: f (a -> b) -> f a -> f b
+-- (>>=) :: m a -> (a -> m b) -> m b
+-- (<&>) :: m a -> (a -> b) -> m b
 
 instance Applicative m => Monoidal (WrappedApplicative m) where
   unit = undefined
