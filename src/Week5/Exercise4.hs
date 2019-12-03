@@ -8,26 +8,20 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveFunctor #-}
-
-
---TODO:
--- The current solution only tries once, in connectUrl
--- Handle errors, in requestUrl
--- Even out the lines in printing
-
+{-# LANGUAGE ScopedTypeVariables #-}
 
 
 module Week5.Exercise4 where
 import Network.HTTP.Client.TLS  hiding (Proxy)
 import Prelude hiding (readFile)
-import Data.ByteString.Lazy as BS hiding (head, putStrLn, putStr, repeat, take)
+import Data.ByteString.Lazy as BS hiding (head, putStrLn, putStr, repeat, take, length)
 import Network.HTTP.Types.Status (statusCode)
 import Options.Generic
 import Data.Aeson
 import Network.HTTP.Client hiding (Proxy)
 import System.Console.ANSI
+import Control.Exception
 
---coerce
 
 newtype MyJson = MyJson [AddressLine] deriving (Generic, Show)
 
@@ -46,10 +40,10 @@ instance FromJSON AddressLine
 
 
 dothething = do
-  MyJson addresses <- readJSON "test.json"
+  MyJson addresses <- readJSON "src/Week5/sites.json"
   let iolines = fmap handleLine addresses
-  lines <- sequenceA iolines
-  printSites lines
+  lineList <- sequenceA iolines
+  printSites lineList
   
 
 readJSON :: FilePath -> IO MyJson
@@ -62,24 +56,41 @@ readJSON fileName = do
 
 handleLine :: AddressLine -> IO Site
 handleLine line = do
-  (res, att) <- connectUrl (url line) 1 (numberOfRepeats line)
+  (res, att) <- connectUrl (url line) (numberOfRepeats line)
   return $ Site (url line) res att (numberOfRepeats line) (useColor line)
 
-connectUrl :: String -> Int -> Int -> IO (Int, Int)
-connectUrl url curAttempt maxAttempts = do
-  res <- requestUrl url
-  return (res, curAttempt)
+
+connectUrl :: String -> Int -> IO (Int, Int)
+connectUrl = f 1  
+  where
+    f :: Int -> String -> Int -> IO (Int, Int)
+    f curAttempt siteUrl maxAttempts = do
+      res <- requestUrl siteUrl
+
+      let final
+            | res == 200                = pure (res, curAttempt)
+            | curAttempt >= maxAttempts = pure (res, curAttempt)
+            | otherwise                 = f (succ curAttempt) siteUrl maxAttempts
+
+      final
+        
+      
+      
 
 
 requestUrl :: String -> IO Int
-requestUrl url = do
-  manager <- newTlsManagerWith tlsManagerSettings
-
-  request <- parseRequest $ url
-  let inittedReq = request {method = "HEAD"}
-  response <- httpLbs inittedReq manager
-
-  return (statusCode $ responseStatus response)
+requestUrl siteUrl = catches f
+                     [Handler (\ (e :: HttpException) -> return 400)]
+  where
+    f :: IO Int
+    f = do
+      manager <- newTlsManagerWith tlsManagerSettings
+      prerequest <- parseRequest $ siteUrl
+      let request = prerequest
+                    { method = "HEAD",
+                      responseTimeout = responseTimeoutMicro 500000 }
+      response <- httpLbs request manager
+      return (statusCode $ responseStatus response)
 
 
 data Site = Site {
@@ -91,31 +102,37 @@ data Site = Site {
   } deriving Show
 
 printSites :: [Site] -> IO ()
-printSites []     = pure ()
-printSites (x:xs) = printSite x >> printSites xs
+printSites sites  = f (maxNameLen sites) sites
+  where
+    f _ []     = pure ()
+    f l (x:xs) = printSite l x >> f l xs
+    maxNameLen []     = 0
+    maxNameLen (x:xs) = max (length (siteName x)) (maxNameLen xs)
 
-printSite :: Site -> IO ()
-printSite (Site name response attempts totalTries color) = do
+printSite :: Int -> Site -> IO ()
+printSite maxLen site = do
 
-  if color then do
+  putStr $ take  (maxLen - (length (siteName site))) (repeat ' ')
+  
+  if colors site then do  
     setSGR [ SetColor Foreground Vivid White ]
-    putStr name
+    putStr $ siteName site
     putStr " "
     setSGR [ SetColor Foreground Vivid Green ]
-    putStr (show response)
+    putStr $ show $ siteResponse site
     putStr " "
     setSGR [ SetColor Background Dull Blue ]
-    putStr (take attempts (repeat ' '))
+    putStr $ take (siteAttempts site) (repeat ' ')
     setSGR [ SetColor Background Dull White ]
-    putStr (take (totalTries - attempts) (repeat ' '))
+    putStr $ take ((totalTries site) - (siteAttempts site)) (repeat ' ')
     setSGR [ Reset ]
     putStrLn ""
     else do
-    putStr name
+    putStr $ siteName site
     putStr " "
-    putStr (show response)
+    putStr $ show $ siteResponse site
     putStr " "
-    putStr (take attempts (repeat '='))
-    putStrLn (take (totalTries - attempts) (repeat '-'))
+    putStr $ take (siteAttempts site) (repeat '=')
+    putStrLn $ take ((totalTries site) - (siteAttempts site)) (repeat '-')
   
 
