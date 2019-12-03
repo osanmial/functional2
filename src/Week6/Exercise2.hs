@@ -87,7 +87,11 @@ instance Applicative m => Monoidal (WrappedMonad m) where
     (unwrapApplicative (WrapApplicative xs >*< WrapApplicative ys))
 
 instance Triad m => Monad (WrappedMonad m) where
-  WrapMonad xs >>= ((unwrapMonad .) -> k) = undefined
+  ma >>= fm = join $ ma <&> fm 
+-- wat is tis?::  ((unwrapMonad .) -> k)
+-- join  :: m (m a) -> m a
+-- (>>=) :: m a -> (a -> m b) -> m b
+-- (<&>) :: m a -> (a -> b) -> m b
 
 instance Monad m => Triad (WrappedMonad m) where
   join (WrapMonad xs) = undefined
