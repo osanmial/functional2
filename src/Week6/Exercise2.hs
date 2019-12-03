@@ -1,3 +1,4 @@
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE ViewPatterns #-}
 
 module Week6.Exercise2 where
@@ -40,11 +41,11 @@ instance Covariant m => Functor (WrappedApplicative m) where
 instance Functor m => Covariant (WrappedApplicative m) where
   WrapApplicative xs <&> f = WrapApplicative
     (unwrapFunctor (WrapFunctor xs <&> f))
-
+{-
 instance Monoidal m => Applicative (WrappedApplicative m) where
-  pure x = WrapApplicative $ 
-  WrapApplicative fs <*> WrapApplicative xs = _2
-
+  pure x = WrapApplicative x
+  (WrapApplicative fs) <*> (WrapApplicative xs) = _2
+-}
 instance Applicative m => Monoidal (WrappedApplicative m) where
   unit = undefined
   WrapApplicative xs >*< WrapApplicative ys = undefined
@@ -87,14 +88,19 @@ instance Applicative m => Monoidal (WrappedMonad m) where
     (unwrapApplicative (WrapApplicative xs >*< WrapApplicative ys))
 
 instance Triad m => Monad (WrappedMonad m) where
-  ma >>= fm = join $ ma <&> fm 
+   (WrapMonad ma) >>= fm = WrapMonad $ join $ ma <&> (unwrapMonad . fm)
 -- wat is tis?::  ((unwrapMonad .) -> k)
 -- join  :: m (m a) -> m a
 -- (>>=) :: m a -> (a -> m b) -> m b
 -- (<&>) :: m a -> (a -> b) -> m b
 
 instance Monad m => Triad (WrappedMonad m) where
-  join (WrapMonad xs) = undefined
+  join (WrapMonad xs) = WrapMonad $  xs >>= (id . unwrapMonad)
+-- join  :: m (m a) -> m a
+-- (>>=) :: m a -> (a -> m b) -> m b
+-- (<&>) :: m a -> (a -> b) -> m b
+
+
 
 newtype WrappedTriad m a = WrapTriad {unwrapTriad :: m a}
 
