@@ -1,0 +1,8 @@
+[
+    { "url" : "http://www.example.com", "numberOfRepeats" : 7, "useColor" : true },
+    { "url" : "https://www.duckduckgo.com", "numberOfRepeats" : 5, "useColor" : true },
+    { "url" : "https://www.google.com", "numberOfRepeats" : 4, "useColor" : false },
+    { "url" : "https://www.wikipedia.org", "numberOfRepeats" : 3, "useColor" : true },
+    { "url" : "http://mehilaisvaaka.tetraedri.fun", "numberOfRepeats" : 9, "useColor" : true }
+    
+]
