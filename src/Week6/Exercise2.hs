@@ -64,7 +64,7 @@ unit :: m ()
 -- (>*<) :: m a -> m b -> m (a, b)
 
 -}  
->>>>>>> 7fa6480649d117f5c53c4b5b306c4947dfc413b7
+
 
 newtype WrappedMonoidal m a = WrapMonoidal {unwrapMonoidal :: m a}
 
