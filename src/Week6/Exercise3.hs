@@ -1,2 +1,49 @@
 module Week6.Exercise3 where
 
+--1) a proof that equivalence is reflexive, 
+-----------------------------------------------------------------------------------
+--2) a proof that equivalence is symmetric, 
+-----------------------------------------------------------------------------------
+-- 3)a proof that equivalence is transitive, 
+-----------------------------------------------------------------------------------
+--4) a proof that addition is proper, 
+-----------------------------------------------------------------------------------
+--5) a proof that addition is associative, 
+-----------------------------------------------------------------------------------
+--6) a proof that addition is commutative, 
+-----------------------------------------------------------------------------------
+--7) a proof that zero is unitary with respect to addition on the left, 
+-----------------------------------------------------------------------------------
+--8) a proof that zero is unitary with respect to addition on the right, 
+-----------------------------------------------------------------------------------
+--9)a proof that multiplication is proper, 
+-----------------------------------------------------------------------------------
+--10) a proof that multiplication is associative, 
+-----------------------------------------------------------------------------------
+--11) a proof that multiplication is commutative, 
+-----------------------------------------------------------------------------------
+--12) a proof that one is unitary with respect to multiplication on the left, 
+-----------------------------------------------------------------------------------
+--13) a proof that one is unitary with respect to multiplication on the right, 
+-----------------------------------------------------------------------------------
+-- 14) a proof that multiplication is distributive over addition on the left, 
+-----------------------------------------------------------------------------------
+--15) a proof that multiplication is distributive over addition on the right, 
+-----------------------------------------------------------------------------------
+--16)a proof that zero is absorbing with respect to multiplication on the left, 
+-----------------------------------------------------------------------------------
+--17)a proof that zero is absorbing with respect to multiplication on the right, 
+-----------------------------------------------------------------------------------
+--18)a proof that exponentiation is proper, 
+-----------------------------------------------------------------------------------
+--19)a proof that exponentiation is distributive over addition and multiplication on the right, 
+-----------------------------------------------------------------------------------
+-- 20)a proof that exponentiation is associative over multiplication on the right, 
+-----------------------------------------------------------------------------------
+--21) a proof that exponentiation is distributive over multiplication on the left, 
+-----------------------------------------------------------------------------------
+--22) a proof that one is a unit of exponentiation on the left, 
+-----------------------------------------------------------------------------------
+-- a proof that one is absorbing with respect to exponentiation on the right, 
+-----------------------------------------------------------------------------------
+-- a proof that zero is absorbing with respect to exponentiation on the left, 
