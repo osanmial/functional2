@@ -3,6 +3,7 @@
 module Week6.Exercise3 where
 import Data.Void
 
+
 -- 1) equivalence is reflexive,
 -- r(∼)
 -- ∀x:A x≅x
@@ -19,8 +20,11 @@ eaReflexiveL = id
 -- s(∼):
 -- ∀xy:A x~y → y~x
 
-eqSymmetry :: (a->b->Bool) -> (b->a->Bool)
-eqSymmetry = flip -- ? or just id?
+eqSymmetry :: y -> y
+eqSymmetry = id
+
+--eqSymmetry :: (a->b->Bool) -> (b->a->Bool)
+--eqSymmetry = flip -- ? or just id?
 -- very quite unsure about this one
 
 
@@ -281,17 +285,21 @@ properExprL = id
 properExprR :: (z -> x) -> z -> x
 properExprR = id
 
+
 -----------------------------------------------------------------------------------
 -- 19) exponentiation is distributive over addition and multiplication on the right,
 -- r(∼),(+),(×),(↑):∀x,y,z:A
 -- x^(y+z) ∼ x^y×x^z
 
+exp :: (->) a b -> a -> b
+exp f a =  f a
+
 --Mitätapahtuu?
-distExpL :: ((Either y z) -> x) -> ((y-> x), (z -> x)) -- Tämä siitä tuli kun katsoin esimerkkiä, mutta täh?!
+distExpL :: (->) (Either y z) x -> (((->) y x), ((->) z x)) -- Tämä siitä tuli kun katsoin esimerkkiä, mutta täh?!
 distExpL f = ((\y -> f (Left y)),(\z -> f (Right z)))
 --huui
 
-distExpR :: ((y-> x), (z -> x)) -> ((Either y z) -> x)
+distExpR :: (((->) y x), ((->) z x)) -> (->) (Either y z) x
 distExpR (yx, zx) = \eit -> case eit of
   Left y -> yx y
   Right z -> zx z
@@ -299,12 +307,12 @@ distExpR (yx, zx) = \eit -> case eit of
 
 -----------------------------------------------------------------------------------
 -- 20) exponentiation is associative over multiplication on the right,
---x^y×z≅(x^y)^z
+--x^(y×z)≅(x^y)^z
 
-arrow_right_associator :: ((y, z) -> x) -> z -> (y -> x)
+arrow_right_associator :: (->) (y, z) x -> (->) z ((->) y x)
 arrow_right_associator = flip . curry
 
-arrow_right_coassociator :: (c -> (b -> a)) -> (b, c) -> a
+arrow_right_coassociator :: (->) z ((->) y x) -> (->) (y, z) x
 arrow_right_coassociator = uncurry . flip
 
 
@@ -313,10 +321,10 @@ arrow_right_coassociator = uncurry . flip
 -- l(∼),(×),(↑):∀x,y,z:A
 -- (x×y)^z ∼ x^z×y^z
 
-distExpMulL :: (z -> (x,y)) -> ((z -> x), (z -> y))
+distExpMulL :: (->) z (x,y) -> (((->) z x), ((->) z y))
 distExpMulL f = (fst . f, snd . f)
 
-distExpMulR :: ((z -> x), (z -> y)) -> (z -> (x,y)) 
+distExpMulR :: (((->) z x), ((->) z y)) -> (->) z (x,y)
 distExpMulR (zx, zy) = \z -> (zx z, zy z)
 
 
@@ -325,10 +333,10 @@ distExpMulR (zx, zy) = \z -> (zx z, zy z)
 -- l(∼),1,(↑):
 -- ∀x:A x^1∼x
 
-unitExpL :: (() -> x) -> x
+unitExpL :: (->) () x -> x
 unitExpL f = f ()
 
-unitExpR :: x -> (() -> x)
+unitExpR :: x -> (->) () x
 unitExpR x = const x
 
 
@@ -337,10 +345,10 @@ unitExpR x = const x
 -- r(∼),1,(↑):∀x:A
 -- 1x∼1
 
-oneAbsorbExpL :: (x -> ()) -> ()
+oneAbsorbExpL :: (->) x () -> ()
 oneAbsorbExpL f = ()
 
-oneAbsorbExpR :: () -> (x -> ())
+oneAbsorbExpR :: () -> (->) x ()
 oneAbsorbExpR () = const ()
 
 
@@ -349,11 +357,11 @@ oneAbsorbExpR () = const ()
 -- l(∼),0,1,(↑):∀x:A
 -- x^0∼1
 
-zeroAbsorbExpL :: (Void -> x) -> ()
+zeroAbsorbExpL :: (->) Void x -> ()
 zeroAbsorbExpL f = ()
 
-zeroAbsorbExpR :: () -> (Void -> x)
-zeroAbsorbExpR () = \v -> case v of {}
+zeroAbsorbExpR :: () -> (->) Void x
+zeroAbsorbExpR () = \e -> case e of {}
 
 
 
