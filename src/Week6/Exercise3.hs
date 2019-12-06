@@ -275,38 +275,86 @@ rightAbsorbMulR x = case x of {}
 -- p(∼),(↑):∀x,y,z,w:A
 -- x∼y → z∼w → z^x∼w^y
 
-properExpr :: z x -> z x
-properExpr = id
+properExprL :: (z -> x) -> z -> x
+properExprL = id
+
+properExprR :: (z -> x) -> z -> x
+properExprR = id
 
 -----------------------------------------------------------------------------------
 -- 19) exponentiation is distributive over addition and multiplication on the right,
 -- r(∼),(+),(×),(↑):∀x,y,z:A
 -- x^(y+z) ∼ x^y×x^z
 
---distExp :: -> (Either y z) x -> ((y x), (z x))
---distExp = 
+--Mitätapahtuu?
+distExpL :: ((Either y z) -> x) -> ((y-> x), (z -> x)) -- Tämä siitä tuli kun katsoin esimerkkiä, mutta täh?!
+distExpL f = ((\y -> f (Left y)),(\z -> f (Right z)))
+--huui
 
---data Exp = Exp x y
+distExpR :: ((y-> x), (z -> x)) -> ((Either y z) -> x)
+distExpR (yx, zx) = \eit -> case eit of
+  Left y -> yx y
+  Right z -> zx z
 
---f :: (a, b) -> t
---f x y = apply (curry f x, id y) where apply (g,z) = g z
-  
+
 -----------------------------------------------------------------------------------
--- 20)a proof that exponentiation is associative over multiplication on the right,
+-- 20) exponentiation is associative over multiplication on the right,
+--x^y×z≅(x^y)^z
 
-arrow_right_associator :: ((b, c) -> a) -> c -> (b -> a)
+arrow_right_associator :: ((y, z) -> x) -> z -> (y -> x)
 arrow_right_associator = flip . curry
 
 arrow_right_coassociator :: (c -> (b -> a)) -> (b, c) -> a
 arrow_right_coassociator = uncurry . flip
 
+
 -----------------------------------------------------------------------------------
---21) a proof that exponentiation is distributive over multiplication on the left, 
+-- 21) exponentiation is distributive over multiplication on the left,
+-- l(∼),(×),(↑):∀x,y,z:A
+-- (x×y)^z ∼ x^z×y^z
+
+distExpMulL :: (z -> (x,y)) -> ((z -> x), (z -> y))
+distExpMulL f = (fst . f, snd . f)
+
+distExpMulR :: ((z -> x), (z -> y)) -> (z -> (x,y)) 
+distExpMulR (zx, zy) = \z -> (zx z, zy z)
+
+
 -----------------------------------------------------------------------------------
---22) a proof that one is a unit of exponentiation on the left, 
+-- 22) one is a unit of exponentiation on the left,
+-- l(∼),1,(↑):
+-- ∀x:A x^1∼x
+
+unitExpL :: (() -> x) -> x
+unitExpL f = f ()
+
+unitExpR :: x -> (() -> x)
+unitExpR x = const x
+
+
 -----------------------------------------------------------------------------------
--- a proof that one is absorbing with respect to exponentiation on the right, 
+-- 23) one is absorbing with respect to exponentiation on the right,
+-- r(∼),1,(↑):∀x:A
+-- 1x∼1
+
+oneAbsorbExpL :: (x -> ()) -> ()
+oneAbsorbExpL f = ()
+
+oneAbsorbExpR :: () -> (x -> ())
+oneAbsorbExpR () = const ()
+
+
 -----------------------------------------------------------------------------------
--- a proof that zero is absorbing with respect to exponentiation on the left, 
+-- 24) zero is absorbing with respect to exponentiation on the left,
+-- l(∼),0,1,(↑):∀x:A
+-- x^0∼1
+
+zeroAbsorbExpL :: (Void -> x) -> ()
+zeroAbsorbExpL f = ()
+
+zeroAbsorbExpR :: () -> (Void -> x)
+zeroAbsorbExpR () = \v -> case v of {}
+
+
 
 
