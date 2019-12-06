@@ -3,16 +3,6 @@
 module Week6.Exercise3 where
 import Data.Void
 
-arrow_right_associator :: ((b, c) -> a) -> c -> (b -> a)
-arrow_right_associator = flip . curry
-
-arrow_right_coassociator :: (c -> (b -> a)) -> (b, c) -> a
-arrow_right_coassociator = uncurry . flip
-
-
-
-
-
 --1) a proof that equivalence is reflexive, 
 -----------------------------------------------------------------------------------
 --2) a proof that equivalence is symmetric, 
@@ -46,18 +36,18 @@ funext: ∀A,B:U ∀f,g:A→B (∀x:A f(x)=g(x))→f=g
 (≅):U×U→U
 A≅B ≡ ∃f:A→B ∃g:B→A g∘f=id∧f∘g=id
 
-∃f:A→B ∃g:B→A g∘f=id∧f∘g=id
+definition of isomorphism:  ∃f:A→B ∃g:B→A g∘f=id∧f∘g=id
+in our case:  ∃f: ((),A)->A  ∃g: A->(A,()) g∘f=id∧f∘g=id
 
-∃f: ((),A)->A  ∃g: A->(A,()) g∘f=id∧f∘g=id
+witnesses?:
+    f : (1, A) -> A
+  f(m) ≡ (1,z) ↦ m (z) 1.rule
+    g : A -> (1, A)
+  g(m) ≡ z ↦ m (1,z) 2.rule
 
-  f : (1, A) -> A
-f(m) ≡ (1,z) ↦ m (z) 1.rule
-  g : A -> (1, A)
-g(m) ≡ z ↦ m (1,z) 2.rule
-
-∀m:1×C→A ∀(z):C  (g∘f)(m)(z) = id(m)(z)
-
-m and k are arbitrary inhabitants of ther definition
+funext applied twice:
+  ∀m:1×C→A ∀(z):C  (g∘f)(m)(z) = id(m)(z)
+m and k are arbitrary inhabitants of ther definition so we can work following:
 
 -- Tässä vissiin tarvittaisiin lambdacalculusta että laskusäännöt olisivat täysin yksiselitteiset?
 (g∘f)(m)(k) = id(m)(k)
@@ -67,7 +57,7 @@ f(m) (1,k) = m(k)
 ((1,z) ↦ m (z))(1,k) = m(k) 1.rule
 m(k) = m(k)
 
--- toimii toisinkinpäin
+-- toimii toisinkinpäin (f∘g), mutta pitäisi todistaa erikseen.
 
 -}
 
@@ -80,11 +70,14 @@ leftUnitaryMulR a = (a,())
 
 -----------------------------------------------------------------------------------
 --13) a proof that one is unitary with respect to multiplication on the right,
+-- there is no proof here. but I guess the answers should look more like this.
 
--- one is unitary with respect to multiplication on the right,
 -- r(∼),(×),1 : ∀x:A x×1≅x,
-unitaryRightMul :: a -> (a, ())
-unitaryRightMul a = (a,()) 
+rightUnitaryMulR :: a -> (a, ())
+rightUnitaryMulR a = (a,())
+
+rightUnitaryMulL :: (a, ()) -> a
+rightUnitaryMulL (a,()) = a
 
 
 -----------------------------------------------------------------------------------
@@ -100,7 +93,14 @@ unitaryRightMul a = (a,())
 -----------------------------------------------------------------------------------
 --19)a proof that exponentiation is distributive over addition and multiplication on the right, 
 -----------------------------------------------------------------------------------
--- 20)a proof that exponentiation is associative over multiplication on the right, 
+-- 20)a proof that exponentiation is associative over multiplication on the right,
+
+arrow_right_associator :: ((b, c) -> a) -> c -> (b -> a)
+arrow_right_associator = flip . curry
+
+arrow_right_coassociator :: (c -> (b -> a)) -> (b, c) -> a
+arrow_right_coassociator = uncurry . flip
+
 -----------------------------------------------------------------------------------
 --21) a proof that exponentiation is distributive over multiplication on the left, 
 -----------------------------------------------------------------------------------
