@@ -53,6 +53,7 @@ instance Monoidal m => Applicative (WrappedApplicative m) where
 -- (>*<' :: m a -> m (a -> b) -> m (a, (a -> b))
 
 instance Applicative m => Monoidal (WrappedApplicative m) where
+
   unit = WrapApplicative $ pure ()
   WrapApplicative ma >*< WrapApplicative mb = WrapApplicative $ (,) <$> ma <*> mb
 
@@ -63,6 +64,7 @@ unit :: m ()
 -- (>*<) :: m a -> m b -> m (a, b)
 
 -}  
+
 
 newtype WrappedMonoidal m a = WrapMonoidal {unwrapMonoidal :: m a}
 
