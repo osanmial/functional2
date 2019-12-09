@@ -8,11 +8,11 @@ import Data.Void
 -- r(∼)
 -- ∀x:A x≅x
 
-eqReflexiveR :: a -> a
-eqReflexiveR = id
+eqReflexiveL :: a -> a
+eqReflexiveL = id
 
-eaReflexiveL :: a -> a
-eaReflexiveL = id
+eaReflexiveR :: a -> a
+eaReflexiveR = id
 
 
 -----------------------------------------------------------------------------------
@@ -20,8 +20,11 @@ eaReflexiveL = id
 -- s(∼):
 -- ∀xy:A x~y → y~x
 
-eqSymmetry :: y -> y
-eqSymmetry = id
+eqSymmetryL :: (x -> y) -> (y -> x) ->  y -> x
+eqSymmetryL f f' = f'
+
+eqSymmetryR :: (x -> y) -> (y -> x) ->  x -> y
+eqSymmetryL f f' = f
 
 --eqSymmetry :: (a->b->Bool) -> (b->a->Bool)
 --eqSymmetry = flip -- ? or just id?

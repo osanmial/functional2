@@ -113,7 +113,7 @@ printSite :: Int -> Site -> IO ()
 printSite maxLen site = do
 
   putStr $ take  (maxLen - (length (siteName site))) (repeat ' ')
-  
+
   if colors site then do  
     setSGR [ SetColor Foreground Vivid White ]
     putStr $ siteName site
