@@ -26,3 +26,11 @@ reverse' = fix f
 (++::) r [] bs = bs
 (++::) r (a:as) bs = a : r as bs
 
+
+foldr':: (a -> b -> b) -> b -> [a] -> b
+foldr' = fix foldF
+  where
+    foldF r f e [ ] = e
+    foldF r f e (x:xs )=  f  x (r f e xs)
+
+
