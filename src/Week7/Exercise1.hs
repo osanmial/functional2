@@ -17,7 +17,4 @@ id' = fix f where
 (++::) r [] bs = bs
 (++::) r (a:as) bs = a : r as bs
 
-(++**) :: a -> [a] -> [a]
-(++**) r a = undefined
-
 
