@@ -79,8 +79,8 @@ connectUrl = f 1
 
 
 requestUrl :: String -> IO Int
-requestUrl siteUrl = catches f
-                     [Handler (\ (e :: HttpException) -> return 400)]
+requestUrl siteUrl = catch f
+                     (\((HttpExceptionRequest _ c) :: HttpException) -> return 666)
   where
     f :: IO Int
     f = do
@@ -88,7 +88,7 @@ requestUrl siteUrl = catches f
       prerequest <- parseRequest $ siteUrl
       let request = prerequest
                     { method = "HEAD",
-                      responseTimeout = responseTimeoutMicro 500000 }
+                      responseTimeout = responseTimeoutMicro (1000 * 1000) }
       response <- httpLbs request manager
       return (statusCode $ responseStatus response)
 
