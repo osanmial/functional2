@@ -7,8 +7,17 @@ fix :: (a -> a) -> a
 fix f = f (fix f)
 
 id' :: a -> a
-id' = fix f where
-  f b a = a
+id' = fix (const id)
+
+repeat' :: a -> [a]
+repeat' x = fix (x:)
+
+reverse' :: [a] -> [a]
+reverse' = fix f
+  where
+    f r (x:xs) = (r xs) ++ [x]
+    f _ []     = []
+
 
 (++:) :: [a] -> [a] -> [a]
 (++:) as bs = fix (++::) as bs
@@ -32,4 +41,4 @@ foldr'' r f e (x:xs) = f x (r f e xs)
 
 
 
-
+fix' = fix (const fix)
