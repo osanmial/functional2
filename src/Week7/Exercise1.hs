@@ -9,9 +9,6 @@ fix f = f (fix f)
 id' :: a -> a
 id' = fix (const id)
 
-repeat' :: a -> [a]
-repeat' x = fix (x:)
-
 reverse' :: [a] -> [a]
 reverse' = fix f
   where
@@ -30,7 +27,7 @@ repeat' :: a -> [a]
 repeat' x = fix (x:) -- repeat''
 
 repeat'' :: (t -> [t]) -> t -> [t]
-repeat'' r  a= a : r a
+repeat'' r  a = a : r a
 
 foldr' :: (a -> b -> b) -> b -> [a] -> b
 foldr' = fix foldr'' --foldr''
