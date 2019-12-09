@@ -24,7 +24,7 @@ eqSymmetryL :: (x -> y) -> (y -> x) ->  y -> x
 eqSymmetryL f f' = f'
 
 eqSymmetryR :: (x -> y) -> (y -> x) ->  x -> y
-eqSymmetryL f f' = f
+eqSymmetryR f f' = f
 
 --eqSymmetry :: (a->b->Bool) -> (b->a->Bool)
 --eqSymmetry = flip -- ? or just id?
@@ -365,7 +365,5 @@ zeroAbsorbExpL f = ()
 
 zeroAbsorbExpR :: () -> (->) Void x
 zeroAbsorbExpR () = \e -> case e of {}
-
-
 
 

@@ -17,7 +17,19 @@ id' = fix f where
 (++::) r [] bs = bs
 (++::) r (a:as) bs = a : r as bs
 
-(++**) :: a -> [a] -> [a]
-(++**) r a = undefined
+repeat' :: a -> [a]
+repeat' x = fix (x:) -- repeat''
+
+repeat'' :: (t -> [t]) -> t -> [t]
+repeat'' r  a= a : r a
+
+foldr' :: (a -> b -> b) -> b -> [a] -> b
+foldr' = fix foldr'' --foldr''
+
+foldr'' :: ((a -> b -> b) -> b -> [a] -> b) -> (a -> b -> b) -> b -> [a] -> b
+foldr'' r f e [] = e
+foldr'' r f e (x:xs) = f x (r f e xs)
+
+
 
 
