@@ -71,4 +71,3 @@ checkCollatz = let
 
 runCollatz :: CollatzType a -> Either Problem (Int, Set a)
 runCollatz ts = runExcept (runReaderT (runStateT ts Set.empty) collatzBound)
-
