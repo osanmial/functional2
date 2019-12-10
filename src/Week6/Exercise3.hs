@@ -36,8 +36,13 @@ eqSymmetryR f f' = f
 -- (∼):∀x,y,z:A
 -- x∼y → y∼z → x∼z,
 
-eqTransitive :: a -> a
-eqTransitive = id -- ? or and?
+
+eqTransitiveL :: ((x -> y),(y -> x)) -> ((y -> z),(z -> y)) -> (x -> z)
+eqTransitiveL (xy,yx) (yz,zy) = yz . xy
+
+eqTransitiveR :: ((x -> y),(y -> x)) -> ((y -> z),(z -> y)) -> (z -> x)
+eqTransitiveR (xy,yx) (yz,zy) = yx . zy 
+
 
 --eqTransitive :: Bool -> Bool -> Bool
 --eqTransitive a b = and [a,b]
@@ -49,9 +54,13 @@ eqTransitive = id -- ? or and?
 -- p(∼),(+):
 -- ∀x,y,z,w:A  x∼y  →  z∼w  →  x+z ∼ y+w,
 
-properAdd :: Either a b -> Either a b
-properAdd = id -- ?
+properAddL :: (x->y,y->x) -> (z -> w, w -> z) -> Either x z -> Either y w
+properAddL (xy,yx) (zw,wz) (Left x) = Left $ xy x
+properAddL (xy,yx) (zw,wz) (Right z) = Right $ zw z
 
+properAddR :: (x->y,y->x) -> (z -> w, w -> z) -> Either y w  -> Either x z
+properAddR (xy,yx) (zw,wz) (Left y) = Left $ yx y
+properAddR (xy,yx) (zw,wz) (Right w) = Right $ wz w
 
 -----------------------------------------------------------------------------------
 -- 5) addition is associative,
@@ -139,11 +148,11 @@ rightUnitaryAddR x = Left x
 -- ∀x,y,z,w:A x∼y → z∼w → x×z∼y×w,
 
 -- x≅z, y≅w -- z and w are replaced by x and y as they are related by id morphism?
-properMulL :: (x,y) -> (x,y)
-properMulL = id
+properMulL :: (x->y,y->x) -> (z->w,w->z) -> (x,z) -> (y,w)
+properMulL (xy,_)(zw,_)(x,z) = (xy x, zw z)
 
-properMulR :: (x,y) -> (x,y)
-properMulR = id
+properMulR :: (x->y,y->x) -> (z->w,w->z) -> (y,w) -> (x,z)
+properMulR (_,yx)(_,wz)(y,w) = (yx y, wz w)
 
 -- all morphisms explicitly written out.
 -- properMul (a,b) -> (id a, id b)
