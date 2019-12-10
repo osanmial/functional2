@@ -9,15 +9,15 @@ fix f = f (fix f)
 id' :: a -> a
 id' = fix (const id)
 
-repeat' :: a -> [a]
-repeat' x = fix (x:)
-
 reverse' :: [a] -> [a]
-reverse' = fix f
-  where
-    f r (x:xs) = (r xs) ++ [x]
-    f _ []     = []
+reverse' xs = fix reverse'' xs []
+reverse'' r [] ys = ys
+reverse'' r (x:xs) ys = r xs (x:ys)
 
+--f
+  -- where
+  --   f r (x:xs) = (r xs) ++ [x]
+  --   f _ []     = []
 
 (++:) :: [a] -> [a] -> [a]
 (++:) as bs = fix (++::) as bs
@@ -27,8 +27,38 @@ reverse' = fix f
 (++::) r (a:as) bs = a : r as bs
 
 
-foldr':: (a -> b -> b) -> b -> [a] -> b
-foldr' = fix foldF
-  where
-    foldF r f e [ ] = e
-    foldF r f e (x:xs )=  f  x (r f e xs)
+
+--foldr':: (a -> b -> b) -> b -> [a] -> b
+--foldr' = fix foldF
+--  where
+--    foldF r f e [ ] = e
+--    foldF r f e (x:xs )=  f  x (r f e xs)
+
+repeat' :: a -> [a]
+repeat' x = fix (x:) -- repeat''
+
+repeat'' :: (t -> [t]) -> t -> [t]
+repeat'' r  a = a : r a
+
+foldr' :: (a -> b -> b) -> b -> [a] -> b
+foldr' = fix foldr'' --foldr''
+
+foldr'' :: ((a -> b -> b) -> b -> [a] -> b) -> (a -> b -> b) -> b -> [a] -> b
+foldr'' r f e [] = e
+foldr'' r f e (x:xs) = f x (r f e xs)
+
+unfoldr' :: (b -> Maybe (a, b)) -> b -> [a]
+unfoldr' = fix unfoldr''
+
+unfoldr'' :: ((b -> Maybe (a, b)) -> b -> [a]) -> (b -> Maybe (a, b)) -> b -> [a]
+unfoldr'' r f b = case f b of
+    Just (a,b) -> a:r f b 
+    Nothing -> []
+
+fix' :: (a -> a) -> a
+fix' = fix fix''
+
+fix'' r f = f (r f)
+
+
+>>>>>>> 805066319a47365775ad3ff00cc3d6911618d15b
