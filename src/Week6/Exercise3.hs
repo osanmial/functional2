@@ -291,6 +291,8 @@ rightAbsorbMulR x = case x of {}
 -- p(∼),(↑):∀x,y,z,w:A
 -- x∼y → z∼w → z^x∼w^y
 
+--TODO
+
 properExprL :: (z -> x) -> z -> x
 properExprL = id
 
@@ -306,8 +308,7 @@ properExprR = id
 exp :: (->) a b -> a -> b
 exp f a =  f a
 
---Mitätapahtuu?
-distExpL :: (->) (Either y z) x -> (((->) y x), ((->) z x)) -- Tämä siitä tuli kun katsoin esimerkkiä, mutta täh?!
+distExpL :: (->) (Either y z) x -> (((->) y x), ((->) z x))
 distExpL f = ((\y -> f (Left y)),(\z -> f (Right z)))
 --huui
 
