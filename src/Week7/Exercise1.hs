@@ -32,5 +32,3 @@ foldr' = fix foldF
   where
     foldF r f e [ ] = e
     foldF r f e (x:xs )=  f  x (r f e xs)
-
-
