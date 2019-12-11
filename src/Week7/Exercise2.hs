@@ -37,7 +37,7 @@ $(deriveShow1 ''U'')
 pattern U = Fix U'''
 
 data L' a = L' (Fix (L'' a)) -- deriving (Show)
-data L'' a r = L'' a r | Empti -- deriving (Show)
+data L'' a r = L'' a r | Empti deriving (Show)
 
 $(deriveShow1 ''L'')
 pattern L x xs = L' (Fix (L'' x xs))
@@ -46,13 +46,27 @@ pattern E = L' (Fix (Empti))
 data Void' = Void' (Fix Void'')
 data Void'' r = Void'' (Void'' r)
 
-$(deriveShow1 ''Void'')
-pattern V = Void' V
+--  $(deriveShow1 ''Void'')
+--pattern V = Void' V
 
 -- data Identity a = 
 
-data Streem' a = Streem' (Fix (Streem'' a))
-data Streem'' a r = a :> r
+--  data Streem' a = Streem' (Fix (Streem'' a))
+--  data Streem'' a r = a ::> r
 
---data Tree' a = Tree' (Fix (Tree'' a ))
---data Tree'' a = root 
+--  $(deriveShow1 ''Streem'')
+--  pattern Streem x xs = Streem (Fix (x ::> xs))
+
+-- data Tree' a = Tree' (Fix (Tree'' a )) deriving (Show)
+-- data Tree'' a r = Node' a (Forest' r) deriving (Show)
+-- data Forest' r = Forest' r | Eimittaan deriving (Show)
+
+--  $(deriveShow1 ''Tree')
+--  $(deriveShow1 ''Tree'')
+--  $(deriveShow1 ''Forest')
+
+-- pattern Tr xs = Tree' (Fix (xs))
+-- pattern Tr' x xs = Node' x (Forest' xs)
+
+
+
