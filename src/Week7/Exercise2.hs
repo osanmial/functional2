@@ -12,27 +12,32 @@ import Data.Tree
 newtype Fix m = Fix {unFix :: m (Fix m)}
 
 
-type Bool' = Fix (Bool'') 
-data Bool'' r = T | F
 
 instance Show1 m => Show (Fix m) where
   showsPrec n (Fix x) = showParen (n >= 11)
     (showString "Fix " . showsPrec1 11 x)
 
+--- Generator for Bool.
+type Bool' = Fix (Bool'') 
+data Bool'' r = T | F
 $(deriveShow1 ''Bool'') -- template haskell splice
 
+
+-- Generator for Maybe a.
 data M' a = M' (Fix (M'' a))
 data M'' a r = N' | J' a
-
 $(deriveShow1 ''M'') -- template haskell splice
+
 pattern N = M' (Fix N')
 pattern J a = M' (Fix (J' a))
 
 -- data Either' a b = Either' a b --------------------------TODO
-type Either' = Fix (Either'')
-data Either'' r= Ri r | Le r 
+-- Generator for Either a b.
+data Either' a b = Either' (Fix (Either'' a b))
+data Either''  a b r= Ri b | Le a
+--  show still needed
 
---unit
+-- Generator for ()
 type U' = Fix U''
 data U'' r = U'''
 
