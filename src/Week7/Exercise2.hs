@@ -1,22 +1,24 @@
+
+--from the assignment:
 {-# LANGUAGE CPP, TemplateHaskell #-}
 {-# LANGUAGE PatternSynonyms #-}
-{-# LANGUAGE DeriveFoldable, GADTs, StandaloneDeriving, TemplateHaskell #-}
-{-# LANGUAGE TemplateHaskell #-}
+--
+
 module Week7.Exercise2 where
+
 import Control.Applicative (Const)
 import Text.Show.Deriving (deriveShow1)
 import Data.Functor.Classes
+-- Mitä helvetin pattern synonyymejä?
 
 
 newtype Fix m = Fix {unFix :: m (Fix m)}
 
+type Either' = Fix (Either'')
+data Either'' r= Ri r | Le r 
 
---Mitä helvetin pattern synonyymejä?
-type Bool' = Fix (Const Bool'') 
-data Bool'' = T | F
-=======
--- Mitä helvetin pattern synonyymejä?
-
+type Bool' = Fix (Bool'') 
+data Bool'' r = T | F
 
 instance Show1 m => Show (Fix m) where
   showsPrec n (Fix x) = showParen (n >= 11)
@@ -25,11 +27,11 @@ instance Show1 m => Show (Fix m) where
 $(deriveShow1 ''Bool'') -- template haskell splice
 
 
-
 data Maybe' a = M (Fix (Const (Maybe' a)))
 data Maybe'' a = N | J a
 
 -- data Either' a b = Either' a b --------------------------TODO
+
 type U' = Fix (Const U'')
 data U'' = U
 
@@ -42,6 +44,3 @@ data L'' a = L'' a | Empti -- deriving (Show)
 -- ... Void = ... --------------------------TODO
 
 -- ... Identity a = --- --------------------------TODO
-
-
-
