@@ -11,8 +11,6 @@ import Data.Tree
 
 newtype Fix m = Fix {unFix :: m (Fix m)}
 
-type Either' = Fix (Either'')
-data Either'' r= Ri r | Le r 
 
 type Bool' = Fix (Bool'') 
 data Bool'' r = T | F
@@ -31,6 +29,8 @@ pattern N = M' (Fix N')
 pattern J a = M' (Fix (J' a))
 
 -- data Either' a b = Either' a b --------------------------TODO
+data Either'' r= Ri r | Le r 
+type Either' = Fix (Either'')
 
 --unit
 type U' = Fix U''
