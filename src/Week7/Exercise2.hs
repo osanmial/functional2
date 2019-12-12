@@ -35,6 +35,10 @@ pattern J a = M' (Fix (J' a))
 -- Generator for Either a b.
 data Either' a b = Either' (Fix (Either'' a b))
 data Either''  a b r= Ri b | Le a
+-- $(deriveShow1 'Either") -- template haskell splice
+pattern Rii b= Either' (Fix (Ri b))
+pattern Lee a = Either' (Fix (Le a))
+
 --  show still needed
 
 -- Generator for ()
