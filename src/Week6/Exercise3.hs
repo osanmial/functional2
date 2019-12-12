@@ -293,11 +293,11 @@ rightAbsorbMulR x = case x of {}
 
 --TODO
 
-properExprL :: (z -> x) -> z -> x
-properExprL = id
+properExprL :: ((x -> y),(y -> x)) -> ((z -> w),(w -> z)) -> ((->) x z -> (->) y w)
+properExprL (xy,yx) (zw,wz) f = zw . f . yx 
 
-properExprR :: (z -> x) -> z -> x
-properExprR = id
+properExprR :: ((x -> y),(y -> x)) -> ((z -> w),(w -> z)) -> ((->) y w -> (->) x z)
+properExprR (xy,yx) (zw,wz) f = wz . f . xy
 
 
 -----------------------------------------------------------------------------------
