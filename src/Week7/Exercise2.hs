@@ -29,8 +29,8 @@ pattern N = M' (Fix N')
 pattern J a = M' (Fix (J' a))
 
 -- data Either' a b = Either' a b --------------------------TODO
-data Either'' r= Ri r | Le r 
 type Either' = Fix (Either'')
+data Either'' r= Ri r | Le r 
 
 --unit
 type U' = Fix U''
