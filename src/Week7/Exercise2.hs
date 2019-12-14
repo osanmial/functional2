@@ -28,8 +28,8 @@ data M' a = M' (Fix (M'' a))
 data M'' a r = N' | J' a
 $(deriveShow1 ''M'') -- template haskell splice
 
-pattern N = M' (Fix N')
-pattern J a = M' (Fix (J' a))
+--pattern N = M' (Fix N')
+--pattern J a = M' (Fix (J' a))
 -------------------------------------------------------
 -- data Either' a b = Either' a b --------------------------TODO
 -- Generator for Either a b.
@@ -37,8 +37,8 @@ data Either' a b = Either' (Fix (Either'' a b))
 data Either''  a b r= Ri b | Le a
 
 $(deriveShow1 ''Either'') -- template haskell splice
-pattern Rii b= Either' (Fix (Ri b))
-pattern Lee a = Either' (Fix (Le a))
+--pattern Rii b= Either' (Fix (Ri b))
+--pattern Lee a = Either' (Fix (Le a))
 -------------------------------------------------------
 
 -- Generator for ()
@@ -46,19 +46,19 @@ type U' = Fix U''
 data U'' r = U'''
 
 $(deriveShow1 ''U'')
-pattern U = Fix U'''
+--pattern U = Fix U'''
 -------------------------------------------------------
 data L' a = L' (Fix (L'' a)) -- deriving (Show)
 data L'' a r = L'' a r | Empti deriving (Show)
 
 $(deriveShow1 ''L'')
-pattern L x xs = L' (Fix (L'' x xs))
-pattern E = L' (Fix (Empti)) 
+--pattern L x xs = L' (Fix (L'' x xs))
+--pattern E = L' (Fix (Empti)) 
 -------------------------------------------------------
 data Void' = Void' (Fix Void'')
 data Void'' r = Void'' (Void'' r)
 
--- $(deriveShow1 ''Void'')
+$(deriveShow1 ''Void'')
 --  pattern V = Void' V
 -------------------------------------------------------
 data Identity' a = Idnetity' (Fix (Idnetity''))
