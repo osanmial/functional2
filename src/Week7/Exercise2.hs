@@ -80,4 +80,23 @@ $(deriveShow1 ''Streem'')
 
 -- pattern Tr xs = Tree' (Fix (xs))
 -- pattern Tr' x xs = Node' x (Forest' xs)
+-------------------------------------------------------
+data  Expr'  =Expr' (Fix (Const Expr)) 
 
+data Expr = Add Expr  Expr | Zero | Mul Expr  Expr  | One|
+   Let String Expr Expr | Var String 
+-- $(deriveShow1 ''Expr)
+
+-------------------------------------------------------
+
+-------------------------------------------------------
+
+
+
+
+-------------------------------------------------------
+
+
+
+
+-------------------------------------------------------
