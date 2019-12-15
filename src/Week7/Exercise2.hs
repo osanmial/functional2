@@ -17,6 +17,7 @@ instance Show1 m => Show (Fix m) where
   showsPrec n (Fix x) = showParen (n >= 11)
     (showString "Fix " . showsPrec1 11 x)
 
+
 --- Generator for Bool.
 type Bool' = Fix (Bool'') 
 data Bool'' r = T | F
