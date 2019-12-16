@@ -31,23 +31,19 @@ $(deriveShow1 ''M'') -- template haskell splice
 -- Generator for Either a b.
 type Either' a b = (Fix (Either'' a b))
 data Either''  a b r= Ri b | Le a
-
 $(deriveShow1 ''Either'') -- template haskell splice
 -------------------------------------------------------
 -- Generator for ()
 type U' = Fix U''
 data U'' r = U'''
-
 $(deriveShow1 ''U'')
 -------------------------------------------------------
 type L' a = (Fix (L'' a)) -- deriving (Show)
 data L'' a r = L'' a r | Empti deriving (Show)
-
 $(deriveShow1 ''L'')
 -------------------------------------------------------
 type Void' =  (Fix Void'')
 data Void'' r = Void'' (Void'' r)
-
 $(deriveShow1 ''Void'')
 -------------------------------------------------------
 type Identity' a = (Fix (Identity''))
@@ -59,17 +55,13 @@ data Streem'' a r = a ::> r
 $(deriveShow1 ''Streem'')
 -------------------------------------------------------
 
-
-
---data Tree' a = Tree' (Fix (Tree'' a )) 
---data Tree'' a r = Node' a (Forest' r) 
-
-
----data Forest' r = Forest' r | Eimittaan 
-
+--type Tree' a = Fix (Tree'' a ) 
+--data Tree'' a r = Node' a (Forest') 
 -- $(deriveShow1 ''Tree')
---  $(deriveShow1 ''Tree'')
--- $(deriveShow1 ''Forest')
+--
+--type Forest'= Fix Forest''
+--data Forest'' r = Forest' r | Eimittaan 
+-- --$(deriveShow1 ''Forest')
 
 -- pattern Tr xs = Tree' (Fix (xs))
 -- pattern Tr' x xs = Node' x (Forest' xs)
@@ -78,7 +70,6 @@ type  Expr'   = (Fix (Expr))
 data Expr a = Add (Expr a)  (Expr a) | Zero | Mul (Expr a)  (Expr a)  | One|
    Let String (Expr a) (Expr a) | Var String 
 $(deriveShow1 ''Expr)
-
 -------------------------------------------------------
 -- Roll :: f (Free f a) -> Free f a
 -- Return :: a -> Free f a
