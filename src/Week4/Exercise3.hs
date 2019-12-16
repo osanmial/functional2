@@ -5,7 +5,7 @@ import System.IO.Unsafe (unsafePerformIO)
 
 data Expr = Add Expr Expr | Zero | Mul Expr Expr | One |
   Let String Expr Expr | Var String
-  deriving Show
+  deriving (Show, Eq)
 
 join :: Monad m => m (m a) -> m a
 join mma = mma >>= id
