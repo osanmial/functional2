@@ -37,34 +37,36 @@ $(deriveShow1 ''Either'') -- template haskell splice
 type U' = Fix U''
 data U'' r = U'''
 $(deriveShow1 ''U'')
--------------------------------------------------------
+pattern U = Fix U'''
+
 type L' a = (Fix (L'' a)) -- deriving (Show)
 data L'' a r = L'' a r | Empti deriving (Show)
 $(deriveShow1 ''L'')
+pattern L x xs = (Fix (L'' x xs))
+pattern E =(Fix (Empti)) 
 -------------------------------------------------------
-type Void' =  (Fix Void'')
-data Void'' r = Void'' (Void'' r)
-$(deriveShow1 ''Void'')
+type Void' = (Fix Void'')
+data Void'' r 
 -------------------------------------------------------
-type Identity' a = (Fix (Identity''))
-data Identity'' a= Identity''  a 
-$(deriveShow1 ''Identity'')
+type Identity' a = (Fix (Idnetity''))
+data Idnetity'' a = Idnetity''  a 
+$(deriveShow1 ''Idnetity'')
 -------------------------------------------------------
 type Streem' a =  (Fix (Streem'' a))
 data Streem'' a r = a ::> r
 $(deriveShow1 ''Streem'')
+pattern Streem x xs = Fix (x ::> xs)
 -------------------------------------------------------
+type Tree' a = Fix (Tree'' a)
+data Tree'' a r = Node' a [r]
+-- data Forest' r = Forest' r | AllTreesCut deriving (Show)
 
---type Tree' a = Fix (Tree'' a ) 
---data Tree'' a r = Node' a (Forest') 
--- $(deriveShow1 ''Tree')
---
---type Forest'= Fix Forest''
---data Forest'' r = Forest' r | Eimittaan 
--- --$(deriveShow1 ''Forest')
+$(deriveShow1 ''Tree'')
+--  $(deriveShow1 ''Forest')
 
--- pattern Tr xs = Tree' (Fix (xs))
--- pattern Tr' x xs = Node' x (Forest' xs)
+pattern Tr x = Fix x
+pattern Tr' x xs = Fix (Node' x (xs))
+-- pattern Fr left right = (Forest' left right)
 -------------------------------------------------------
 type  Expr'   = (Fix (Expr)) 
 data Expr r = Add r r | Zero | Mul r  r | One|
