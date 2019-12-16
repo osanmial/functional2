@@ -29,12 +29,12 @@ comp a b = if a>b then
   else
   b + 1
 
-nestingDepth :: Expr -> Int
-nestingDepth Zero = 1
-nestingDepth One = 1
-nestingDepth (Add a b )= comp (nestingDepth a) (nestingDepth b)
-nestingDepth (Mul a b )= comp (nestingDepth a) (nestingDepth b)
-nestingDepth (Let _ a b) = comp (nestingDepth a) (nestingDepth b) 
-nestingDepth (Var _ )= 1
+depth :: Expr -> Int
+depth Zero = 1
+depth One = 1
+depth (Add a b )= comp (depth a) (depth b)
+depth (Mul a b )= comp (depth a) (depth b)
+depth (Let _ a b) = comp (depth a) (depth b) 
+depth (Var _ )= 1
 
 
