@@ -67,8 +67,8 @@ $(deriveShow1 ''Streem'')
 -- pattern Tr' x xs = Node' x (Forest' xs)
 -------------------------------------------------------
 type  Expr'   = (Fix (Expr)) 
-data Expr r = Add (Expr r)  (Expr r) | Zero | Mul (Expr r)  (Expr r)  | One|
-   Let String (Expr r) (Expr r) | Var String 
+data Expr r = Add r r | Zero | Mul r  r | One|
+   Let String r r | Var String 
 $(deriveShow1 ''Expr)
 -------------------------------------------------------
 -- Roll :: f (Free f a) -> Free f a
