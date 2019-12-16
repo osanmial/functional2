@@ -20,11 +20,19 @@ comp a b = if a>b then
   else
   b + 1
 
-nestingDepth :: Expr -> Int
-nestingDepth Zero = 1
-nestingDepth One = 1
-nestingDepth Add a b = comp a b
-nestingDepth Mul a b = comp a b
-nestingDepth Let _ a b = comp a b
-nestingDepth Var String = 1
+-- nestingDepth :: Expr -> Int
+-- nestingDepth Zero = 1
+-- nestingDepth One = 1
+-- nestingDepth Add a b = comp a b
+-- nestingDepth Mul a b = comp a b
+-- nestingDepth Let _ a b = comp a b
+-- nestingDepth Var _ = 1
+
+assocAdd :: Expr -> Expr
+assocAdd (Add (Add a b) z) = assocAdd (Add a (Add b z))
+assocAdd (Add a b) = Add (assocAdd a) (assocAdd b)
+assocAdd (Mul a b) = Mul (assocAdd a) (assocAdd b)
+assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
+assocAdd x = x
+
 
