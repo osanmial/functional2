@@ -26,6 +26,14 @@ reverse'' r (x:xs) ys = r xs (x:ys)
 (++::) r [] bs = bs
 (++::) r (a:as) bs = a : r as bs
 
+
+
+--foldr':: (a -> b -> b) -> b -> [a] -> b
+--foldr' = fix foldF
+--  where
+--    foldF r f e [ ] = e
+--    foldF r f e (x:xs )=  f  x (r f e xs)
+
 repeat' :: a -> [a]
 repeat' x = fix (x:) -- repeat''
 
@@ -39,17 +47,18 @@ foldr'' :: ((a -> b -> b) -> b -> [a] -> b) -> (a -> b -> b) -> b -> [a] -> b
 foldr'' r f e [] = e
 foldr'' r f e (x:xs) = f x (r f e xs)
 
-unfoldr' :: (b -> Maybe (a, b)) -> b -> [a]
-unfoldr' = fix unfoldr''
+--unfoldr' :: (b -> Maybe (a, b)) -> b -> [a]
+--unfoldr' = fix unfoldr''
 
-unfoldr'' :: ((b -> Maybe (a, b)) -> b -> [a]) -> (b -> Maybe (a, b)) -> b -> [a]
-unfoldr'' r f b = case f b of
-    Just (a,b) -> a:r f b 
-    Nothing -> []
+--unfoldr'' :: ((b -> Maybe (a, b)) -> b -> [a]) -> (b -> Maybe (a, b)) -> b -> [a]
+--unfoldr'' r f b = case f b of
+--    Just (a,b) -> a:r f b 
+--    Nothing -> []
 
 fix' :: (a -> a) -> a
 fix' = fix fix''
 
 fix'' r f = f (r f)
+
 
 
