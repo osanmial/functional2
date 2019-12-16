@@ -65,3 +65,14 @@ unifyAddZero x = x
 unifyMulOne (Mul One x) = x
 unifyMulOne (Mul x One) = x
 unifyMulOne x = x
+
+codistAddMul :: Expr -> Expr
+codistAddMul ok@(Add (Mul a b) (Mul c d))
+  | a == c , b == d = Mul (Add One One) (Mul a b)
+  | a == c = Mul a (Add b d)
+  | b == d = Mul b (Add a c)
+  | otherwise = ok
+codistAddMul x = x
+
+
+
