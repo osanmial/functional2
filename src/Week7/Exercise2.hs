@@ -69,8 +69,8 @@ pattern Tr' x xs = Fix (Node' x (xs))
 -- pattern Fr left right = (Forest' left right)
 -------------------------------------------------------
 type  Expr'   = (Fix (Expr)) 
-data Expr r = Add (Expr r)  (Expr r) | Zero | Mul (Expr r)  (Expr r)  | One|
-   Let String (Expr r) (Expr r) | Var String 
+data Expr r = Add r r | Zero | Mul r  r | One|
+   Let String r r | Var String 
 $(deriveShow1 ''Expr)
 -------------------------------------------------------
 -- Roll :: f (Free f a) -> Free f a
@@ -82,9 +82,9 @@ data Free'' f a r = Roll (f r) | Return a
 $(deriveShow1 ''Free'')
 
 -------------------------------------------------------
-
-
-
+type Cofree' f a = Fix (Cofree'' f a)
+data Cofree'' f a r = a :< r
+$(deriveShow1 ''Cofree'')
 
 -------------------------------------------------------
 
