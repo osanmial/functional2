@@ -47,13 +47,13 @@ foldr'' :: ((a -> b -> b) -> b -> [a] -> b) -> (a -> b -> b) -> b -> [a] -> b
 foldr'' r f e [] = e
 foldr'' r f e (x:xs) = f x (r f e xs)
 
-unfoldr' :: (b -> Maybe (a, b)) -> b -> [a]
-unfoldr' = fix unfoldr''
+--unfoldr' :: (b -> Maybe (a, b)) -> b -> [a]
+--unfoldr' = fix unfoldr''
 
-unfoldr'' :: ((b -> Maybe (a, b)) -> b -> [a]) -> (b -> Maybe (a, b)) -> b -> [a]
-unfoldr'' r f b = case f b of
-    Just (a,b) -> a:r f b 
-    Nothing -> []
+--unfoldr'' :: ((b -> Maybe (a, b)) -> b -> [a]) -> (b -> Maybe (a, b)) -> b -> [a]
+--unfoldr'' r f b = case f b of
+--    Just (a,b) -> a:r f b 
+--    Nothing -> []
 
 fix' :: (a -> a) -> a
 fix' = fix fix''

@@ -11,8 +11,6 @@ import Data.Tree
 
 newtype Fix m = Fix {unFix :: m (Fix m)}
 
-
-
 instance Show1 m => Show (Fix m) where
   showsPrec n (Fix x) = showParen (n >= 11)
     (showString "Fix " . showsPrec1 11 x)
@@ -25,72 +23,68 @@ $(deriveShow1 ''Bool'') -- template haskell splice
 
 -------------------------------------------------------
 -- Generator for Maybe a.
-data M' a = M' (Fix (M'' a))
-data M'' a r = N' | J' a
+type M' a = Fix (M'' a)
+data M'' a r = Nothing | Just a
 $(deriveShow1 ''M'') -- template haskell splice
 
-pattern N = M' (Fix N')
-pattern J a = M' (Fix (J' a))
 -------------------------------------------------------
--- data Either' a b = Either' a b --------------------------TODO
 -- Generator for Either a b.
-data Either' a b = Either' (Fix (Either'' a b))
+type Either' a b = (Fix (Either'' a b))
 data Either''  a b r= Ri b | Le a
 
 $(deriveShow1 ''Either'') -- template haskell splice
-pattern Rii b= Either' (Fix (Ri b))
-pattern Lee a = Either' (Fix (Le a))
 -------------------------------------------------------
-
 -- Generator for ()
 type U' = Fix U''
 data U'' r = U'''
 
 $(deriveShow1 ''U'')
-pattern U = Fix U'''
 -------------------------------------------------------
-data L' a = L' (Fix (L'' a)) -- deriving (Show)
+type L' a = (Fix (L'' a)) -- deriving (Show)
 data L'' a r = L'' a r | Empti deriving (Show)
 
 $(deriveShow1 ''L'')
-pattern L x xs = L' (Fix (L'' x xs))
-pattern E = L' (Fix (Empti)) 
 -------------------------------------------------------
-data Void' = Void' (Fix Void'')
+type Void' =  (Fix Void'')
 data Void'' r = Void'' (Void'' r)
 
 $(deriveShow1 ''Void'')
---pattern V = Void' V
 -------------------------------------------------------
-data Identity' a = Idnetity' (Fix (Idnetity''))
+type Identity' a = (Fix (Idnetity''))
 data Idnetity'' a= Idnetity''  a 
 $(deriveShow1 ''Idnetity'')
 -------------------------------------------------------
-data Streem' a = Streem' (Fix (Streem'' a))
+type Streem' a =  (Fix (Streem'' a))
 data Streem'' a r = a ::> r
 $(deriveShow1 ''Streem'')
---  pattern Streem x xs = Streem (Fix (x ::> xs))
 -------------------------------------------------------
--- data Tree' a = Tree' (Fix (Tree'' a )) deriving (Show)
--- data Tree'' a r = Node' a (Forest' r) deriving (Show)
--- data Forest' r = Forest' r | Eimittaan deriving (Show)
 
---  $(deriveShow1 ''Tree')
+
+
+--data Tree' a = Tree' (Fix (Tree'' a )) 
+--data Tree'' a r = Node' a (Forest' r) 
+
+
+---data Forest' r = Forest' r | Eimittaan 
+
+-- $(deriveShow1 ''Tree')
 --  $(deriveShow1 ''Tree'')
---  $(deriveShow1 ''Forest')
+-- $(deriveShow1 ''Forest')
 
 -- pattern Tr xs = Tree' (Fix (xs))
 -- pattern Tr' x xs = Node' x (Forest' xs)
 -------------------------------------------------------
-data  Expr'   =Expr' (Fix (Expr)) 
-
+type  Expr'   = (Fix (Expr)) 
 data Expr a = Add (Expr a)  (Expr a) | Zero | Mul (Expr a)  (Expr a)  | One|
    Let String (Expr a) (Expr a) | Var String 
 $(deriveShow1 ''Expr)
 
 -------------------------------------------------------
-
+-- Roll :: f (Free f a) -> Free f a
+-- Return :: a -> Free f a
+data Free f a = Roll (f (Free f a)) | Return a
 -------------------------------------------------------
+
 
 
 
