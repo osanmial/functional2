@@ -50,9 +50,9 @@ data Void'' r = Void'' (Void'' r)
 
 $(deriveShow1 ''Void'')
 -------------------------------------------------------
-type Identity' a = (Fix (Idnetity''))
-data Idnetity'' a= Idnetity''  a 
-$(deriveShow1 ''Idnetity'')
+type Identity' a = (Fix (Identity''))
+data Identity'' a= Identity''  a 
+$(deriveShow1 ''Identity'')
 -------------------------------------------------------
 type Streem' a =  (Fix (Streem'' a))
 data Streem'' a r = a ::> r
