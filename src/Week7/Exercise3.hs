@@ -79,10 +79,16 @@ codistAddMul x = x
 
 
 commAdd::  Expr -> Expr
-commAdd (Let s exp1 exp2)= (Let s (commAdd exp1) (commAdd exp2))
-commAdd (Add exp1 exp2)
-  | exp1 > exp2 = Add exp2 exp1 
-  |otherwise= Add exp1 exp2
+--commAdd (Let s exp1 exp2)
+--   |(commAdd exp1)> (commAdd exp2)= (Let s (commAdd exp2) (commAdd exp1))
+--   |otherwise= (Let s  (commAdd exp1) (commAdd exp2))
+--commAdd (Add exp1 exp2)
+--  | exp1 > exp2 = Add exp2 exp1 
+--  |otherwise= Add exp1 exp2
+commAdd (Add x y) = case (commAdd x, commAdd y) of
+  (z, w) | z > w -> Add w z
+  (z, w) -> Add z w
+commAdd (Mul x y) = Mul (commAdd x) (commAdd y)
 
 closedStringBad :: String
 closedStringBad = "let \
