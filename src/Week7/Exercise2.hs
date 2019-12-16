@@ -77,9 +77,9 @@ $(deriveShow1 ''Expr)
 -- Return :: a -> Free f a
 data Free f a = Roll (f (Free f a)) | Return a
 -------------------------------------------------------
-
-
-
+type Cofree' f a = Fix (Cofree'' f a)
+data Cofree'' f a r = a :< r
+$(deriveShow1 ''Cofree'')
 
 
 -------------------------------------------------------
