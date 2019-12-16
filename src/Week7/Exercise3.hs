@@ -16,4 +16,13 @@ isSimple exp= case exp of
     otherwise-> case exp of 
         Var _ ->False
         otherwise->  True
-  
+
+
+breadth :: Expr -> Int 
+breadth Zero= 1
+breadth One= 1
+breadth (Add exp1 exp2)=1 + breadth exp1 + breadth exp2
+breadth (Mul exp1 exp2)=1 + breadth exp1 + breadth exp2
+breadth (Let s exp1 exp2)=2 + breadth exp1 + breadth exp2 
+breadth (Var _)= 1
+
