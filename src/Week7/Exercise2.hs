@@ -36,37 +36,38 @@ data U'' r = U'''
 $(deriveShow1 ''U'')
 pattern U = Fix U'''
 
-data L' a = L' (Fix (L'' a)) -- deriving (Show)
+type L' a = (Fix (L'' a)) -- deriving (Show)
 data L'' a r = L'' a r | Empti deriving (Show)
 
 $(deriveShow1 ''L'')
-pattern L x xs = L' (Fix (L'' x xs))
-pattern E = L' (Fix (Empti)) 
+pattern L x xs = (Fix (L'' x xs))
+pattern E =(Fix (Empti)) 
 
-data Void' = Void' (Fix Void'')
-data Void'' r = Void'' (Void'' r)
 
---  $(deriveShow1 ''Void'')
---pattern V = Void' V
+type Void' = (Fix Void'')
+data Void'' r 
 
 -- data Identity a = 
 
---  data Streem' a = Streem' (Fix (Streem'' a))
---  data Streem'' a r = a ::> r
+type Streem' a = Fix (Streem'' a)
+data Streem'' a r = a ::> r
 
---  $(deriveShow1 ''Streem'')
---  pattern Streem x xs = Streem (Fix (x ::> xs))
+$(deriveShow1 ''Streem'')
+pattern Streem x xs = Fix (x ::> xs)
 
--- data Tree' a = Tree' (Fix (Tree'' a )) deriving (Show)
--- data Tree'' a r = Node' a (Forest' r) deriving (Show)
--- data Forest' r = Forest' r | Eimittaan deriving (Show)
 
---  $(deriveShow1 ''Tree')
---  $(deriveShow1 ''Tree'')
---  $(deriveShow1 ''Forest')
+type Tree' a = Fix (Tree'' a)
+data Tree'' a r = Node' a [r]
+-- data Forest' r = Forest' r | AllTreesCut deriving (Show)
 
--- pattern Tr xs = Tree' (Fix (xs))
--- pattern Tr' x xs = Node' x (Forest' xs)
+$(deriveShow1 ''Tree'')
+-- $(deriveShow1 ''Forest')
+
+pattern Tr x = Fix x
+pattern Tr' x xs = Fix (Node' x (xs))
+-- pattern Fr left right = (Forest' left right)
+
+
 
 
 
