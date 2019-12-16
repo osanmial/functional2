@@ -59,7 +59,7 @@ pattern Streem x xs = Fix (x ::> xs)
 -------------------------------------------------------
 type Tree' a = Fix (Tree'' a)
 data Tree'' a r = Node' a [r]
--- data Forest' r = Forest' r | AllTreesCut deriving (Show)
+--data Forest' r = Forest' r | AllTreesCut deriving (Show)
 
 $(deriveShow1 ''Tree'')
 --  $(deriveShow1 ''Forest')
@@ -75,9 +75,13 @@ $(deriveShow1 ''Expr)
 -------------------------------------------------------
 -- Roll :: f (Free f a) -> Free f a
 -- Return :: a -> Free f a
-data Free f a = Roll (f (Free f a)) | Return a
--------------------------------------------------------
+-- data Free f a = Roll (f (Free f a)) | Return a
 
+type Free' f a = Fix (Free'' f a)
+data Free'' f a r = Roll (f r) | Return a
+$(deriveShow1 ''Free'')
+
+-------------------------------------------------------
 
 
 
