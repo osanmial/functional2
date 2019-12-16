@@ -87,8 +87,9 @@ data Cofree'' f a r = a :< r
 $(deriveShow1 ''Cofree'')
 
 -------------------------------------------------------
-
-
-
+--newtype Fix m = Fix {unFix :: m (Fix m)}
+type Fix' f = Fix (Fix'' f)
+data Fix'' f r = Fix'' f r
+$(deriveShow1 ''Fix'')
 
 -------------------------------------------------------
