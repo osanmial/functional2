@@ -54,8 +54,6 @@ depth (Mul a b ) = comp (depth a) (depth b)
 depth (Let _ a b) = comp (depth a) (depth b) 
 depth (Var _ ) = 1
 
-commAdd :: Expr -> Expr
-commAdd exp = undefined
 
 unifyAddZero :: Expr -> Expr
 unifyAddZero (Add Zero x) = x
