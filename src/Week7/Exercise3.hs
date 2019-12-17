@@ -13,11 +13,9 @@ import Week4.Exercise3
 import Week4.Exercise4
 
 isSimple :: Expr -> Bool
-isSimple exp= case exp of 
-    Let _ _ _ -> False
-    otherwise-> case exp of 
-        Var _ ->False
-        otherwise->  True
+isSimple (Let _ _ _) = False
+isSimple (Var _) =False
+isSimple _ =   True
 
 breadth :: Expr -> Int 
 breadth Zero= 1
