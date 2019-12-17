@@ -13,11 +13,9 @@ import Week4.Exercise3
 import Week4.Exercise4
 
 isSimple :: Expr -> Bool
-isSimple exp= case exp of 
-    Let _ _ _ -> False
-    otherwise-> case exp of 
-        Var _ ->False
-        otherwise->  True
+isSimple (Let _ _ _) = False
+isSimple (Var _) =False
+isSimple _ =   True
 
 breadth :: Expr -> Int 
 breadth Zero= 1
@@ -79,16 +77,16 @@ codistAddMul x = x
 
 
 commAdd::  Expr -> Expr
---commAdd (Let s exp1 exp2)
---   |(commAdd exp1)> (commAdd exp2)= (Let s (commAdd exp2) (commAdd exp1))
---   |otherwise= (Let s  (commAdd exp1) (commAdd exp2))
---commAdd (Add exp1 exp2)
---  | exp1 > exp2 = Add exp2 exp1 
---  |otherwise= Add exp1 exp2
+commAdd (Let s x y)= case (commAdd x, commAdd y) of
+  (z, w) | z > w -> Let s w z
+  (z, w) -> Let s z w
 commAdd (Add x y) = case (commAdd x, commAdd y) of
   (z, w) | z > w -> Add w z
   (z, w) -> Add z w
-commAdd (Mul x y) = Mul (commAdd x) (commAdd y)
+commAdd (Mul x y) = case  (commAdd x, commAdd y) of
+  (z, w) | z > w -> Mul w z
+  (z, w) -> Mul  z w
+
 
 closedStringBad :: String
 closedStringBad = "let \
@@ -215,3 +213,11 @@ instance Eq Expr where
 
 instance Ord Expr where
   compare = compareExpr
+
+optimize :: Expr -> Expr
+optimize = (appEndo . foldMap Endo) [
+  assocAdd, commAdd, unifyAddZero,
+  assocMul, unifyMulOne, codistAddMul]
+
+optimizePasses :: Int -> Expr -> Expr
+optimizePasses n = (appEndo . stimesMonoid n . Endo) optimize
