@@ -215,3 +215,11 @@ instance Eq Expr where
 
 instance Ord Expr where
   compare = compareExpr
+
+optimize :: Expr -> Expr
+optimize = (appEndo . foldMap Endo) [
+  assocAdd, commAdd, unifyAddZero,
+  assocMul, unifyMulOne, codistAddMul]
+
+optimizePasses :: Int -> Expr -> Expr
+optimizePasses n = (appEndo . stimesMonoid n . Endo) optimize
