@@ -104,12 +104,15 @@ assocAdd' (MulF a b) =Fix $ (MulF a b)
 assocAdd' (LetF s a b) = Fix $ LetF  s a b
 assocAdd' x = Fix $ x
 
--- assocMul :: Expr' -> Expr'
--- assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
--- assocMul (Add a b) = Add (assocMul a) (assocMul b)
--- assocMul (Mul a b) = Mul (assocMul a) (assocMul b)
--- assocMul (Let s a b) = Let s (assocMul a) (assocMul b)
--- assocMul x = x
+assocMul :: Expr' -> Expr'
+assocMul exp= cata assocMul' exp
+
+assocMul' :: Algebra ExprF Expr'
+assocMul'(MulF (Fix (MulF a b)) z) = Fix $ AddF a $ Fix  (AddF b z)
+assocMul' (AddF a b) = Fix $ AddF a b
+assocMul' (MulF a b) = Fix $ MulF a b
+assocMul' (LetF s a b) = Fix $ LetF s  a b
+assocMul'  x = Fix $ x
 
 -- comp a b = if a>b then
 --   a + 1
