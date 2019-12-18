@@ -21,6 +21,8 @@ import Week4.Exercise3
 import Week7.Exercise2
 import Week7.Exercise3
 
+import Data.Coerce
+
 import Data.Char (intToDigit)
 import Data.Foldable (find)
 import Data.Map (Map (..))
@@ -59,7 +61,7 @@ comonad reader field guide
 -- pattern (Fix (Var s)) = Var s
 
 isSimple :: Expr' -> Bool
-isSimple exp = cata isSimpleAlg exp
+isSimple expr = cata isSimpleAlg expr
 
 isSimpleAlg :: Algebra ExprF Bool
 isSimpleAlg expr = case expr of
@@ -67,8 +69,10 @@ isSimpleAlg expr = case expr of
   VarF _ -> False
   AddF False _ -> False
   AddF _ False -> False
+  AddF _ _ -> True
   MulF False _ -> False
   MulF _ False -> False
+  MulF _ _ -> True
   ZeroF -> True
   OneF -> True
 
@@ -80,7 +84,7 @@ isSimpleAlg expr = case expr of
 -}
   
 breadth :: Expr' -> Int
-breadth exp = cata breadth' exp
+breadth expr = cata breadth' expr
 
 breadth' :: Algebra ExprF Int
 breadth' ZeroF = 1
@@ -92,7 +96,6 @@ breadth' (VarF _) = 1
 
 assocAdd :: Expr' -> Expr'
 assocAdd exp = cata assocAdd' exp
-
 
 assocAdd':: Algebra ExprF Expr'
 assocAdd' (AddF (Fix (AddF a b)) z) =Fix $ AddF a $ Fix (AddF b z)
@@ -113,6 +116,7 @@ assocAdd' x = Fix $ x
 --   else
 --   b + 1
 
+
 -- depth :: Expr' -> Int
 -- depth Zero = 1
 -- depth One = 1
@@ -122,10 +126,13 @@ assocAdd' x = Fix $ x
 -- depth (Var _ ) = 1
 
 
--- unifyAddZero :: Expr' -> Expr'
--- unifyAddZero (Add Zero x) = x
--- unifyAddZero (Add x Zero) = x
--- unifyAddZero x = x
+unifyAddZero :: Expr' -> Expr'
+unifyAddZero = cata unifyAddZero'
+
+unifyAddZero' :: Algebra ExprF Expr'
+unifyAddZero' (AddF (Fix ZeroF) x) = x
+unifyAddZero' (AddF x (Fix ZeroF)) = x
+unifyAddZero' x = coerce x
 
 -- unifyMulOne (Mul One x) = x
 -- unifyMulOne (Mul x One) = x
