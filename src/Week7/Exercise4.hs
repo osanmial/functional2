@@ -1,6 +1,12 @@
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# OPTIONS_GHC -fwarn-incomplete-patterns  #-}
+{-# OPTIONS_GHC -fwarn-hi-shadowing #-}
+{-# OPTIONS_GHC -fwarn-name-shadowing #-}
 
-module Week7.Exercise3 where
+module Week7.Exercise4 where
 
 import Data.Char (intToDigit)
 import Data.Foldable (find)
@@ -9,8 +15,10 @@ import qualified Data.Map as Map
 import Data.Semigroup (Endo (..), stimesMonoid)
 import Data.Set (Set (..))
 import qualified Data.Set as Set
-import Week4.Exercise3
-import Week4.Exercise4
+--import Week4.Exercise3
+--import Week4.Exercise4
+import Data.Range.Algebra (Algebra)
+import Data.Fix
 -- import Data.Fix
 
 {-
@@ -20,75 +28,101 @@ repeats the algebra untill it is done.
 comonad reader field guide
 -}
 
--- cata :: Functor f => (f a -> a) -> Fix f -> a  
+-- cata :: Functor f => (f a -> a) -> Fix f -> a
 
-isSimple :: Expr -> Bool
-isSimple exp= case exp of 
+-- F-Algebra
+-- type Algebra f a = f a -> a 
+
+type  Expr'   = (Fix (Expr'')) 
+data Expr'' r = Add r r | Zero | Mul r r | One |
+   Let String r r | Var String deriving (Functor)
+--  $(deriveShow1 ''Expr'')
+
+isSimple :: Expr' -> Bool
+isSimple exp = cata isSimpleAlg exp
+
+
+isSimpleAlg :: Algebra Expr'' Bool
+isSimpleAlg expr = case expr of
+  Let _ _ _ -> False
+  Var _ -> False
+  Add False _ -> False
+  Add _ False -> False
+  Mul False _ -> False
+  Mul _ False -> False
+  Zero -> True
+  One -> True
+
+{-case exp of
     Let _ _ _ -> False
-    otherwise-> case exp of 
+    otherwise-> case exp of
         Var _ ->False
         otherwise->  True
+-}
+  
+breadth :: Expr' -> Int
+breadth exp = cata breath' exp
 
-breadth :: Expr -> Int 
-breadth Zero= 1
-breadth One= 1
-breadth (Add exp1 exp2) = 1 + breadth exp1 + breadth exp2
-breadth (Mul exp1 exp2) = 1 + breadth exp1 + breadth exp2
-breadth (Let s exp1 exp2) = 1 + breadth exp1 + breadth exp2 
-breadth (Var _) = 1
+breadth' :: Algebra Expr'' Int
+breadth' Zero = 1
+breadth' One = 1
+breadth' (Add l r) = 1 + l + r
+breadth' (Mul l r) = 1 + l + r
+breadth' (Let s l r) = 1 + l + r
+breadth' (Var _) = 1
 
-assocAdd :: Expr -> Expr
-assocAdd (Add (Add a b) z) = assocAdd (Add a (Add b z))
-assocAdd (Add a b) = Add (assocAdd a) (assocAdd b)
-assocAdd (Mul a b) = Mul (assocAdd a) (assocAdd b)
-assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
-assocAdd x = x
+-- assocAdd :: Expr' -> Expr'
+-- assocAdd (Add (Add a b) z) = assocAdd (Add a (Add b z))
+-- assocAdd (Add a b) = Add (assocAdd a) (assocAdd b)
+-- assocAdd (Mul a b) = Mul (assocAdd a) (assocAdd b)
+-- assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
+-- assocAdd x = x
 
-assocMul :: Expr -> Expr
-assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
-assocMul (Add a b) = Add (assocMul a) (assocMul b)
-assocMul (Mul a b) = Mul (assocMul a) (assocMul b)
-assocMul (Let s a b) = Let s (assocMul a) (assocMul b)
-assocMul x = x
+-- assocMul :: Expr' -> Expr'
+-- assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
+-- assocMul (Add a b) = Add (assocMul a) (assocMul b)
+-- assocMul (Mul a b) = Mul (assocMul a) (assocMul b)
+-- assocMul (Let s a b) = Let s (assocMul a) (assocMul b)
+-- assocMul x = x
 
-comp a b = if a>b then
-  a + 1
-  else
-  b + 1
+-- comp a b = if a>b then
+--   a + 1
+--   else
+--   b + 1
 
-depth :: Expr -> Int
-depth Zero = 1
-depth One = 1
-depth (Add a b ) = comp (depth a) (depth b)
-depth (Mul a b ) = comp (depth a) (depth b)
-depth (Let _ a b) = comp (depth a) (depth b) 
-depth (Var _ ) = 1
-
-
-unifyAddZero :: Expr -> Expr
-unifyAddZero (Add Zero x) = x
-unifyAddZero (Add x Zero) = x
-unifyAddZero x = x
-
-unifyMulOne (Mul One x) = x
-unifyMulOne (Mul x One) = x
-unifyMulOne x = x
-
-codistAddMul :: Expr -> Expr
-codistAddMul ok@(Add (Mul a b) (Mul c d))
-  | a == c , b == d = Mul (Add One One) (Mul a b)
-  | a == c = Mul a (Add b d)
-  | b == d = Mul b (Add a c)
-  | otherwise = ok
-codistAddMul x = x
+-- depth :: Expr' -> Int
+-- depth Zero = 1
+-- depth One = 1
+-- depth (Add a b ) = comp (depth a) (depth b)
+-- depth (Mul a b ) = comp (depth a) (depth b)
+-- depth (Let _ a b) = comp (depth a) (depth b) 
+-- depth (Var _ ) = 1
 
 
+-- unifyAddZero :: Expr' -> Expr'
+-- unifyAddZero (Add Zero x) = x
+-- unifyAddZero (Add x Zero) = x
+-- unifyAddZero x = x
 
--- data Expr = Add Expr Expr | Zero | Mul Expr Expr | One |
---   Let String Expr Expr | Var String
+-- unifyMulOne (Mul One x) = x
+-- unifyMulOne (Mul x One) = x
+-- unifyMulOne x = x
+
+-- codistAddMul :: Expr' -> Expr'
+-- codistAddMul ok@(Add (Mul a b) (Mul c d))
+--   | a == c , b == d = Mul (Add One One) (Mul a b)
+--   | a == c = Mul a (Add b d)
+--   | b == d = Mul b (Add a c)
+--   | otherwise = ok
+-- codistAddMul x = x
 
 
-commAdd::  Expr -> Expr
+
+-- data Expr' = Add Expr' Expr' | Zero | Mul Expr' Expr' | One |
+--   Let String Expr' Expr' | Var String
+
+
+commAdd::  Expr' -> Expr'
 --commAdd (Let s exp1 exp2)
 --   |(commAdd exp1)> (commAdd exp2)= (Let s (commAdd exp2) (commAdd exp1))
 --   |otherwise= (Let s  (commAdd exp1) (commAdd exp2))
@@ -114,8 +148,8 @@ closedStringBad = "let \
    \ nine = 0 + three * (three + 0) in \
    \ (0 * five + 1) + (three * (1 + nine) + eight * 0)"
   
---closedDeepBad :: Expr
---closedDeepBad = case parseExpr closedStringBad of
+--closedDeepBad :: Expr'
+--closedDeepBad = case parseExpr' closedStringBad of
 --  Left e -> error (show e)
 --  Right x -> x
 
@@ -155,9 +189,9 @@ freshName css = case find (`Set.notMember` css)
   Nothing -> error "Out of names"
   Just cs -> cs
 
-findFree :: Expr -> Set String
+findFree :: Expr' -> Set String
 findFree = let
-  f :: Expr -> Set String
+  f :: Expr' -> Set String
   f (Add x y) = f x <> f y
   f Zero = mempty
   f (Mul x y) = f x <> f y
@@ -166,9 +200,9 @@ findFree = let
   f (Var cs) = Set.singleton cs in
   f
 
-compareExpr :: Expr -> Expr -> Ordering
-compareExpr = let
-  f :: Map String String -> Map String String -> Expr -> Expr -> Ordering
+compareExpr' :: Expr' -> Expr' -> Ordering
+compareExpr' = let
+  f :: Map String String -> Map String String -> Expr' -> Expr' -> Ordering
   f css dss (Add x y) (Add z w) = f css dss x z `thenCmp` f css dss y w
   f _ _ Zero Zero = EQ
   f css dss (Mul x y) (Mul z w) = f css dss x z `thenCmp` f css dss y w
@@ -220,9 +254,9 @@ compareExpr = let
   f _ _ Var {} Let {} = GT in
   f mempty mempty
 
-instance Eq Expr where
+instance Eq Expr' where
   x == y = compareExpr x y == EQ
 
-instance Ord Expr where
+instance Ord Expr' where
   compare = compareExpr
 
