@@ -46,9 +46,9 @@ comonad reader field guide
 -- F-Algebra
 -- type Algebra f a = f a -> a 
 
--- type  Expr'   = (Fix (Expr'')) 
--- data Expr'' r = Add r r | Zero | Mul r r | One |
---    Let String r r | Var String deriving (Functor)
+-- type  Expr'   = (Fix (ExprF)) 
+-- data ExprF r = AddF r r | Zero | MulF r r | One |
+--    LetF String r r | VarF String deriving (Functor)
 --  $(deriveShow1 ''Expr'')
 
 -- pattern (Fix (Add l r)) = Add l r
@@ -91,13 +91,15 @@ breadth' (LetF s l r) = 1 + l + r
 breadth' (VarF _) = 1
 
 assocAdd :: Expr' -> Expr'
-assocAdd exp = undefined
+assocAdd exp = cata assocAdd' exp
 
--- assocAdd (Add (Add a b) z) = assocAdd (Add a (Add b z))
--- assocAdd (Add a b) = Add (assocAdd a) (assocAdd b)
--- assocAdd (Mul a b) = Mul (assocAdd a) (assocAdd b)
--- assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
--- assocAdd x = x
+
+assocAdd':: Algebra ExprF Expr'
+assocAdd' (AddF (Fix (AddF a b)) z) =Fix $ AddF a $ Fix (AddF b z)
+assocAdd' (AddF a b) = Fix $ (AddF a b)
+assocAdd' (MulF a b) =Fix $ (MulF a b)
+assocAdd' (LetF s a b) = Fix $ LetF  s a b
+assocAdd' x = Fix $ x
 
 -- assocMul :: Expr' -> Expr'
 -- assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
