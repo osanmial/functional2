@@ -34,7 +34,7 @@ assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
 assocAdd x = x
 
 assocMul :: Expr -> Expr
-assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
+assocMul (Mul (Mul a b) z) = assocMul (Mul a (Mul b z))
 assocMul (Add a b) = Add (assocMul a) (assocMul b)
 assocMul (Mul a b) = Mul (assocMul a) (assocMul b)
 assocMul (Let s a b) = Let s (assocMul a) (assocMul b)

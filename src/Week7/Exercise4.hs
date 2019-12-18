@@ -99,19 +99,13 @@ assocAdd exp = cata assocAdd' exp
 
 assocAdd':: Algebra ExprF Expr'
 assocAdd' (AddF (Fix (AddF a b)) z) =Fix $ AddF a $ Fix (AddF b z)
-assocAdd' (AddF a b) = Fix $ (AddF a b)
-assocAdd' (MulF a b) =Fix $ (MulF a b)
-assocAdd' (LetF s a b) = Fix $ LetF  s a b
 assocAdd' x = Fix $ x
 
 assocMul :: Expr' -> Expr'
 assocMul exp= cata assocMul' exp
 
 assocMul' :: Algebra ExprF Expr'
-assocMul'(MulF (Fix (MulF a b)) z) = Fix $ AddF a $ Fix  (AddF b z)
-assocMul' (AddF a b) = Fix $ AddF a b
-assocMul' (MulF a b) = Fix $ MulF a b
-assocMul' (LetF s a b) = Fix $ LetF s  a b
+assocMul'(MulF (Fix (MulF a b)) z) = Fix $ MulF a $ Fix  (MulF b z)
 assocMul'  x = Fix $ x
 
 -- comp a b = if a>b then
