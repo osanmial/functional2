@@ -95,32 +95,29 @@ breadth' (LetF s l r) = 1 + l + r
 breadth' (VarF _) = 1
 
 assocAdd :: Expr' -> Expr'
-assocAdd exp = cata assocAdd' exp
+assocAdd expr = cata assocAdd' expr
 
 assocAdd':: Algebra ExprF Expr'
 assocAdd' (AddF (Fix (AddF a b)) z) =Fix $ AddF a $ Fix (AddF b z)
 assocAdd' x = Fix $ x
 
 assocMul :: Expr' -> Expr'
-assocMul exp= cata assocMul' exp
+assocMul expr= cata assocMul' expr
 
 assocMul' :: Algebra ExprF Expr'
 assocMul'(MulF (Fix (MulF a b)) z) = Fix $ MulF a $ Fix  (MulF b z)
 assocMul'  x = Fix $ x
 
--- comp a b = if a>b then
---   a + 1
---   else
---   b + 1
+depth :: Expr' -> Int
+depth expr= cata depth' expr
 
-
--- depth :: Expr' -> Int
--- depth Zero = 1
--- depth One = 1
--- depth (Add a b ) = comp (depth a) (depth b)
--- depth (Mul a b ) = comp (depth a) (depth b)
--- depth (Let _ a b) = comp (depth a) (depth b) 
--- depth (Var _ ) = 1
+depth' :: Algebra ExprF Int 
+depth' ZeroF = 1
+depth' OneF = 1
+depth' (AddF a b ) = comp a  b
+depth' (MulF a b ) = comp a  b
+depth' (LetF _ a b) = comp  a b
+depth' (VarF _ ) = 1
 
 
 unifyAddZero :: Expr' -> Expr'
