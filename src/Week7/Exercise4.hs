@@ -149,9 +149,9 @@ commAdd::  Expr' -> Expr'
 commAdd expr= cata commAdd' expr
 
 commAdd':: Algebra ExprF Expr'
-commAdd' (LetF s x y) = case (x,y) of 
-  (z, w) | z > w -> Fix $ LetF s w z
-  (z, w) -> Fix $ LetF s z w
+--commAdd' (LetF s x y) = case (x,y) of 
+--  (z, w) | z > w -> Fix $ LetF s w z
+--  (z, w) -> Fix $ LetF s z w
 commAdd' (AddF x y) = case ( x,  y) of
    (z, w) | z > w -> Fix $  AddF w z
    (z, w) -> Fix $  AddF z w

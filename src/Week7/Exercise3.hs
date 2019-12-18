@@ -78,9 +78,9 @@ codistAddMul x = x
 
 
 commAdd::  Expr -> Expr
-commAdd (Let s x y)= case (commAdd x, commAdd y) of
-  (z, w) | z > w -> Let s w z
-  (z, w) -> Let s z w
+--commAdd (Let s x y)= case (commAdd x, commAdd y) of
+--  (z, w) | z > w -> Let s w z
+--  (z, w) -> Let s z w
 commAdd (Add x y) = case (commAdd x, commAdd y) of
   (z, w) | z > w -> Add w z
   (z, w) -> Add z w
