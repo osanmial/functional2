@@ -3,6 +3,8 @@
 
 module Week7.Exercise2 where
 
+import Data.Functor.Deriving
+--import Data.
 import Control.Applicative (Const)
 import Text.Show.Deriving (deriveShow1)
 import Data.Functor.Classes
@@ -68,10 +70,11 @@ pattern Tr x = Fix x
 pattern Tr' x xs = Fix (Node' x (xs))
 -- pattern Fr left right = (Forest' left right)
 -------------------------------------------------------
-type  Expr'   = (Fix (Expr'')) 
-data Expr'' r = Add r r | Zero | Mul r r | One |
-   Let String r r | Var String 
-$(deriveShow1 ''Expr'')
+type  Expr'   = (Fix (ExprF)) 
+data ExprF r = AddF r r | ZeroF | MulF r r | OneF |
+   LetF String r r | VarF String
+$(deriveShow1 ''ExprF)
+$(deriveFunctor ''ExprF)
 -------------------------------------------------------
 -- Roll :: f (Free f a) -> Free f a
 -- Return :: a -> Free f a
@@ -81,11 +84,15 @@ type Free' f a = Fix (Free'' f a)
 data Free'' f a r = Roll (f r) | Return a
 $(deriveShow1 ''Free'')
 
+pattern Pure' x = Fix (Return x)
+pattern Free' xs = Fix (Roll xs)
+
 -------------------------------------------------------
 type Cofree' f a = Fix (Cofree'' f a)
-data Cofree'' f a r = a :< r
+data Cofree'' f a r = a :< f r
 $(deriveShow1 ''Cofree'')
 
+pattern Cofree' x xs = Fix (x :< xs)
 -------------------------------------------------------
 --newtype Fix m = Fix {unFix :: m (Fix m)}
 type Fix' f = Fix (Fix'' f)
