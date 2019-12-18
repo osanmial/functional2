@@ -145,18 +145,19 @@ unifyAddZero' x = coerce x
 -- data Expr' = Add Expr' Expr' | Zero | Mul Expr' Expr' | One |
 --   Let String Expr' Expr' | Var String
 
+commAdd::  Expr' -> Expr' 
+commAdd expr= cata commAdd' expr
 
--- commAdd::  Expr' -> Expr'
---commAdd (Let s exp1 exp2)
---   |(commAdd exp1)> (commAdd exp2)= (Let s (commAdd exp2) (commAdd exp1))
---   |otherwise= (Let s  (commAdd exp1) (commAdd exp2))
---commAdd (Add exp1 exp2)
---  | exp1 > exp2 = Add exp2 exp1 
---  |otherwise= Add exp1 exp2
--- commAdd (Add x y) = case (commAdd x, commAdd y) of
---   (z, w) | z > w -> Add w z
---   (z, w) -> Add z w
--- commAdd (Mul x y) = Mul (commAdd x) (commAdd y)
+commAdd':: Algebra ExprF Expr'
+commAdd' (LetF s x y) = case (x,y) of 
+  (z, w) | z > w -> Fix $ LetF s w z
+  (z, w) -> Fix $ LetF s z w
+commAdd' (AddF x y) = case ( x,  y) of
+   (z, w) | z > w -> Fix $  AddF w z
+   (z, w) -> Fix $  AddF z w
+commAdd' (MulF x y) = case  (x, y) of
+  (z, w) | z > w -> Fix $ MulF w z
+  (z, w) -> Fix $ MulF  z w
 
 
 
