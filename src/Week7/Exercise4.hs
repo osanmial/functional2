@@ -20,6 +20,7 @@ import qualified Data.Set as Set
 import Week4.Exercise3
 import Week7.Exercise2
 import Week7.Exercise3
+import Data.Functor.Foldable hiding (cata, Fix, histo, para, futu, ana, apo, hylo)
 
 import Data.Coerce
 
@@ -133,22 +134,50 @@ unifyAddZero' (AddF (Fix ZeroF) x) = x
 unifyAddZero' (AddF x (Fix ZeroF)) = x
 unifyAddZero' x = coerce x
 
--- unifyMulOne (Mul One x) = x
--- unifyMulOne (Mul x One) = x
--- unifyMulOne x = x
+unifyMulOne (Mul One x) = x
+unifyMulOne (Mul x One) = x
+unifyMulOne x = x
 
--- codistAddMul :: Expr' -> Expr'
--- codistAddMul ok@(Add (Mul a b) (Mul c d))
---   | a == c , b == d = Mul (Add One One) (Mul a b)
---   | a == c = Mul a (Add b d)
---   | b == d = Mul b (Add a c)
---   | otherwise = ok
--- codistAddMul x = x
+codistAddMul :: Expr' -> Expr'
+codistAddMul = cata codistAddMul'
 
+codistAddMul' :: Algebra ExprF Expr'
+codistAddMul' ok@(AddF (Fix (MulF a b)) (Fix (MulF c d)))
+  | a == c , b == d = Fix (MulF (Fix (AddF (Fix OneF) (Fix OneF))) (Fix (MulF a b)))
+  | a == c = Fix $ MulF a (Fix $ AddF b d)
+  | b == d = Fix $ MulF b (Fix $ AddF a c)
+  | otherwise = Fix ok
+codistAddMul' x = Fix x
 
+-- type family Base t :: * -> *
+--para :: (t (t, a) -> a) -> t -> a
+--para t = p where p x = t . fmap ((,) <*> p) $ project x
 
--- data Expr' = Add Expr' Expr' | Zero | Mul Expr' Expr' | One |
---   Let String Expr' Expr' | Var String
+--para :: Functor m => ProductAlgebra m a -> Fix m -> a
+--codistAddMul :: Expr' -> Expr'
+--codistAddMul'' = para codistAddMul'''
+
+--codistAddMul :: ProductAlgebra ExprF Expr'
+--codistAddMul''' = undefined
+
+-- zygo :: Recursive t => (Base t b -> b) -> (Base t (b, a) -> a) -> t -> a 
+-- zygo f = gfold (distZygo f)
+
+--codistAddMul'' = zygo codistAddMul''' codistAddMul''''
+
+-- --codistAddMul''' :: (Base t b -> b)
+-- codistAddMul''' :: (Base (ExprF Expr') (Either Expr' (Expr',Expr')) -> (Either Expr' (Expr',Expr')))
+-- codistAddMul''' (Mul a b) = Right (a, b)
+-- codistAddMul''' o = Left o
+  
+-- --codistAddMul'''' (Base t (b, a) -> a)
+-- codistAddMul'''' :: (Base (ExprF Expr') ((Either Expr' Expr'), Expr') -> Expr')
+-- codistAddMul'''' (Add (Fix (Right (a,b)), x) (Fix (Right (c,d) , y)))
+--   | a == c , b == d = Fix (MulF (Fix (AddF (Fix OneF) (Fix OneF))) (Fix (MulF a b)))
+--   | a == c = Fix $ MulF a (Fix $ AddF b d)
+--   | b == d = Fix $ MulF b (Fix $ AddF a c)
+--   | otherwise = Fix (Add x y)
+-- codistAddMul'''' x = Fix $ fmap snd x
 
 
 -- commAdd::  Expr' -> Expr'
