@@ -11,6 +11,7 @@ import Data.Set (Set (..))
 import qualified Data.Set as Set
 import Week4.Exercise3
 import Week4.Exercise4
+import Week3.Exercise3
 
 isSimple :: Expr -> Bool
 isSimple (Let _ _ _) = False
@@ -33,7 +34,7 @@ assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
 assocAdd x = x
 
 assocMul :: Expr -> Expr
-assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
+assocMul (Mul (Mul a b) z) = assocMul (Mul a (Mul b z))
 assocMul (Add a b) = Add (assocMul a) (assocMul b)
 assocMul (Mul a b) = Mul (assocMul a) (assocMul b)
 assocMul (Let s a b) = Let s (assocMul a) (assocMul b)
@@ -77,9 +78,9 @@ codistAddMul x = x
 
 
 commAdd::  Expr -> Expr
-commAdd (Let s x y)= case (commAdd x, commAdd y) of
-  (z, w) | z > w -> Let s w z
-  (z, w) -> Let s z w
+--commAdd (Let s x y)= case (commAdd x, commAdd y) of
+--  (z, w) | z > w -> Let s w z
+--  (z, w) -> Let s z w
 commAdd (Add x y) = case (commAdd x, commAdd y) of
   (z, w) | z > w -> Add w z
   (z, w) -> Add z w
@@ -102,10 +103,19 @@ closedStringBad = "let \
    \ nine = 0 + three * (three + 0) in \
    \ (0 * five + 1) + (three * (1 + nine) + eight * 0)"
   
---closedDeepBad :: Expr
---closedDeepBad = case parseExpr closedStringBad of
---  Left e -> error (show e)
---  Right x -> x
+
+closedDeepBad :: Expr
+closedDeepBad = Let "two" (Add One One) $
+   Let "three" (Mul One (Add One (Mul (Var "two") One))) $
+   Let "five" (Let "four" (Mul (Var "two") (Var "two")) $
+     Add One (Var "four")) $
+   Let "six" (Let "seven" (Add One (Var "six")) $
+     Mul (Var "two") (Var "three")) $
+   Let "eight" (Mul (Var "two") (Var "four")) $
+   Let "nine" (Add Zero (Mul (Var "three") (Add (Var "three") Zero))) $
+   Add (Add (Mul Zero (Var "five")) One)
+     (Add (Mul (Var "three") (Add One (Var "nine")))
+       (Mul (Var "eight") Zero))
 
 -- | An improved version of the `showIntAtBase` function
 -- from the `Numeric` module of the `base` package.

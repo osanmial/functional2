@@ -49,9 +49,9 @@ comonad reader field guide
 -- F-Algebra
 -- type Algebra f a = f a -> a 
 
--- type  Expr'   = (Fix (Expr'')) 
--- data Expr'' r = Add r r | Zero | Mul r r | One |
---    Let String r r | Var String deriving (Functor)
+-- type  Expr'   = (Fix (ExprF)) 
+-- data ExprF r = AddF r r | Zero | MulF r r | One |
+--    LetF String r r | VarF String deriving (Functor)
 --  $(deriveShow1 ''Expr'')
 
 -- pattern (Fix (Add l r)) = Add l r
@@ -96,34 +96,29 @@ breadth' (LetF s l r) = 1 + l + r
 breadth' (VarF _) = 1
 
 assocAdd :: Expr' -> Expr'
-assocAdd expr = undefined
+assocAdd expr = cata assocAdd' expr
 
--- assocAdd (Add (Add a b) z) = assocAdd (Add a (Add b z))
--- assocAdd (Add a b) = Add (assocAdd a) (assocAdd b)
--- assocAdd (Mul a b) = Mul (assocAdd a) (assocAdd b)
--- assocAdd (Let s a b) = Let s (assocAdd a) (assocAdd b)
--- assocAdd x = x
+assocAdd':: Algebra ExprF Expr'
+assocAdd' (AddF (Fix (AddF a b)) z) =Fix $ AddF a $ Fix (AddF b z)
+assocAdd' x = Fix $ x
 
--- assocMul :: Expr' -> Expr'
--- assocMul (Mul (Mul a b) z) = assocMul (Add a (Add b z))
--- assocMul (Add a b) = Add (assocMul a) (assocMul b)
--- assocMul (Mul a b) = Mul (assocMul a) (assocMul b)
--- assocMul (Let s a b) = Let s (assocMul a) (assocMul b)
--- assocMul x = x
+assocMul :: Expr' -> Expr'
+assocMul expr= cata assocMul' expr
 
--- comp a b = if a>b then
---   a + 1
---   else
---   b + 1
+assocMul' :: Algebra ExprF Expr'
+assocMul'(MulF (Fix (MulF a b)) z) = Fix $ MulF a $ Fix  (MulF b z)
+assocMul'  x = Fix $ x
 
+depth :: Expr' -> Int
+depth expr= cata depth' expr
 
--- depth :: Expr' -> Int
--- depth Zero = 1
--- depth One = 1
--- depth (Add a b ) = comp (depth a) (depth b)
--- depth (Mul a b ) = comp (depth a) (depth b)
--- depth (Let _ a b) = comp (depth a) (depth b) 
--- depth (Var _ ) = 1
+depth' :: Algebra ExprF Int 
+depth' ZeroF = 1
+depth' OneF = 1
+depth' (AddF a b ) = comp a  b
+depth' (MulF a b ) = comp a  b
+depth' (LetF _ a b) = comp  a b
+depth' (VarF _ ) = 1
 
 
 unifyAddZero :: Expr' -> Expr'
@@ -179,18 +174,19 @@ codistAddMul' x = Fix x
 --   | otherwise = Fix (Add x y)
 -- codistAddMul'''' x = Fix $ fmap snd x
 
+commAdd::  Expr' -> Expr' 
+commAdd expr= cata commAdd' expr
 
--- commAdd::  Expr' -> Expr'
---commAdd (Let s exp1 exp2)
---   |(commAdd exp1)> (commAdd exp2)= (Let s (commAdd exp2) (commAdd exp1))
---   |otherwise= (Let s  (commAdd exp1) (commAdd exp2))
---commAdd (Add exp1 exp2)
---  | exp1 > exp2 = Add exp2 exp1 
---  |otherwise= Add exp1 exp2
--- commAdd (Add x y) = case (commAdd x, commAdd y) of
---   (z, w) | z > w -> Add w z
---   (z, w) -> Add z w
--- commAdd (Mul x y) = Mul (commAdd x) (commAdd y)
+commAdd':: Algebra ExprF Expr'
+--commAdd' (LetF s x y) = case (x,y) of 
+--  (z, w) | z > w -> Fix $ LetF s w z
+--  (z, w) -> Fix $ LetF s z w
+commAdd' (AddF x y) = case ( x,  y) of
+   (z, w) | z > w -> Fix $  AddF w z
+   (z, w) -> Fix $  AddF z w
+commAdd' (MulF x y) = case  (x, y) of
+  (z, w) | z > w -> Fix $ MulF w z
+  (z, w) -> Fix $ MulF  z w
 
 
 
