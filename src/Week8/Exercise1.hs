@@ -9,6 +9,8 @@ derivative:
 1
 
 -}
+type MaybeContext = ()
+data MaybeZipper a = MZ (a, ())
 
 ----    Derivative of Join (,) a.
 {-
@@ -21,61 +23,47 @@ derivative:
 2a
 ==> (Bool, a)
 -}
+data TupleContext a = TC (Bool, a) 
+data TupleZipper a = TZ (a,(Bool,a))
 
 ----    Derivative of [] a.
 {-
-(D_a(a (μx(a x +1)) + 1)
--> (μz2 (D_a(a (μx(a x +1)) + 1) + (D_a(a (μx(a x +1)) + 1)) × z2))
+[a] 
+≅ μy(1 + x × y)
+D >> D_x (1 + x × y)
 
-List a = a List a | []
-[a] -> μx (a x + 1)
-derivative
-D_x(μy (x y + 1))
--> μz (λy(D_x(x y) + 1)(μy(x y + 1)) + λy(D_y(x y + 1))(μy(x y + 1)) × z)
--> μz (λy(y)(μy(x y + 1)) + λy(x(μy(x y + 1))) × z)
--> μz (μy(x y + 1) + x × z)
--> μz (μy(x y + 1) + x × z)
--> μy(x y + 1) + x × μz(μy(x y + 1) + x × z)
--> (x μy(x y + 1) + 1) + x × μz(μy(x y + 1) + x × z)
--> (x μy(x y + 1) + 1) + x × (μy(x y + 1) + x × μz(μy(x y + 1) + x × z))
--> 
+helper definition for list:
+  [a]
+≅ (μy(1 + x × y))
+≅ (1 + x × (μy(1 + x × y)))
+≅ (1 + x × (1 + x × (μy(1 + x × y))))
+≅ (1 + x × (1 + x × (1 + x × (μy(1 + x × y)))))
+≅ 1 + x × (1 + x × (1 + x × ...))
+≅ 1 + x + x^2 + x^3 × ...
 
--> (x μy(x y + 1) + 1) + x × (x × μy(x y + 1) + 1 + x × μz(μy(x y + 1) + x × z))
+F := (1 + y × x)
+  D_x (μy(1 + y × x))
+≅ μz( (λy(D_x(1 + y × x))(μy.F)  +  (λy(D_y(1 + y × x))(μy.F)  × z)
+≅ μz( (λy(y)(μy.F)  +  (λy(x)(μy.F)  × z)
+≅ μz( (μy (1 + y × x))  +  x × z)
+≅ μz( (μy (1 + y × x))  +  x × z)
+≅ (μy (1 + y × x))  +  x × μz((μy (1 + y × x))  +  x × z)
+≅ (μy (1 + y × x))  +  x × ((μy (1 + y × x))  +  x × μz((μy (1 + y × x))  +  x × z))
+≅ [x] + (x×[x] + (x×[x] + (x×[x] + ... ))
+≅ [x] + [x] × (x + x + x + ... ))
+≅ [x] + [x] × x × (1 + 1 + 1 + ... ))
+≅ (1 + x + x^2 + x^3 × ...) + (1 + x + x^2 × x^3 + ...) × x × (1+1+1...)
+≅ (1 + x + x^2 + x^3 × ...) + (1 + x + x^2 × x^3 + ...) × (x+x+x...)
+≅ (1 + x + x^2 + x^3 × ...) + (1 + x + x^2 × x^3 + ...) × ( x + x^2 + x^3 ...)
+≅ (1 + x + x^2 × x^3 + ...) × (1 + x + x^2 + x^3 + ...)
+≅ [x] × [x]
 
--> (x μy(x y + 1) + 1) + x + x^2 × (μy(x y + 1) + μz(μy(x y + 1) + x × z)))
--> x ×   (μy(x y + 1) + 1 + 1 + x × (μy(x y + 1) + μz(μy(x y + 1) + x × z))))
--> x ×   (2 + μy(x y + 1) + x × (μy(x y + 1) + μz(μy(x y + 1) + x × z))))
+Omitted writing descriptions for operations.
 
-
--> μy(x y + 1) × μy(x y + 1)
--> 
-
--> μz (D_x(x (μy(x y +1)) + 1) + (0 + 0 + D_y(μy(x y + 1) + 0) + 0) × z)
--> μz (D_x(x (μy(x y +1)) + 1) + (0 + 0 + 1 + 0) + 0) × z)
--> μz (D_x(x (μy(x y +1)) + 1) + z)
-
--> 1 + D_x(μy(x y +1)) + μz (1 + D_x(μy(x y +1)) + z)
-
-
--> μz (D_x(μy(x y +1)) + (D_x(μy(x y +1))) × z)
--> (D_x(μy(x y +1)) + (D_x(μy(x y +1))) × (μz (D_x(μy(x y +1)) + (D_x(μy(x y +1))) × z)))
-
-...
--> 
--> μx (a x + 1) × μx (a x + 1)
--> μx (a x + 1) × μx (a x + 1)
--> [a]×[a]
-
-
-μy(x y + 1) sarja: 1+x+x^2+x^3+... vs 1+x(1 + x (1 + x (1 + x (...))) 
-
-
-Based on the ability of μy(x y + 1) being represented as a geometric series (1/(1-x))
-we can see that its derivative should be (1/(1-x))^2. But we don't even have a division operation defined for μy(x y + 1) so how does this come? beyond that there are far too many symbols in the paper I don't have the slightest clue about.
-
-the answer is apparently said to be :
-[a]×[a]
 -}
+
+data ListContext a = LC ([a],[a])
+data ListZipper a = LZ (a, ([a],[a]))
 
 ----    Derivative of Stream a from the streams package.
 {-

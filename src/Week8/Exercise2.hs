@@ -14,7 +14,7 @@ import Week8.Exercise1
 import Data.Bifunctor.Join
 import Data.Typeable
 
-data ZipperEnd = ZippersPrematureDeadEnd
+data ZipperEnd = ZippersDeadEnd
      deriving (Show, Typeable)
 
 instance Exception ZipperEnd
@@ -26,7 +26,7 @@ instance Exception ZipperEnd
 
 stepperMaybe :: MonadThrow m => Maybe a -> m (a, ())
 stepperMaybe (Just a) = pure (a,())
-stepperMaybe (Nothing) = throwM ZippersPrematureDeadEnd
+stepperMaybe (Nothing) = throwM ZippersDeadEnd
 
 stepMaybe :: MonadThrow m => (a, ()) -> m (a, ())
 stepMaybe a = pure a
@@ -61,11 +61,11 @@ ZA := (a,[a]×[a])
 
 stepperList :: MonadThrow m => [a] -> m (a,([a], [a]))
 stepperList (x:xs) = pure (x, ([],xs))
-stepperList [] = throwM ZippersPrematureDeadEnd
+stepperList [] = throwM ZippersDeadEnd
 
 stepList :: MonadThrow m => (a,([a], [a])) -> m (a,([a],[a]))
 stepList (a,(as, b:bs)) = pure (b,(a:as,bs))
-stepList (_,(_, [])) = throwM ZippersPrematureDeadEnd
+stepList (_,(_, [])) = throwM ZippersDeadEnd
 
 stepperStream :: MonadThrow m => Stream a -> m (a, ([a],Stream a))
 stepperStream (a :> as) = pure (a, ([],as))
@@ -74,50 +74,6 @@ stepStream :: MonadThrow m => (a, ([a],Stream a)) -> m (a, ([a],Stream a))
 stepStream (a, (as, b :> bs))= pure (b, (a:as, bs))
 
 {-
-list?
-μy(1 + y × a)
-(1 + y × a)
-D >> D(1 + y × a)
-y
-
-
-helper definition for list:
-  [a]
-≅ (μy(1 + x × y))
-≅ (1 + x × (μy(1 + x × y)))
-≅ (1 + x × (1 + x × (μy(1 + x × y))))
-≅ (1 + x × (1 + x × (1 + x × (μy(1 + x × y)))))
-≅ 1 + x × (1 + x × (1 + x × ...))
-≅ 1 + x + x^2 + x^3 × ...
-
-F := (1 + y × x)
-  D_x (μy(1 + y × x))
-≅ μz( (λy(D_x(1 + y × x))(μy.F)  +  (λy(D_y(1 + y × x))(μy.F)  × z)
-≅ μz( (λy(y)(μy.F)  +  (λy(x)(μy.F)  × z)
-≅ μz( (μy (1 + y × x))  +  x × z)
-≅ μz( (μy (1 + y × x))  +  x × z)
-≅ (μy (1 + y × x))  +  x × μz((μy (1 + y × x))  +  x × z)
-≅ (μy (1 + y × x))  +  x × ((μy (1 + y × x))  +  x × μz((μy (1 + y × x))  +  x × z))
-≅ [x] + (x×[x] + (x×[x] + (x×[x] + ... ))
-≅ [x] + [x] × (x + x + x + ... ))
-≅ [x] + [x] × x × (1 + 1 + 1 + ... ))
-≅ (1 + x + x^2 + x^3 × ...) + (1 + x + x^2 × x^3 + ...) × x × (1+1+1...)
-≅ (1 + x + x^2 + x^3 × ...) + (1 + x + x^2 × x^3 + ...) × (x+x+x...)
-≅ (1 + x + x^2 + x^3 × ...) + (1 + x + x^2 × x^3 + ...) × ( x + x^2 + x^3 ...)
-≅ (1 + x + x^2 × x^3 + ...) × (1 + x + x^2 + x^3 + ...)
-≅ [x] × [x]
-
-
-≅ (1 + x + x^2 + x^3 + ...) × (1 + x + x^2 + x^3 + ...)
-≅ (1 + x + x^2 + x^3 + ...) + (1 + x + x^2 + x^3 + ...) × (x + x^2 + x^3 + ...)
-≅ (1 + x + x^2 + x^3 + ...) + (x + x^2 + x^3 + ...)  +
-            (1 + x + x^2 + x^3 + ...) × (x^2 + x^3 + ...)
-
-≅ (1 + x + x^2 + x^3 + ...) + (x + x^2 + x^3 + ...) + (x^2 + x^3 + ...)  +
-                                (1 + x + x^2 + x^3 + ...) × (x^2 + x^3 + ...)
-
-≅
-
 ()
 D(μy.F) ↦ μz.(((D_x F) |y=μy.F) + ((D_y F) |y=μy.F) × z)
 D(F|y=S) ↦ D_x(F|y=S) + D_y(F|y=S) × D_x S
@@ -131,5 +87,5 @@ D >> y^2
 context 
 -}
 
-stepBTree :: MonadThrow m => Binary.Tree a -> m (a, ([a],Stream a))
-stpeBtree = undefined
+--stepBTree :: MonadThrow m => Binary.Tree a -> m (a, ([a],Stream a))
+--stpeBTree = undefined
